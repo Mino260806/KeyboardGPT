@@ -68,3 +68,6 @@ See "Demo Video" above
 - Gemini
 
 More suggestions are welcome !
+
+## Links
+[XDA Link](https://xdaforums.com/t/mod-xposed-integrate-generative-ai-like-chatgpt-in-keyboard.4683421/)
