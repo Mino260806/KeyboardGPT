@@ -29,7 +29,7 @@ public class MainHook implements IXposedHookLoadPackage {
             case "com.google.android.inputmethod.latin":
             case "com.touchtype.swiftkey":
             case "com.syntellia.fleksy.keyboard":
-            case "com.simejikeyboard":
+            default:
                 hookKeyboardWithTranslateFeature(lpparam);
                 break;
         }
