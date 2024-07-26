@@ -43,7 +43,7 @@ public class MainHook implements IXposedHookLoadPackage {
                 if (param.thisObject instanceof EditText) {
                     CharSequence text = (CharSequence) param.args[0];
 
-                    log("sendBeforeTextChanged \"" + text + "\"");
+//                    log("sendBeforeTextChanged \"" + text + "\"");
                     if (brain.setLastText((EditText) param.thisObject, String.valueOf(text))) {
                         param.setResult(null);
                     }
@@ -58,7 +58,7 @@ public class MainHook implements IXposedHookLoadPackage {
                 if (param.thisObject instanceof EditText) {
                     CharSequence text = (CharSequence) param.args[0];
 
-                    log("sendOnTextChanged \"" + text + "\"");
+//                    log("sendOnTextChanged \"" + text + "\"");
                     if (brain.setLastText((EditText) param.thisObject, String.valueOf(text))) {
                         param.setResult(null);
                     }
@@ -73,7 +73,7 @@ public class MainHook implements IXposedHookLoadPackage {
                 if (param.thisObject instanceof EditText) {
                     Editable text = (Editable) param.args[0];
 
-                    log("sendAfterTextChanged \"" + text + "\"");
+//                    log("sendAfterTextChanged \"" + text + "\"");
                     if (brain.setLastText((EditText) param.thisObject, String.valueOf(text))) {
                         param.setResult(null);
                     }
