@@ -38,16 +38,21 @@ public class ChatGPTClient extends LanguageModelClient {
             JSONObject rootJson = new JSONObject();
             rootJson.put("model", getSubModel());
             rootJson.put("messages", messagesJson);
+            rootJson.put("stream", true);
 
             con.setDoOutput(true);
             con.getOutputStream().write(rootJson.toString().getBytes());
 
             return new InputStreamPublisher(con.getInputStream(), line -> {
                 try {
-                    return new JSONObject(line)
+                    JSONObject choice = new JSONObject(line)
                             .getJSONArray("choices")
-                            .getJSONObject(0)
-                            .getJSONObject("delta")
+                            .getJSONObject(0);
+                    if (choice.has("delta")) {
+                        return choice.getJSONObject("delta")
+                                .getString("content");
+                    }
+                    return choice.getJSONObject("message")
                             .getString("content");
                 } catch (JSONException e) {
                     return line;
