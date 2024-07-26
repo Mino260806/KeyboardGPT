@@ -9,6 +9,8 @@ import android.inputmethodservice.InputMethodService;
 import android.os.Bundle;
 import android.view.View;
 
+import androidx.core.content.ContextCompat;
+
 import tn.amin.keyboard_gpt.language_model.LanguageModel;
 import tn.amin.keyboard_gpt.ui.DialogType;
 
@@ -33,6 +35,11 @@ public class UiInteracter {
     private final ConfigInfoProvider mConfigInfoProvider;
     private ConfigChangeListener mConfigChangeListener = null;
     private DialogInterface.OnDismissListener mOnDismissListener = null;
+
+    public UiInteracter(Context context, ConfigInfoProvider configInfoProvider) {
+        mContext = context;
+        mConfigInfoProvider = configInfoProvider;
+    }
 
     private final BroadcastReceiver mDialogResultReceiver = new BroadcastReceiver() {
         @Override
@@ -73,14 +80,10 @@ public class UiInteracter {
         }
     };
 
-    public UiInteracter(Context context, ConfigInfoProvider configInfoProvider) {
-        mContext = context;
-        mConfigInfoProvider = configInfoProvider;
-    }
-
     public void onInputMethodService(InputMethodService inputMethodService) {
         IntentFilter filter = new IntentFilter(ACTION_DIALOG_RESULT);
-        inputMethodService.registerReceiver(mDialogResultReceiver, filter);
+        ContextCompat.registerReceiver(inputMethodService.getApplicationContext(), mDialogResultReceiver,
+                filter, ContextCompat.RECEIVER_EXPORTED);
     }
 
     public void showChoseModelDialog(DialogInterface.OnDismissListener onDismissListener) {
@@ -107,6 +110,6 @@ public class UiInteracter {
     }
 
     public void unregisterService(InputMethodService inputMethodService) {
-        inputMethodService.unregisterReceiver(mDialogResultReceiver);
+        inputMethodService.getApplicationContext().unregisterReceiver(mDialogResultReceiver);
     }
 }
