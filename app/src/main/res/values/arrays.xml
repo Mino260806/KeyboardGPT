@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="xposedscope">
+        <item>com.google.android.inputmethod.latin</item>
+        <item>com.touchtype.swiftkey</item>
+        <item>com.syntellia.fleksy.keyboard</item>
+    </string-array>
+</resources>
