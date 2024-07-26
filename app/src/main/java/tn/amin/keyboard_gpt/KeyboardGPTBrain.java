@@ -60,6 +60,12 @@ public class KeyboardGPTBrain implements ConfigChangeListener, DialogInterface.O
                 return true;
             }
 
+            if (mModelClient.getApiKey() == null || mModelClient.getApiKey().isEmpty()) {
+                mToaster.toastShort(mModelClient.getLanguageModel().label + " is Missing API Key");
+                mInteracter.showChoseModelDialog(this);
+                return true;
+            }
+
             if (mCommandTreater.isConfigureCommand(mLastText)) {
                 mInteracter.showChoseModelDialog(this);
                 return false;
