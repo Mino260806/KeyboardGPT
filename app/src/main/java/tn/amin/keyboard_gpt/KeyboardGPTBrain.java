@@ -112,7 +112,7 @@ public class KeyboardGPTBrain implements ConfigChangeListener, DialogInterface.O
 
                 MainHook.log("onNext: \"" + s + "\"");
 
-                mInputConnection.commitText(s, 0);
+                mInputConnection.commitText(s, 1);
             }
 
             @Override
