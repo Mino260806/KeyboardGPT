@@ -1,12 +1,17 @@
 # Keyboard GPT
 
-An **LSPosed Module** that lets you integrate Generative AI like ChatGPT in keyboard.
+An **LSPosed Module** that lets you integrate Generative AI like ChatGPT in keyboard. **Works in All Apps**
 
-```xml
+<details>
+  <summary>Demo Video</summary>
+
+https://github.com/user-attachments/assets/d00d362d-078f-4d8f-8b17-1544fb62cb37
+
+</details>
+
 <p align="center">
-  <img src="demo/icon.png" alt="Icon"/>
+  <img src="demo/icon_border.png" alt="Icon" style="border: 10px solid black;"/>
 </p>
-```
 
 ## Tested Keyboards
 
@@ -34,7 +39,7 @@ An **LSPosed Module** that lets you integrate Generative AI like ChatGPT in keyb
 
 ## Usage Guide
 
-Open any editable text in your keyboard, and type
+Open any editable text (like translate, search gif, etc) in your keyboard, and type
 
 ```
 ? your prompt
@@ -45,6 +50,13 @@ Select enter to submit your prompt.
 - If first time, a dialog should appear that lets you select your preferred language model then input your API Key. Select enter again.
 
 - You will get a realtime AI Generated response typed automatically typed by the keyboard
+
+If you want to select / configure a language model, then type before selecting Enter
+```
+??
+```
+
+See "Demo Video" above
 
 ## Supported Generative AIs
 
