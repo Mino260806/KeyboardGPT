@@ -47,11 +47,12 @@ Open any editable text (like translate, search gif, etc) in your keyboard, and t
 
 Select enter to submit your prompt.
 
-- If first time, a dialog should appear that lets you select your preferred language model then input your API Key. Select enter again.
+- If first time, a dialog should appear that lets you select your preferred language model then input your API Key. Select enter again when finished.
 
-- You will get a realtime AI Generated response typed automatically typed by the keyboard
+- You will get a realtime AI Generated response typed automatically typed by the keyboard.
 
 If you want to select / configure a language model, then type before selecting Enter
+
 ```
 ??
 ```
@@ -65,5 +66,3 @@ See "Demo Video" above
 - Gemini
 
 More suggestions are welcome !
-
-
