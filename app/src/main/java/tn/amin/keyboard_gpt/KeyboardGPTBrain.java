@@ -157,7 +157,7 @@ public class KeyboardGPTBrain implements ConfigChangeListener, DialogInterface.O
     @Override
     public void onApiKeyChange(LanguageModel languageModel, String apiKey) {
         mSPManager.setApiKey(languageModel, apiKey);
-        if (mModelClient != null) {
+        if (mModelClient != null && mModelClient.getLanguageModel() == languageModel) {
             mModelClient.setApiKey(apiKey);
         }
     }
@@ -165,8 +165,16 @@ public class KeyboardGPTBrain implements ConfigChangeListener, DialogInterface.O
     @Override
     public void onSubModelChange(LanguageModel languageModel, String subModel) {
         mSPManager.setSubModel(languageModel, subModel);
-        if (mModelClient != null) {
+        if (mModelClient != null && mModelClient.getLanguageModel() == languageModel) {
             mModelClient.setSubModel(subModel);
+        }
+    }
+
+    @Override
+    public void onBaseUrlChange(LanguageModel languageModel, String baseUrl) {
+        mSPManager.setBaseUrl(languageModel, baseUrl);
+        if (mModelClient != null && mModelClient.getLanguageModel() == languageModel) {
+            mModelClient.setBaseUrl(baseUrl);
         }
     }
 
@@ -181,6 +189,7 @@ public class KeyboardGPTBrain implements ConfigChangeListener, DialogInterface.O
         mModelClient = LanguageModelClient.forModel(model);
         mModelClient.setApiKey(mSPManager.getApiKey(model));
         mModelClient.setSubModel(mSPManager.getSubModel(model));
+        mModelClient.setBaseUrl(mSPManager.getBaseUrl(model));
     }
 
     private void setText(String text) {

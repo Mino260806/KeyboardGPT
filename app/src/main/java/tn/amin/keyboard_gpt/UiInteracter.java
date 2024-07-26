@@ -23,9 +23,11 @@ public class UiInteracter {
 
     public static final String EXTRA_CONFIG_LANGUAGE_MODEL = "tn.amin.keyboard_gpt.config.model";
 
-    public static final String EXTRA_CONFIG_LANGUAGE_MODEL_API_KEY = "tn.amin.keyboard_gpt.config.model.EXTRA_CONFIG_BUNDLE_API_KEY";
+    public static final String EXTRA_CONFIG_LANGUAGE_MODEL_BASE_URL = "tn.amin.keyboard_gpt.config.model.BASE_URL";
 
-    public static final String EXTRA_CONFIG_LANGUAGE_MODEL_SUB_MODEL = "tn.amin.keyboard_gpt.config.model.EXTRA_CONFIG_BUNDLE_SUB_MODEL";
+    public static final String EXTRA_CONFIG_LANGUAGE_MODEL_API_KEY = "tn.amin.keyboard_gpt.config.model.API_KEY";
+
+    public static final String EXTRA_CONFIG_LANGUAGE_MODEL_SUB_MODEL = "tn.amin.keyboard_gpt.config.model.SUB_MODEL";
 
 
     private final ConfigInfoProvider mConfigInfoProvider;
@@ -54,9 +56,11 @@ public class UiInteracter {
 
                                     String apiKey = languageModelBundle.getString(EXTRA_CONFIG_LANGUAGE_MODEL_API_KEY);
                                     String subModel = languageModelBundle.getString(EXTRA_CONFIG_LANGUAGE_MODEL_SUB_MODEL);
+                                    String baseUrl = languageModelBundle.getString(EXTRA_CONFIG_LANGUAGE_MODEL_BASE_URL);
 
                                     mConfigChangeListener.onApiKeyChange(languageModel, apiKey);
                                     mConfigChangeListener.onSubModelChange(languageModel, subModel);
+                                    mConfigChangeListener.onBaseUrlChange(languageModel, baseUrl);
                                 }
                                 break;
                         }

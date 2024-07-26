@@ -60,14 +60,18 @@ public class DialogActivity extends Activity {
         String subModel = modelConfig.getString(UiInteracter.EXTRA_CONFIG_LANGUAGE_MODEL_SUB_MODEL);
         subModel = subModel != null ? subModel : mSelectedModel.defaultSubModel;
         String apiKey = modelConfig.getString(UiInteracter.EXTRA_CONFIG_LANGUAGE_MODEL_API_KEY);
+        String baseUrl = modelConfig.getString(UiInteracter.EXTRA_CONFIG_LANGUAGE_MODEL_BASE_URL);
+        baseUrl = baseUrl != null ? baseUrl : mSelectedModel.defaultBaseUrl;
 
         LinearLayout layout = (LinearLayout)
                 getLayoutInflater().inflate(R.layout.dialog_configue_model, null);
 
         EditText apiKeyEditText = layout.findViewById(R.id.edit_apikey);
         EditText subModelEditText = layout.findViewById(R.id.edit_model);
+        EditText baseUrlEditText = layout.findViewById(R.id.edit_baseurl);
         apiKeyEditText.setText(apiKey);
         subModelEditText.setText(subModel);
+        baseUrlEditText.setText(baseUrl);
 
         return new AlertDialog.Builder(this)
                 .setTitle(mSelectedModel.label + " configuration")
@@ -77,6 +81,8 @@ public class DialogActivity extends Activity {
                             apiKeyEditText.getText().toString());
                     modelConfig.putString(UiInteracter.EXTRA_CONFIG_LANGUAGE_MODEL_SUB_MODEL,
                             subModelEditText.getText().toString());
+                    modelConfig.putString(UiInteracter.EXTRA_CONFIG_LANGUAGE_MODEL_BASE_URL,
+                            baseUrlEditText.getText().toString());
                     dialog.dismiss();
                 })
                 .setNegativeButton("Cancel", (dialog, which) -> {

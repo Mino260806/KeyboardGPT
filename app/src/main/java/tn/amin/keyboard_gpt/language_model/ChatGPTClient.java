@@ -12,15 +12,13 @@ import tn.amin.keyboard_gpt.language_model.publisher.ExceptionPublisher;
 import tn.amin.keyboard_gpt.language_model.publisher.InputStreamPublisher;
 
 public class ChatGPTClient extends LanguageModelClient {
-    private static final String BASE_URL = "https://api.openai.com";
-
     @Override
     public Publisher<String> submitPrompt(String prompt) {
         if (getApiKey() == null || getApiKey().isEmpty()) {
             return LanguageModelClient.MISSING_API_KEY_PUBLISHER;
         }
 
-        String url = BASE_URL + "/v1/chat/completions";
+        String url = getBaseUrl() + "/v1/chat/completions";
         HttpURLConnection con;
         try {
             con = (HttpURLConnection) new URL(url).openConnection();

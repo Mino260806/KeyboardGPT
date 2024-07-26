@@ -22,6 +22,8 @@ public class SPManager implements ConfigInfoProvider {
 
     private static final String PREF_SUB_MODEL = "%s.sub_model";
 
+    private static final String PREF_BASE_URL = "%s.base_url";
+
     private final SharedPreferences mSP;
 
     public SPManager(Context context) {
@@ -61,6 +63,16 @@ public class SPManager implements ConfigInfoProvider {
         return mSP.getString(key, null);
     }
 
+    public void setBaseUrl(LanguageModel model, String baseUrl) {
+        String key = String.format(PREF_BASE_URL, model.name());
+        mSP.edit().putString(key, baseUrl).apply();
+    }
+
+    public String getBaseUrl(LanguageModel model) {
+        String key = String.format(PREF_BASE_URL, model.name());
+        return mSP.getString(key, null);
+    }
+
     public Map<LanguageModel, String> getApiKeyMap() {
         return Arrays.stream(LanguageModel.values())
                 .collect(Collectors.toMap(model -> model, model -> {
@@ -79,6 +91,7 @@ public class SPManager implements ConfigInfoProvider {
 
             configBundle.putString(UiInteracter.EXTRA_CONFIG_LANGUAGE_MODEL_API_KEY, getApiKey(model));
             configBundle.putString(UiInteracter.EXTRA_CONFIG_LANGUAGE_MODEL_SUB_MODEL, getSubModel(model));
+            configBundle.putString(UiInteracter.EXTRA_CONFIG_LANGUAGE_MODEL_BASE_URL, getBaseUrl(model));
 
             bundle.putBundle(model.name(), configBundle);
         }

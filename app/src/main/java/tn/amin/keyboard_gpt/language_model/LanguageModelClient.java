@@ -9,6 +9,8 @@ public abstract class LanguageModelClient {
 
     private String mSubModel = null;
 
+    private String mBaseUrl = null;
+
     abstract public Publisher<String> submitPrompt(String prompt);
 
     abstract public LanguageModel getLanguageModel();
@@ -21,12 +23,20 @@ public abstract class LanguageModelClient {
         mSubModel = subModel;
     }
 
+    public void setBaseUrl(String baseUrl) {
+        mBaseUrl = baseUrl;
+    }
+
     public String getSubModel() {
         return mSubModel != null ? mSubModel : getLanguageModel().defaultSubModel;
     }
 
     public String getApiKey() {
         return mApiKey;
+    }
+
+    public String getBaseUrl() {
+        return mBaseUrl != null ? mBaseUrl : getLanguageModel().defaultBaseUrl;
     }
 
     public static LanguageModelClient forModel(LanguageModel model) {

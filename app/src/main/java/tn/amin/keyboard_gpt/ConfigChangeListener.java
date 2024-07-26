@@ -8,4 +8,6 @@ public interface ConfigChangeListener {
     void onApiKeyChange(LanguageModel languageModel, String apiKey);
 
     void onSubModelChange(LanguageModel languageModel, String subModel);
+
+    void onBaseUrlChange(LanguageModel languageModel, String baseUrl);
 }

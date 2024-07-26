@@ -8,17 +8,19 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public enum LanguageModel {
-    Gemini("Gemini", "gemini-1.5-flash"),
-    ChatGPT("ChatGPT", "gpt-4o-mini"),
+    Gemini("Gemini", "gemini-1.5-flash", "Not configurable"),
+    ChatGPT("ChatGPT", "gpt-4o-mini", "https://api.openai.com"),
 //    HuggingChat("Hugging Chat"),
     ;
 
     public final String label;
     public final String defaultSubModel;
+    public final String defaultBaseUrl;
 
-    LanguageModel(String label, String defaultSubModel) {
+    LanguageModel(String label, String defaultSubModel, String defaultBaseUrl) {
         this.label = label;
         this.defaultSubModel = defaultSubModel;
+        this.defaultBaseUrl = defaultBaseUrl;
     }
 
     public static Map<LanguageModel, String> decodeMap(String raw) {
