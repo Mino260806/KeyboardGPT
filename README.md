@@ -2,6 +2,12 @@
 
 An **LSPosed Module** that lets you integrate Generative AI like ChatGPT in keyboard.
 
+```xml
+<p align="center">
+  <img src="demo/icon.png" alt="Icon"/>
+</p>
+```
+
 ## Tested Keyboards
 
 - [Gboard](https://play.google.com/store/apps/details?id=com.google.android.inputmethod.latin)
