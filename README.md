@@ -59,6 +59,8 @@ If you want to select / configure a language model, then type before selecting E
 
 See "Demo Video" above
 
+**<u>Bonus Tip</u>**: Google offers Gemini API for free. Grab a key in [google aistudio](https://aistudio.google.com/app/apikey)
+
 ## Supported Generative AIs
 
 - ChatGPT
