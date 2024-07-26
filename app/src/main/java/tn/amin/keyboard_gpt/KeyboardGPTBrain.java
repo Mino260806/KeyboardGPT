@@ -12,6 +12,7 @@ import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 
 import java.lang.ref.WeakReference;
+import java.util.logging.Logger;
 
 import de.robv.android.xposed.XposedBridge;
 import tn.amin.keyboard_gpt.language_model.LanguageModel;
@@ -182,6 +183,7 @@ public class KeyboardGPTBrain implements ConfigChangeListener, DialogInterface.O
     public void onDismiss(DialogInterface dialog) {
         commandTreatEnd();
 
+        MainHook.log("Selected " + mModelClient);
         mToaster.toastShort("Selected " + mModelClient);
     }
 
