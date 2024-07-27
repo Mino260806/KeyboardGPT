@@ -3,6 +3,7 @@ package tn.amin.keyboard_gpt;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.inputmethodservice.InputMethodService;
+import android.os.Handler;
 import android.text.InputType;
 import android.view.inputmethod.InputConnection;
 import android.widget.EditText;
@@ -120,6 +121,8 @@ public class KeyboardGPTBrain implements ConfigChangeListener, DialogInterface.O
         Publisher<String> publisher = mModelClient.submitPrompt(prompt);
 
         publisher.subscribe(new Subscriber<String>() {
+            boolean completed = false;
+
             @Override
             public void onSubscribe(Subscription s) {
                 s.request(Long.MAX_VALUE);
@@ -141,11 +144,21 @@ public class KeyboardGPTBrain implements ConfigChangeListener, DialogInterface.O
                 XposedBridge.log(t);
                 commandTreatEnd();
 
-                mToaster.toastLong(t.getClass().getName() + " : " + t.getMessage() + " (see logs)");
+                mEditText.get().post(() -> {
+                    mToaster.toastLong(t.getClass().getName() + " : " + t.getMessage() + " (see logs)");
+                });
+
+                onComplete();
             }
 
             @Override
             public void onComplete() {
+                if (completed) {
+                    MainHook.log("Skipping dumlicate onComplete");
+                    return;
+                }
+                completed = true;
+
                 commandTreatEnd();
                 mLastText = null;
                 mEditText.get().post(() -> {
