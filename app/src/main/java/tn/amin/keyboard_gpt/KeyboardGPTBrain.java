@@ -141,7 +141,7 @@ public class KeyboardGPTBrain implements ConfigChangeListener, DialogInterface.O
                 XposedBridge.log(t);
                 commandTreatEnd();
 
-                mToaster.toastLong(t.getClass().getName() + ", read logs for more info");
+                mToaster.toastLong(t.getClass().getName() + " : " + t.getMessage() + " (see logs)");
             }
 
             @Override
