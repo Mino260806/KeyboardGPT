@@ -88,6 +88,8 @@ public class UiInteracter {
         intent.putExtra(EXTRA_CONFIG_LANGUAGE_MODEL, mConfigInfoProvider.getConfigBundle());
         intent.putExtra(EXTRA_CONFIG_SELECTED_MODEL,
                 mConfigInfoProvider.getLanguageModel().name());
+
+        MainHook.log("Launching configure dialog");
         mContext.startActivity(intent);
     }
 

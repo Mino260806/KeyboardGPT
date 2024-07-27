@@ -13,4 +13,8 @@ public class Toaster {
     public void toastShort(String message) {
         Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
     }
+
+    public void toastLong(String message) {
+        Toast.makeText(mContext, message, Toast.LENGTH_LONG).show();
+    }
 }
