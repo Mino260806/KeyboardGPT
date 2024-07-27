@@ -99,24 +99,18 @@ public class MainHook implements IXposedHookLoadPackage {
                     }
                 });
 
-        XposedHelpers.findAndHookMethod(InputMethodService.class, "getCurrentInputConnection", new XC_MethodHook() {
-            boolean once = false;
+        XposedHelpers.findAndHookMethod(InputMethodService.class, "onCreate", new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                brain.setInputConnection((InputConnection) param.getResult());
-                if (!once) {
-                    once = true;
-
-                    log("getCurrentInputConnection");
-                    brain.getInteracter().onInputMethodService((InputMethodService) param.thisObject);
-                }
+                MainHook.log("InputMethodService onCreate");
+                brain.onInputMethodCreate((InputMethodService) param.thisObject);
             }
         });
 
         XposedHelpers.findAndHookMethod(InputMethodService.class, "onDestroy", new XC_MethodHook() {
-            boolean once = false;
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                MainHook.log("InputMethodService onDestroy");
                 brain.onInputMethodDestroy((InputMethodService) param.thisObject);
             }
         });

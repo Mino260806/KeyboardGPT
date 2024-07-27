@@ -21,7 +21,7 @@ import tn.amin.keyboard_gpt.language_model.LanguageModelClient;
 public class KeyboardGPTBrain implements ConfigChangeListener, DialogInterface.OnDismissListener {
     private String mLastText = null;
 
-    private InputConnection mInputConnection = null;
+    private InputMethodService mInputMethodService = null;
     private boolean mTreatingCommand = false;
 
     private WeakReference<EditText> mEditText = null;
@@ -113,7 +113,7 @@ public class KeyboardGPTBrain implements ConfigChangeListener, DialogInterface.O
 
                 MainHook.log("onNext: \"" + s + "\"");
 
-                mInputConnection.commitText(s, 1);
+                getInputConnection().commitText(s, 1);
             }
 
             @Override
@@ -134,8 +134,8 @@ public class KeyboardGPTBrain implements ConfigChangeListener, DialogInterface.O
         });
     }
 
-    public void setInputConnection(InputConnection inputConnection) {
-        mInputConnection = inputConnection;
+    private InputConnection getInputConnection() {
+        return mInputMethodService.getCurrentInputConnection();
     }
 
     public boolean isEditTextOwned() {
@@ -209,6 +209,12 @@ public class KeyboardGPTBrain implements ConfigChangeListener, DialogInterface.O
     }
 
     public void onInputMethodDestroy(InputMethodService inputMethodService) {
+        mInputMethodService = null;
         getInteracter().unregisterService(inputMethodService);
+    }
+
+    public void onInputMethodCreate(InputMethodService inputMethodService) {
+        mInputMethodService = inputMethodService;
+        getInteracter().registerService(inputMethodService);
     }
 }

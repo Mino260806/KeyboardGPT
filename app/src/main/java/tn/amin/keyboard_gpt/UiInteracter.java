@@ -80,12 +80,6 @@ public class UiInteracter {
         }
     };
 
-    public void onInputMethodService(InputMethodService inputMethodService) {
-        IntentFilter filter = new IntentFilter(ACTION_DIALOG_RESULT);
-        ContextCompat.registerReceiver(inputMethodService.getApplicationContext(), mDialogResultReceiver,
-                filter, ContextCompat.RECEIVER_EXPORTED);
-    }
-
     public void showChoseModelDialog(DialogInterface.OnDismissListener onDismissListener) {
         mOnDismissListener = onDismissListener;
         Intent intent = new Intent("tn.amin.keyboard_gpt.OVERLAY");
@@ -107,6 +101,12 @@ public class UiInteracter {
 
     public void registerConfigChangeListener(ConfigChangeListener listener) {
         mConfigChangeListener = listener;
+    }
+
+    public void registerService(InputMethodService inputMethodService) {
+        IntentFilter filter = new IntentFilter(ACTION_DIALOG_RESULT);
+        ContextCompat.registerReceiver(inputMethodService.getApplicationContext(), mDialogResultReceiver,
+                filter, ContextCompat.RECEIVER_EXPORTED);
     }
 
     public void unregisterService(InputMethodService inputMethodService) {
