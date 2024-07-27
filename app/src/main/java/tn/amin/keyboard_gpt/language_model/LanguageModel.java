@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 public enum LanguageModel {
     Gemini("Gemini", "gemini-1.5-flash", "Not configurable"),
     ChatGPT("ChatGPT", "gpt-4o-mini", "https://api.openai.com"),
-    Groq("Groq", "", "https://api.groq.com/openai"),
+    Groq("Groq", "llama3-8b-8192", "https://api.groq.com/openai"),
 //    HuggingChat("Hugging Chat"),
     ;
 
