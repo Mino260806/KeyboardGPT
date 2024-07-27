@@ -145,7 +145,7 @@ public class KeyboardGPTBrain implements ConfigChangeListener, DialogInterface.O
                 commandTreatEnd();
 
                 mEditText.get().post(() -> {
-                    mToaster.toastLong(t.getClass().getName() + " : " + t.getMessage() + " (see logs)");
+                    mToaster.toastLong(t.getClass().getSimpleName() + " : " + t.getMessage() + " (see logs)");
                 });
 
                 onComplete();

@@ -1,13 +1,21 @@
 package tn.amin.keyboard_gpt.language_model;
 
+import android.net.http.HttpException;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.reactivestreams.Publisher;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.stream.Collectors;
 
+import tn.amin.keyboard_gpt.MainHook;
 import tn.amin.keyboard_gpt.language_model.publisher.ExceptionPublisher;
 import tn.amin.keyboard_gpt.language_model.publisher.InputStreamPublisher;
 
@@ -39,23 +47,49 @@ public class ChatGPTClient extends LanguageModelClient {
             rootJson.put("stream", true);
 
             con.setDoOutput(true);
-            con.getOutputStream().write(rootJson.toString().getBytes());
 
-            return new InputStreamPublisher(con.getInputStream(), line -> {
-                try {
-                    JSONObject choice = new JSONObject(line)
-                            .getJSONArray("choices")
-                            .getJSONObject(0);
-                    if (choice.has("delta")) {
-                        return choice.getJSONObject("delta")
+            try (OutputStream os = con.getOutputStream()) {
+                byte[] input = rootJson.toString().getBytes(StandardCharsets.UTF_8);
+                os.write(input, 0, input.length);
+            }
+
+            int responseCode = con.getResponseCode();
+            MainHook.log("Received response with code " + responseCode);
+
+            if (responseCode == 200) {
+                return new InputStreamPublisher(con.getInputStream(), line -> {
+                    try {
+                        JSONObject choice = new JSONObject(line)
+                                .getJSONArray("choices")
+                                .getJSONObject(0);
+                        if (choice.has("delta")) {
+                            return choice.getJSONObject("delta")
+                                    .getString("content");
+                        }
+                        return choice.getJSONObject("message")
                                 .getString("content");
+                    } catch (JSONException e) {
+                        return line;
                     }
-                    return choice.getJSONObject("message")
-                            .getString("content");
-                } catch (JSONException e) {
-                    return line;
+                });
+            }
+
+            else {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(con.getErrorStream()));
+                String response = reader.lines().collect(Collectors.joining(""));
+                JSONObject responseJson = new JSONObject(response);
+                if (responseJson.has("error")) {
+                    JSONObject errorJson = responseJson
+                            .getJSONObject("error");
+                    String message = errorJson.getString("message");
+                    String type = errorJson.getString("type");
+
+                    throw new IllegalArgumentException("(" + type + ") " + message);
                 }
-            });
+                else {
+                    throw new IllegalArgumentException(response);
+                }
+            }
         } catch (Exception e) {
             return new ExceptionPublisher(e);
         }
