@@ -23,6 +23,7 @@ public class KeyboardGPTBrain implements ConfigChangeListener, DialogInterface.O
 
     private InputMethodService mInputMethodService = null;
     private boolean mTreatingCommand = false;
+    private long mLastDialogLaunch = 0L;
 
     private WeakReference<EditText> mEditText = null;
 
@@ -53,31 +54,49 @@ public class KeyboardGPTBrain implements ConfigChangeListener, DialogInterface.O
     }
 
     public boolean handleClearText() {
-        if (!mTreatingCommand && mCommandTreater.isPrompt(mLastText)) {
-            commandTreatStart();
-
-            if (mModelClient == null) {
-                mToaster.toastLong("Chose and configure your language model");
-                mInteracter.showChoseModelDialog(this);
-                return true;
-            }
-
-            if (mModelClient.getApiKey() == null || mModelClient.getApiKey().isEmpty()) {
-                mToaster.toastLong(mModelClient.getLanguageModel().label + " is Missing API Key");
-                mInteracter.showChoseModelDialog(this);
-                return true;
-            }
-
-            if (mCommandTreater.isConfigureCommand(mLastText)) {
-                mInteracter.showChoseModelDialog(this);
-                return false;
-            }
-
-            final String lastText = mLastText;
-            new Thread(() -> generateResponse(lastText)).start();
+        if (!mCommandTreater.isPrompt(mLastText)) {
+            MainHook.log("Aborting handleClearText because text is not a command");
+            return false;
         }
 
+        commandTreatStart();
+
+        if (mModelClient == null) {
+            if (showChooseModelDialog()) {
+                mToaster.toastLong("Chose and configure your language model");
+            }
+            return true;
+        }
+
+        if (mModelClient.getApiKey() == null || mModelClient.getApiKey().isEmpty()) {
+            if (showChooseModelDialog()) {
+                mToaster.toastLong(mModelClient.getLanguageModel().label + " is Missing API Key");
+            }
+            return true;
+        }
+
+        if (mCommandTreater.isConfigureCommand(mLastText)) {
+            if (showChooseModelDialog()) {
+                mToaster.toastLong("Chose and configure your language model");
+            }
+            return false;
+        }
+
+        final String lastText = mLastText;
+        new Thread(() -> generateResponse(lastText)).start();
+
         return false;
+    }
+
+    private boolean showChooseModelDialog() {
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - mLastDialogLaunch < 3000) {
+            MainHook.log("Preventing spam dialog launch. (" + currentTime + " ~ " + mLastDialogLaunch + ")");
+            return false;
+        }
+        mLastDialogLaunch = currentTime;
+        mInteracter.showChoseModelDialog(this);
+        return true;
     }
 
     public void generateResponse(String lastText) {
@@ -120,6 +139,7 @@ public class KeyboardGPTBrain implements ConfigChangeListener, DialogInterface.O
             @Override
             public void onError(Throwable t) {
                 XposedBridge.log(t);
+                commandTreatEnd();
             }
 
             @Override
