@@ -32,13 +32,24 @@ public class UiInteracter {
     public static final String EXTRA_CONFIG_LANGUAGE_MODEL_SUB_MODEL = "tn.amin.keyboard_gpt.config.model.SUB_MODEL";
 
 
+    public static final String EXTRA_WEBVIEW_TITLE = "tn.amin.keyboard_gpt.webview.TITLE";
+
+    public static final String EXTRA_WEBVIEW_URL = "tn.amin.keyboard_gpt.webview.URL";
+
+
     private final ConfigInfoProvider mConfigInfoProvider;
     private ConfigChangeListener mConfigChangeListener = null;
     private DialogInterface.OnDismissListener mOnDismissListener = null;
 
+    private long mLastDialogLaunch = 0L;
+
     public UiInteracter(Context context, ConfigInfoProvider configInfoProvider) {
         mContext = context;
         mConfigInfoProvider = configInfoProvider;
+    }
+
+    public void setOnDismissListener(DialogInterface.OnDismissListener listener) {
+        mOnDismissListener = listener;
     }
 
     private final BroadcastReceiver mDialogResultReceiver = new BroadcastReceiver() {
@@ -80,8 +91,11 @@ public class UiInteracter {
         }
     };
 
-    public void showChoseModelDialog(DialogInterface.OnDismissListener onDismissListener) {
-        mOnDismissListener = onDismissListener;
+    public boolean showChoseModelDialog() {
+        if (isDialogOnCooldown()) {
+            return false;
+        }
+
         Intent intent = new Intent("tn.amin.keyboard_gpt.OVERLAY");
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra(EXTRA_DIALOG_TYPE, DialogType.ChoseModel.name());
@@ -91,6 +105,24 @@ public class UiInteracter {
 
         MainHook.log("Launching configure dialog");
         mContext.startActivity(intent);
+        return true;
+    }
+
+    public boolean showWebSearchDialog(String title, String url) {
+        if (isDialogOnCooldown()) {
+            return false;
+        }
+
+        Intent intent = new Intent("tn.amin.keyboard_gpt.OVERLAY");
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra(EXTRA_DIALOG_TYPE, DialogType.WebSearch.name());
+        intent.putExtra(EXTRA_WEBVIEW_TITLE, title);
+        intent.putExtra(EXTRA_WEBVIEW_URL, url);
+
+        MainHook.log("Launching web search");
+        mContext.startActivity(intent);
+
+        return true;
     }
 
     boolean onceFeedView = false;
@@ -113,5 +145,16 @@ public class UiInteracter {
 
     public void unregisterService(InputMethodService inputMethodService) {
         inputMethodService.getApplicationContext().unregisterReceiver(mDialogResultReceiver);
+    }
+
+
+    private boolean isDialogOnCooldown() {
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - mLastDialogLaunch < 3000) {
+            MainHook.log("Preventing spam dialog launch. (" + currentTime + " ~ " + mLastDialogLaunch + ")");
+            return true;
+        }
+        mLastDialogLaunch = currentTime;
+        return false;
     }
 }

@@ -24,7 +24,6 @@ public class KeyboardGPTBrain implements ConfigChangeListener, DialogInterface.O
 
     private InputMethodService mInputMethodService = null;
     private boolean mTreatingCommand = false;
-    private long mLastDialogLaunch = 0L;
 
     private WeakReference<EditText> mEditText = null;
 
@@ -41,6 +40,7 @@ public class KeyboardGPTBrain implements ConfigChangeListener, DialogInterface.O
         mCommandTreater = new CommandTreater();
         mToaster = new Toaster(context);
 
+        mInteracter.setOnDismissListener(this);
         mInteracter.registerConfigChangeListener(this);
         if (mSPManager.hasLanguageModel()) {
             setModel(mSPManager.getLanguageModel());
@@ -63,23 +63,27 @@ public class KeyboardGPTBrain implements ConfigChangeListener, DialogInterface.O
         commandTreatStart();
 
         if (mModelClient == null) {
-            if (showChooseModelDialog()) {
+            if (mInteracter.showChoseModelDialog()) {
                 mToaster.toastLong("Chose and configure your language model");
             }
             return true;
         }
 
         if (mModelClient.getApiKey() == null || mModelClient.getApiKey().isEmpty()) {
-            if (showChooseModelDialog()) {
+            if (mInteracter.showChoseModelDialog()) {
                 mToaster.toastLong(mModelClient.getLanguageModel().label + " is Missing API Key");
             }
             return true;
         }
 
         if (mCommandTreater.isConfigureCommand(mLastText)) {
-            if (showChooseModelDialog()) {
+            if (mInteracter.showChoseModelDialog()) {
                 mToaster.toastLong("Chose and configure your language model");
             }
+            return false;
+        }
+
+        if (mCommandTreater.consumeIfCommand(mLastText, getInteracter())) {
             return false;
         }
 
@@ -87,17 +91,6 @@ public class KeyboardGPTBrain implements ConfigChangeListener, DialogInterface.O
         new Thread(() -> generateResponse(lastText)).start();
 
         return false;
-    }
-
-    private boolean showChooseModelDialog() {
-        long currentTime = System.currentTimeMillis();
-        if (currentTime - mLastDialogLaunch < 3000) {
-            MainHook.log("Preventing spam dialog launch. (" + currentTime + " ~ " + mLastDialogLaunch + ")");
-            return false;
-        }
-        mLastDialogLaunch = currentTime;
-        mInteracter.showChoseModelDialog(this);
-        return true;
     }
 
     public void generateResponse(String lastText) {
@@ -253,4 +246,6 @@ public class KeyboardGPTBrain implements ConfigChangeListener, DialogInterface.O
         mInputMethodService = inputMethodService;
         getInteracter().registerService(inputMethodService);
     }
+
+
 }
