@@ -61,11 +61,13 @@ See "Demo Video" above
 
 **<u>Bonus Tip</u>**: Google offers Gemini API for free. Grab a key in [google aistudio](https://aistudio.google.com/app/apikey)
 
-## Supported Generative AIs
+## Supported Generative AI APIs
 
 - ChatGPT
 
 - Gemini
+
+- Groq
 
 More suggestions are welcome !
 
