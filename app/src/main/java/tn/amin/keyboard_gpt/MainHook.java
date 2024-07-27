@@ -132,4 +132,8 @@ public class MainHook implements IXposedHookLoadPackage {
     public static void log(String message) {
         XposedBridge.log("(KeyboardGPT) " + message);
     }
+
+    public static void log(Throwable t) {
+        XposedBridge.log(t);
+    }
 }

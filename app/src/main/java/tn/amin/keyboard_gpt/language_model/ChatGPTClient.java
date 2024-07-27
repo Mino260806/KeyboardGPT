@@ -58,6 +58,9 @@ public class ChatGPTClient extends LanguageModelClient {
 
             if (responseCode == 200) {
                 return new InputStreamPublisher(con.getInputStream(), line -> {
+                    if (line.startsWith("data:")) {
+                        line = line.substring("data:".length()).trim();
+                    }
                     try {
                         JSONObject choice = new JSONObject(line)
                                 .getJSONArray("choices")
@@ -69,7 +72,8 @@ public class ChatGPTClient extends LanguageModelClient {
                         return choice.getJSONObject("message")
                                 .getString("content");
                     } catch (JSONException e) {
-                        return line;
+                        MainHook.log(e);
+                        return "";
                     }
                 });
             }
