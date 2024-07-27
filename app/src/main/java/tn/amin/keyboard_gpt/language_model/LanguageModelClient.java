@@ -47,8 +47,10 @@ public abstract class LanguageModelClient {
                 return new ChatGPTClient();
 //            case HuggingChat:
 //                return new HuggingChatClient();
+            case Groq:
+                return new GroqClient();
             default:
-                return new GeminiClient();
+                return new ChatGPTClient();
         }
     }
 
