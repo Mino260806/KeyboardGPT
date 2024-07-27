@@ -140,6 +140,8 @@ public class KeyboardGPTBrain implements ConfigChangeListener, DialogInterface.O
             public void onError(Throwable t) {
                 XposedBridge.log(t);
                 commandTreatEnd();
+
+                getInputConnection().commitText(t.getClass().getSimpleName() + " : " + t.getMessage(), 1);
             }
 
             @Override
