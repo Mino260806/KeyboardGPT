@@ -19,7 +19,7 @@ public class HuggingChatClient extends LanguageModelClient {
     private static final String BASE_URL = "https://huggingface.co";
 
     @Override
-    public Publisher<String> submitPrompt(String prompt) {
+    public Publisher<String> submitPrompt(String prompt, String systemMessage) {
         String url;
         HttpURLConnection con;
         try {

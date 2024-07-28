@@ -17,9 +17,13 @@ import tn.amin.keyboard_gpt.language_model.publisher.GeminiPublisherWrapper;
 
 public class GeminiClient extends LanguageModelClient {
     @Override
-    public Publisher<String> submitPrompt(String prompt) {
+    public Publisher<String> submitPrompt(String prompt, String systemMessage) {
         if (getApiKey() == null || getApiKey().isEmpty()) {
             return MISSING_API_KEY_PUBLISHER;
+        }
+
+        if (systemMessage == null) {
+            systemMessage = getDefaultSystemMessage();
         }
 
         GenerationConfig.Builder configBuilder = new GenerationConfig.Builder();
@@ -43,11 +47,17 @@ public class GeminiClient extends LanguageModelClient {
 
         GenerativeModelFutures model = GenerativeModelFutures.from(gm);
 
-        Content content = new Content.Builder()
+        Content userContent = new Content.Builder()
                 .addText(prompt)
                 .build();
 
-        Publisher<GenerateContentResponse> publisher = model.generateContentStream(content);
+        Publisher<GenerateContentResponse> publisher;
+        Content.Builder systemContentBuilder = new Content.Builder()
+                .addText(systemMessage);
+        systemContentBuilder.setRole("system");
+        Content systemContent = systemContentBuilder.build();
+
+        publisher = model.generateContentStream(systemContent, userContent);
         return new GeminiPublisherWrapper(publisher);
     }
 

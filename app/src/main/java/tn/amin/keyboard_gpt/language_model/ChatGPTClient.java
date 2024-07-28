@@ -22,9 +22,13 @@ import tn.amin.keyboard_gpt.language_model.publisher.InputStreamPublisher;
 
 public class ChatGPTClient extends LanguageModelClient {
     @Override
-    public Publisher<String> submitPrompt(String prompt) {
+    public Publisher<String> submitPrompt(String prompt, String systemMessage) {
         if (getApiKey() == null || getApiKey().isEmpty()) {
             return LanguageModelClient.MISSING_API_KEY_PUBLISHER;
+        }
+
+        if (systemMessage == null) {
+            systemMessage = getDefaultSystemMessage();
         }
 
         String url = getBaseUrl() + "/v1/chat/completions";
@@ -38,7 +42,7 @@ public class ChatGPTClient extends LanguageModelClient {
             JSONArray messagesJson = new JSONArray();
             messagesJson.put(new JSONObject()
                     .accumulate("role", "system")
-                    .accumulate("content", "You are a helpful assistant."));
+                    .accumulate("content", systemMessage));
             messagesJson.put(new JSONObject()
                     .accumulate("role", "user")
                     .accumulate("content", prompt));

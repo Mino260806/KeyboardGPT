@@ -50,7 +50,7 @@ public class InstructionTreater implements TextTreater {
             case Prompt:
                 return mPromptTreater.treat(instruction);
             case Command:
-                throw new IllegalArgumentException("Not implemented yet");
+                return mCommandTreater.treat(instruction);
             case None:
                 MainHook.log("Aborting performCommand because text is not a valid instruction");
                 break;

@@ -74,6 +74,10 @@ public class GenerativeAIController implements ConfigChangeListener {
     }
 
     public void generateResponse(String prompt) {
+        generateResponse(prompt, null);
+    }
+
+    public void generateResponse(String prompt, String systemMessage) {
         MainHook.log("Getting response for text \"" + prompt + "\"");
 
         if (prompt.isEmpty()) {
@@ -88,7 +92,7 @@ public class GenerativeAIController implements ConfigChangeListener {
             mInteracter.setText("Generating Response...");
         });
 
-        Publisher<String> publisher = mModelClient.submitPrompt(prompt);
+        Publisher<String> publisher = mModelClient.submitPrompt(prompt, systemMessage);
 
         publisher.subscribe(new Subscriber<String>() {
             boolean completed = false;

@@ -11,7 +11,7 @@ public abstract class LanguageModelClient {
 
     private String mBaseUrl = null;
 
-    abstract public Publisher<String> submitPrompt(String prompt);
+    abstract public Publisher<String> submitPrompt(String prompt, String systemMessage);
 
     abstract public LanguageModel getLanguageModel();
 
@@ -63,5 +63,9 @@ public abstract class LanguageModelClient {
     @Override
     public String toString() {
         return getLanguageModel().label + " (" + getSubModel() + ")";
+    }
+
+    protected static String getDefaultSystemMessage() {
+        return "You are a helpful assitant.";
     }
 }
