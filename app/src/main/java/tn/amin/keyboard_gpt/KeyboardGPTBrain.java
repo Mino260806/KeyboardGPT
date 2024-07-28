@@ -3,7 +3,6 @@ package tn.amin.keyboard_gpt;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.inputmethodservice.InputMethodService;
-import android.os.Handler;
 import android.text.InputType;
 import android.view.inputmethod.InputConnection;
 import android.widget.EditText;
@@ -13,7 +12,6 @@ import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 
 import java.lang.ref.WeakReference;
-import java.util.logging.Logger;
 
 import de.robv.android.xposed.XposedBridge;
 import tn.amin.keyboard_gpt.language_model.LanguageModel;
@@ -47,14 +45,14 @@ public class KeyboardGPTBrain implements ConfigChangeListener, DialogInterface.O
         }
     }
 
-    public boolean setLastText(EditText editText, String text) {
+    public boolean updateText(EditText editText, String text) {
         mEditText = new WeakReference<>(editText);
         mLastText = text;
 
         return !isEditTextOwned();
     }
 
-    public boolean handleClearText() {
+    public boolean performCommand() {
         if (!mCommandTreater.isPrompt(mLastText)) {
             MainHook.log("Aborting handleClearText because text is not a command");
             return false;

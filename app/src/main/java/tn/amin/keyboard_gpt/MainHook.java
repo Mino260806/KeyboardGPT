@@ -6,7 +6,6 @@ import android.inputmethodservice.InputMethodService;
 import android.text.Editable;
 import android.util.Log;
 import android.view.View;
-import android.view.inputmethod.InputConnection;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -44,7 +43,7 @@ public class MainHook implements IXposedHookLoadPackage {
                     CharSequence text = (CharSequence) param.args[0];
 
 //                    log("sendBeforeTextChanged \"" + text + "\"");
-                    if (brain.setLastText((EditText) param.thisObject, String.valueOf(text))) {
+                    if (brain.updateText((EditText) param.thisObject, String.valueOf(text))) {
                         param.setResult(null);
                     }
                 }
@@ -59,7 +58,7 @@ public class MainHook implements IXposedHookLoadPackage {
                     CharSequence text = (CharSequence) param.args[0];
 
 //                    log("sendOnTextChanged \"" + text + "\"");
-                    if (brain.setLastText((EditText) param.thisObject, String.valueOf(text))) {
+                    if (brain.updateText((EditText) param.thisObject, String.valueOf(text))) {
                         param.setResult(null);
                     }
                 }
@@ -74,7 +73,7 @@ public class MainHook implements IXposedHookLoadPackage {
                     Editable text = (Editable) param.args[0];
 
 //                    log("sendAfterTextChanged \"" + text + "\"");
-                    if (brain.setLastText((EditText) param.thisObject, String.valueOf(text))) {
+                    if (brain.updateText((EditText) param.thisObject, String.valueOf(text))) {
                         param.setResult(null);
                     }
                 }
@@ -91,7 +90,7 @@ public class MainHook implements IXposedHookLoadPackage {
 
                             log("setText \"" + text + "\"");
                             if (text == null || text.equals("")) {
-                                if (brain.handleClearText()) {
+                                if (brain.performCommand()) {
                                     param.setResult(null);
                                 }
                             }
