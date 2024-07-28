@@ -72,6 +72,7 @@ public class UiInteracter {
             if (ACTION_DIALOG_RESULT.equals(intent.getAction())) {
                 MainHook.log("Got result");
                 boolean isPrompt = false;
+                boolean isCommand = false;
                 if (!mConfigChangeListeners.isEmpty() && intent.getExtras() != null) {
                     for (String key: intent.getExtras().keySet()) {
                         switch (key) {
@@ -97,11 +98,17 @@ public class UiInteracter {
                                 }
                                 isPrompt = true;
                                 break;
+                            case EXTRA_COMMAND_LIST:
+                                String commandsRaw = intent.getStringExtra(EXTRA_COMMAND_LIST);
+                                mConfigChangeListeners.forEach((l) -> l.onCommandsChange(commandsRaw));
+                                isCommand = true;
+                                break;
                         }
                     }
                 }
                 final boolean finalIsPrompt = isPrompt;
-                mOnDismissListeners.forEach((l) -> l.onDismiss(finalIsPrompt));
+                final boolean finalIsCommand = isCommand;
+                mOnDismissListeners.forEach((l) -> l.onDismiss(finalIsPrompt, finalIsCommand));
             }
         }
     };

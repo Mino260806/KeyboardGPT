@@ -13,6 +13,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
@@ -23,9 +24,11 @@ import java.util.stream.Stream;
 
 import tn.amin.keyboard_gpt.R;
 import tn.amin.keyboard_gpt.UiInteracter;
+import tn.amin.keyboard_gpt.instruction.InstructionCategory;
 import tn.amin.keyboard_gpt.instruction.command.AbstractCommand;
 import tn.amin.keyboard_gpt.instruction.command.Commands;
 import tn.amin.keyboard_gpt.instruction.command.GenerativeAICommand;
+import tn.amin.keyboard_gpt.instruction.command.SimpleGenerativeAICommand;
 import tn.amin.keyboard_gpt.language_model.LanguageModel;
 
 public class DialogActivity extends Activity {
@@ -78,8 +81,8 @@ public class DialogActivity extends Activity {
     private Dialog buildCommandsListDialog() {
         ensureHasCommands();
 
-        CharSequence[] names = Stream.concat(mCommands.stream()
-                .map(AbstractCommand::getCommandPrefix), Stream.of("New Command"))
+        CharSequence[] names = Stream.concat(Stream.of("New Command"),
+                        mCommands.stream().map(AbstractCommand::getCommandPrefix))
                 .toArray(CharSequence[]::new);
 
         return new AlertDialog.Builder(this)
@@ -98,7 +101,65 @@ public class DialogActivity extends Activity {
 
     private Dialog buildEditCommandDialog() {
         ensureHasCommands();
-        return null;
+
+        LinearLayout layout = (LinearLayout)
+                getLayoutInflater().inflate(R.layout.dialog_command_edit, null);
+
+        EditText prefixEditText = layout.findViewById(R.id.edit_prefix);
+        EditText messageEditText = layout.findViewById(R.id.edit_message);
+
+        String title;
+        if (mCommandIndex >= 0) {
+            GenerativeAICommand command = mCommands.get(mCommandIndex);
+            prefixEditText.setText(command.getCommandPrefix());
+            messageEditText.setText(command.getTweakMessage());
+            title = "Edit " + InstructionCategory.Command.prefix + command.getCommandPrefix();
+        }
+        else {
+            title = "New command";
+        }
+
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setView(layout)
+                .setPositiveButton("Ok", (dialog, which) -> {
+                    String prefix = prefixEditText.getText().toString().trim();
+                    String message = messageEditText.getText().toString();
+                    long similarCount = mCommands.stream().filter((c) -> prefix.equals(c.getCommandPrefix())).count();
+                    if ((mCommandIndex == -1 && similarCount >= 1)
+                            || (mCommandIndex >= 0 && similarCount >= 2)) {
+                        Toast.makeText(this, "There is another command with same name", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+
+                    if (mCommandIndex >= 0) {
+                        mCommands.remove(mCommandIndex);
+                    }
+                    else {
+                        mCommandIndex = mCommands.size();
+                    }
+
+                    mCommands.add(mCommandIndex, new SimpleGenerativeAICommand(prefix, message));
+
+                    dialog.dismiss();
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> {
+                    showDialog(buildCommandsListDialog(), DialogType.EditCommandsList);
+                    dialog.dismiss();
+                })
+                .setOnDismissListener(d -> returnToKeyboard(DialogType.EditCommand));
+
+        if (mCommandIndex >= 0) {
+            dialogBuilder
+                    .setNeutralButton("Delete", (dialog, which) -> {
+                        mCommands.remove(mCommandIndex);
+
+                        showDialog(buildCommandsListDialog(), DialogType.EditCommandsList);
+                        dialog.dismiss();
+                    });
+        }
+
+        return dialogBuilder.create();
     }
 
     private Dialog buildWebSearchDialog() {
@@ -195,16 +256,16 @@ public class DialogActivity extends Activity {
     private void returnToKeyboard(DialogType dialogType) {
         Log.d("LSPosed-Bridge", dialogType + " : " + mLanguageModelsConfig);
         if (dialogType == mLastDialogType) {
-            if (mSelectedModel != null || mLanguageModelsConfig != null) {
-                Intent broadcastIntent = new Intent(UiInteracter.ACTION_DIALOG_RESULT);
+            Intent broadcastIntent = new Intent(UiInteracter.ACTION_DIALOG_RESULT);
 
-                if (mSelectedModel != null)
-                    broadcastIntent.putExtra(UiInteracter.EXTRA_CONFIG_SELECTED_MODEL, mSelectedModel.name());
-                if (mLanguageModelsConfig != null)
-                    broadcastIntent.putExtra(UiInteracter.EXTRA_CONFIG_LANGUAGE_MODEL, mLanguageModelsConfig);
+            if (mSelectedModel != null)
+                broadcastIntent.putExtra(UiInteracter.EXTRA_CONFIG_SELECTED_MODEL, mSelectedModel.name());
+            if (mLanguageModelsConfig != null)
+                broadcastIntent.putExtra(UiInteracter.EXTRA_CONFIG_LANGUAGE_MODEL, mLanguageModelsConfig);
+            if (mCommands != null)
+                broadcastIntent.putExtra(UiInteracter.EXTRA_COMMAND_LIST, Commands.encodeCommands(mCommands));
 
-                sendBroadcast(broadcastIntent);
-            }
+            sendBroadcast(broadcastIntent);
             finish();
         }
     }

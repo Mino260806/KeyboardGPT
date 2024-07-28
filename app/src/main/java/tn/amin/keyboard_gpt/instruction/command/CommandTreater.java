@@ -1,17 +1,18 @@
 package tn.amin.keyboard_gpt.instruction.command;
 
-import org.checkerframework.checker.units.qual.A;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import tn.amin.keyboard_gpt.ConfigChangeListener;
+import tn.amin.keyboard_gpt.DialogDismissListener;
 import tn.amin.keyboard_gpt.GenerativeAIController;
 import tn.amin.keyboard_gpt.SPManager;
 import tn.amin.keyboard_gpt.UiInteracter;
 import tn.amin.keyboard_gpt.instruction.InstructionCategory;
 import tn.amin.keyboard_gpt.instruction.TextTreater;
+import tn.amin.keyboard_gpt.language_model.LanguageModel;
 
-public class CommandTreater implements TextTreater {
+public class CommandTreater implements TextTreater, ConfigChangeListener, DialogDismissListener {
     private static final List<AbstractCommand> BUILTIN_COMMANDS = List.of(
             new WebSearchCommand(),
             new SimpleGenerativeAICommand("t", "You are a specialized language model designed to perform mathematical calculations with precision and accuracy. Your task is to interpret math problems, compute the solutions, and output only the result of the computation.\n" +
@@ -72,6 +73,9 @@ public class CommandTreater implements TextTreater {
         mInteracter = interacter;
         mAIController = aiController;
 
+        mInteracter.registerConfigChangeListener(this);
+        mInteracter.registerOnDismissListener(this);
+
         mCommands.addAll(BUILTIN_COMMANDS);
         mCommands.addAll(mSPManager.getGenerativeAICommands());
     }
@@ -82,7 +86,7 @@ public class CommandTreater implements TextTreater {
             return mInteracter.showEditCommandsDialog(mSPManager.getGenerativeAICommandsRaw());
         }
 
-        for (AbstractCommand command: BUILTIN_COMMANDS) {
+        for (AbstractCommand command: mCommands) {
             if (text.startsWith(command.getCommandPrefix())) {
                 text = text.substring(command.getCommandPrefix().length()).trim();
                 command.consume(text, mInteracter, mAIController);
@@ -91,5 +95,45 @@ public class CommandTreater implements TextTreater {
         }
 
         return false;
+    }
+
+    @Override
+    public void onLanguageModelChange(LanguageModel model) {
+
+    }
+
+    @Override
+    public void onApiKeyChange(LanguageModel languageModel, String apiKey) {
+
+    }
+
+    @Override
+    public void onSubModelChange(LanguageModel languageModel, String subModel) {
+
+    }
+
+    @Override
+    public void onBaseUrlChange(LanguageModel languageModel, String baseUrl) {
+
+    }
+
+    @Override
+    public void onCommandsChange(String commandsRaw) {
+        ArrayList<GenerativeAICommand> commands = Commands.decodeCommands(commandsRaw);
+        if (mCommands.size() > BUILTIN_COMMANDS.size()) {
+            mCommands.subList(BUILTIN_COMMANDS.size(), mCommands.size()).clear();
+        }
+        mCommands.addAll(commands);
+    }
+
+    @Override
+    public void onDismiss(boolean isPrompt, boolean isCommand) {
+        if (!isCommand) {
+            return;
+        }
+
+        mInteracter.post(() -> {
+            mInteracter.toastShort("New Commands Saved");
+        });
     }
 }

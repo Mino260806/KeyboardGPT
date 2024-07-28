@@ -49,7 +49,7 @@ public class PromptTreater implements TextTreater, DialogDismissListener {
     }
 
     @Override
-    public void onDismiss(boolean isPrompt) {
+    public void onDismiss(boolean isPrompt, boolean isCommand) {
         if (!isPrompt) {
             return;
         }

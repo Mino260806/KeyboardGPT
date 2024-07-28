@@ -4,8 +4,12 @@ import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 
+import java.util.ArrayList;
+
 import de.robv.android.xposed.XposedBridge;
 import tn.amin.keyboard_gpt.instruction.InstructionCategory;
+import tn.amin.keyboard_gpt.instruction.command.Commands;
+import tn.amin.keyboard_gpt.instruction.command.GenerativeAICommand;
 import tn.amin.keyboard_gpt.language_model.LanguageModel;
 import tn.amin.keyboard_gpt.language_model.LanguageModelClient;
 
@@ -71,6 +75,11 @@ public class GenerativeAIController implements ConfigChangeListener {
         if (mModelClient != null && mModelClient.getLanguageModel() == languageModel) {
             mModelClient.setBaseUrl(baseUrl);
         }
+    }
+
+    @Override
+    public void onCommandsChange(String commandsRaw) {
+        mSPManager.setGenerativeAICommandsRaw(commandsRaw);
     }
 
     public void generateResponse(String prompt) {
