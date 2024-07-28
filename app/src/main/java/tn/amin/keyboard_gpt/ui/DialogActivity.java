@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.InsetDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.EditText;
@@ -45,7 +46,7 @@ public class DialogActivity extends Activity {
             case ChoseModel:
                 dialog = buildChoseModelDialog();
                 break;
-            case SetApiKey:
+            case ConfigureModel:
                 dialog = buildConfigureModelDialog();
                 break;
             case WebSearch:
@@ -55,7 +56,6 @@ public class DialogActivity extends Activity {
                 dialog = buildChoseModelDialog();
                 break;
         }
-        dialog.setOnDismissListener(d -> returnToKeyboard(dialogType));
         return dialog;
     }
 
@@ -77,7 +77,8 @@ public class DialogActivity extends Activity {
         Dialog dialog = new AlertDialog.Builder(this)
                 .setTitle(title)
                 .setView(webView)
-                .create();
+                .setOnDismissListener(d -> returnToKeyboard(DialogType.WebSearch))
+                 .create();
         ColorDrawable back = new ColorDrawable(Color.TRANSPARENT);
         InsetDrawable inset = new InsetDrawable(back, 100, 200, 100, 200);
         dialog.getWindow().setBackgroundDrawable(inset);
@@ -125,6 +126,7 @@ public class DialogActivity extends Activity {
                     showDialog(buildChoseModelDialog(), DialogType.ChoseModel);
                     dialog.dismiss();
                 })
+                .setOnDismissListener(d -> returnToKeyboard(DialogType.ConfigureModel))
                 .create();
     }
 
@@ -140,19 +142,24 @@ public class DialogActivity extends Activity {
                     mSelectedModel = LanguageModel.values()[which];
 
                     Dialog apiKeyDialog = buildConfigureModelDialog();
-                    showDialog(apiKeyDialog, DialogType.SetApiKey);
+                    showDialog(apiKeyDialog, DialogType.ConfigureModel);
 
                     dialog.dismiss();
                 })
+                .setOnDismissListener(d -> returnToKeyboard(DialogType.ChoseModel))
                 .create();
     }
 
     private void returnToKeyboard(DialogType dialogType) {
+        Log.d("LSPosed-Bridge", dialogType + " : " + mLanguageModelsConfig);
         if (dialogType == mLastDialogType) {
-            if (dialogType.isConfiguration) {
+            if (mSelectedModel != null || mLanguageModelsConfig != null) {
                 Intent broadcastIntent = new Intent(UiInteracter.ACTION_DIALOG_RESULT);
-                broadcastIntent.putExtra(UiInteracter.EXTRA_CONFIG_SELECTED_MODEL, mSelectedModel.name());
-                broadcastIntent.putExtra(UiInteracter.EXTRA_CONFIG_LANGUAGE_MODEL, mLanguageModelsConfig);
+
+                if (mSelectedModel != null)
+                    broadcastIntent.putExtra(UiInteracter.EXTRA_CONFIG_SELECTED_MODEL, mSelectedModel.name());
+                if (mLanguageModelsConfig != null)
+                    broadcastIntent.putExtra(UiInteracter.EXTRA_CONFIG_LANGUAGE_MODEL, mLanguageModelsConfig);
 
                 sendBroadcast(broadcastIntent);
             }
@@ -161,10 +168,12 @@ public class DialogActivity extends Activity {
     }
 
     private void ensureHasReadModelData() {
-        mSelectedModel =
-                LanguageModel.valueOf(getIntent().getStringExtra(UiInteracter.EXTRA_CONFIG_SELECTED_MODEL));
-        mLanguageModelsConfig =
-                getIntent().getBundleExtra(UiInteracter.EXTRA_CONFIG_LANGUAGE_MODEL);
+        if (mSelectedModel == null)
+            mSelectedModel =
+                    LanguageModel.valueOf(getIntent().getStringExtra(UiInteracter.EXTRA_CONFIG_SELECTED_MODEL));
+        if (mLanguageModelsConfig == null)
+            mLanguageModelsConfig =
+                    getIntent().getBundleExtra(UiInteracter.EXTRA_CONFIG_LANGUAGE_MODEL);
     }
 
     private void showDialog(Dialog dialog, DialogType dialogType) {

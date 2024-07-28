@@ -43,7 +43,7 @@ public class MainHook implements IXposedHookLoadPackage {
                     CharSequence text = (CharSequence) param.args[0];
 
 //                    log("sendBeforeTextChanged \"" + text + "\"");
-                    if (brain.updateText((EditText) param.thisObject, String.valueOf(text))) {
+                    if (brain.consumeText(String.valueOf(text))) {
                         param.setResult(null);
                     }
                 }
@@ -58,7 +58,7 @@ public class MainHook implements IXposedHookLoadPackage {
                     CharSequence text = (CharSequence) param.args[0];
 
 //                    log("sendOnTextChanged \"" + text + "\"");
-                    if (brain.updateText((EditText) param.thisObject, String.valueOf(text))) {
+                    if (brain.consumeText(String.valueOf(text))) {
                         param.setResult(null);
                     }
                 }
@@ -73,7 +73,7 @@ public class MainHook implements IXposedHookLoadPackage {
                     Editable text = (Editable) param.args[0];
 
 //                    log("sendAfterTextChanged \"" + text + "\"");
-                    if (brain.updateText((EditText) param.thisObject, String.valueOf(text))) {
+                    if (brain.consumeText(String.valueOf(text))) {
                         param.setResult(null);
                     }
                 }
@@ -84,13 +84,13 @@ public class MainHook implements IXposedHookLoadPackage {
                 new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                        brain.getInteracter().feedView((View) param.thisObject);
                         if (param.thisObject instanceof EditText) {
+                            EditText editText = (EditText) param.thisObject;
                             CharSequence text = (CharSequence) param.args[0];
 
                             log("setText \"" + text + "\"");
                             if (text == null || text.equals("")) {
-                                if (brain.performCommand()) {
+                                if (brain.performCommand(editText)) {
                                     param.setResult(null);
                                 }
                             }

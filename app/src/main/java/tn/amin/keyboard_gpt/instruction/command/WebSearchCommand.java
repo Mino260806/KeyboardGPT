@@ -1,4 +1,4 @@
-package tn.amin.keyboard_gpt.command;
+package tn.amin.keyboard_gpt.instruction.command;
 
 import tn.amin.keyboard_gpt.UiInteracter;
 

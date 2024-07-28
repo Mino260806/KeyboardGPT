@@ -1,6 +1,7 @@
 package tn.amin.keyboard_gpt.language_model;
 
 import android.net.http.HttpException;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -58,6 +59,11 @@ public class ChatGPTClient extends LanguageModelClient {
 
             if (responseCode == 200) {
                 return new InputStreamPublisher(con.getInputStream(), line -> {
+                    line = line.trim();
+//                    MainHook.log("line is " + line);
+                    if (line.isEmpty() || line.endsWith("[DONE]")) {
+                        return "";
+                    }
                     if (line.startsWith("data:")) {
                         line = line.substring("data:".length()).trim();
                     }
@@ -66,11 +72,9 @@ public class ChatGPTClient extends LanguageModelClient {
                                 .getJSONArray("choices")
                                 .getJSONObject(0);
                         if (choice.has("delta")) {
-                            return choice.getJSONObject("delta")
-                                    .getString("content");
+                            return extractContent(choice.getJSONObject("delta"));
                         }
-                        return choice.getJSONObject("message")
-                                .getString("content");
+                        return extractContent(choice.getJSONObject("message"));
                     } catch (JSONException e) {
                         MainHook.log(e);
                         return "";
@@ -102,5 +106,13 @@ public class ChatGPTClient extends LanguageModelClient {
     @Override
     public LanguageModel getLanguageModel() {
         return LanguageModel.ChatGPT;
+    }
+
+    private String extractContent(JSONObject message) throws JSONException {
+        if (!message.has("content")) {
+            return "";
+        }
+
+        return message.getString("content");
     }
 }

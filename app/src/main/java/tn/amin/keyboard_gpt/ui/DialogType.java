@@ -2,7 +2,7 @@ package tn.amin.keyboard_gpt.ui;
 
 public enum DialogType {
     ChoseModel(true),
-    SetApiKey(true),
+    ConfigureModel(true),
     WebSearch(false),
     ;
 

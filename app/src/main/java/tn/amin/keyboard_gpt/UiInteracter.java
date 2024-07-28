@@ -2,14 +2,22 @@ package tn.amin.keyboard_gpt;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.inputmethodservice.InputMethodService;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.text.InputType;
 import android.view.View;
+import android.view.inputmethod.InputConnection;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
+
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 
 import tn.amin.keyboard_gpt.language_model.LanguageModel;
 import tn.amin.keyboard_gpt.ui.DialogType;
@@ -38,18 +46,19 @@ public class UiInteracter {
 
 
     private final ConfigInfoProvider mConfigInfoProvider;
-    private ConfigChangeListener mConfigChangeListener = null;
-    private DialogInterface.OnDismissListener mOnDismissListener = null;
+    private final ArrayList<ConfigChangeListener> mConfigChangeListeners = new ArrayList<>();
+    private final ArrayList<DialogDismissListener> mOnDismissListeners = new ArrayList<>();
 
     private long mLastDialogLaunch = 0L;
+    private Object mEditTextOwner = null;
+
+    private WeakReference<View> mRootView = null;
+    private WeakReference<EditText> mEditText = null;
+    private InputMethodService mInputMethodService;
 
     public UiInteracter(Context context, ConfigInfoProvider configInfoProvider) {
         mContext = context;
         mConfigInfoProvider = configInfoProvider;
-    }
-
-    public void setOnDismissListener(DialogInterface.OnDismissListener listener) {
-        mOnDismissListener = listener;
     }
 
     private final BroadcastReceiver mDialogResultReceiver = new BroadcastReceiver() {
@@ -57,36 +66,37 @@ public class UiInteracter {
         public void onReceive(Context context, Intent intent) {
             if (ACTION_DIALOG_RESULT.equals(intent.getAction())) {
                 MainHook.log("Got result");
-                if (mConfigChangeListener != null && intent.getExtras() != null) {
+                boolean isPrompt = false;
+                if (!mConfigChangeListeners.isEmpty() && intent.getExtras() != null) {
                     for (String key: intent.getExtras().keySet()) {
-                        LanguageModel languageModel;
                         switch (key) {
                             case EXTRA_CONFIG_SELECTED_MODEL:
-                                languageModel = LanguageModel.valueOf(
+                                LanguageModel selectedLanguageModel = LanguageModel.valueOf(
                                         intent.getStringExtra(EXTRA_CONFIG_SELECTED_MODEL));
-                                mConfigChangeListener.onLanguageModelChange(languageModel);
+                                mConfigChangeListeners.forEach((l) -> l.onLanguageModelChange(selectedLanguageModel));
+                                isPrompt = true;
                                 break;
                             case EXTRA_CONFIG_LANGUAGE_MODEL:
                                 Bundle bundle = intent.getBundleExtra(EXTRA_CONFIG_LANGUAGE_MODEL);
                                 for (String modelName: bundle.keySet()) {
-                                    languageModel = LanguageModel.valueOf(modelName);
+                                    LanguageModel configuredlanguageModel = LanguageModel.valueOf(modelName);
                                     Bundle languageModelBundle = bundle.getBundle(modelName);
 
                                     String apiKey = languageModelBundle.getString(EXTRA_CONFIG_LANGUAGE_MODEL_API_KEY);
                                     String subModel = languageModelBundle.getString(EXTRA_CONFIG_LANGUAGE_MODEL_SUB_MODEL);
                                     String baseUrl = languageModelBundle.getString(EXTRA_CONFIG_LANGUAGE_MODEL_BASE_URL);
 
-                                    mConfigChangeListener.onApiKeyChange(languageModel, apiKey);
-                                    mConfigChangeListener.onSubModelChange(languageModel, subModel);
-                                    mConfigChangeListener.onBaseUrlChange(languageModel, baseUrl);
+                                    mConfigChangeListeners.forEach((l) -> l.onApiKeyChange(configuredlanguageModel, apiKey));
+                                    mConfigChangeListeners.forEach((l) -> l.onSubModelChange(configuredlanguageModel, subModel));
+                                    mConfigChangeListeners.forEach((l) -> l.onBaseUrlChange(configuredlanguageModel, baseUrl));
                                 }
+                                isPrompt = true;
                                 break;
                         }
                     }
                 }
-                if (mOnDismissListener != null) {
-                    mOnDismissListener.onDismiss(null);
-                }
+                final boolean finalIsPrompt = isPrompt;
+                mOnDismissListeners.forEach((l) -> l.onDismiss(finalIsPrompt));
             }
         }
     };
@@ -125,19 +135,26 @@ public class UiInteracter {
         return true;
     }
 
-    boolean onceFeedView = false;
-    public void feedView(View view) {
-        if (!onceFeedView) {
-            MainHook.log("Root View is " + view.getRootView().getClass().getName());
-            onceFeedView = true;
-        }
+    public void updateRootView(View view) {
+        MainHook.log("Root View is " + view.getRootView().getClass().getName());
+        mRootView = new WeakReference<>(view);
+    }
+
+    public void setEditText(EditText editText) {
+        mEditText = new WeakReference<>(editText);
+        updateRootView(editText.getRootView());
     }
 
     public void registerConfigChangeListener(ConfigChangeListener listener) {
-        mConfigChangeListener = listener;
+        mConfigChangeListeners.add(listener);
+    }
+
+    public void registerOnDismissListener(DialogDismissListener listener) {
+        mOnDismissListeners.add(listener);
     }
 
     public void registerService(InputMethodService inputMethodService) {
+        mInputMethodService = inputMethodService;
         IntentFilter filter = new IntentFilter(ACTION_DIALOG_RESULT);
         ContextCompat.registerReceiver(inputMethodService.getApplicationContext(), mDialogResultReceiver,
                 filter, ContextCompat.RECEIVER_EXPORTED);
@@ -145,6 +162,10 @@ public class UiInteracter {
 
     public void unregisterService(InputMethodService inputMethodService) {
         inputMethodService.getApplicationContext().unregisterReceiver(mDialogResultReceiver);
+        if (inputMethodService != mInputMethodService) {
+            MainHook.log("[W] inputMethodService do not correspond in unregisterService");
+            mInputMethodService = null;
+        }
     }
 
 
@@ -156,5 +177,61 @@ public class UiInteracter {
         }
         mLastDialogLaunch = currentTime;
         return false;
+    }
+
+    public void setText(String text) {
+        mEditText.get().setText(text);
+        mEditText.get().setSelection(text.length());
+    }
+
+    public void setInputType(int inputType) {
+        mEditText.get().setInputType(inputType);
+    }
+
+    public void toastShort(String message) {
+        Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
+    }
+
+    public void toastLong(String message) {
+        Toast.makeText(mContext, message, Toast.LENGTH_LONG).show();
+    }
+
+    public void post(Runnable runnable) {
+        if (mRootView != null && mRootView.get() != null) {
+            mRootView.get().post(runnable);
+        }
+        else {
+            new Handler(Looper.getMainLooper()).post(runnable);
+        }
+    }
+
+    public InputConnection getInputConnection() {
+        return mInputMethodService.getCurrentInputConnection();
+    }
+
+    public boolean requestEditTextOwnership(Object newOwner) {
+        if (mEditText == null || mEditText.get() == null) {
+            MainHook.log("Refused EditText ownership to " + newOwner + " because EditText is null");
+            return false;
+        }
+
+        if (mEditTextOwner != null && !newOwner.equals(mEditTextOwner)) {
+            MainHook.log("Refused EditText ownership to " + newOwner + " because owned by " + mEditTextOwner);
+            return false;
+        }
+
+        mEditTextOwner = newOwner;
+        setInputType(InputType.TYPE_NULL);
+        return true;
+    }
+
+    public void releaseEditTextOwnership(Object owner) {
+        if (owner != mEditTextOwner) {
+            MainHook.log("EditText owner " + owner + " cannot release EditText");
+            return;
+        }
+
+        setInputType(InputType.TYPE_CLASS_TEXT);
+        mEditTextOwner = null;
     }
 }
