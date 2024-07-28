@@ -42,6 +42,10 @@ public class InstructionTreater implements TextTreater {
         return text.substring(category.prefix.length()).trim();
     }
 
+    public boolean isInstruction(String text) {
+        return getInstructionCategory(text) != InstructionCategory.None;
+    }
+
     @Override
     public boolean treat(String text) {
         InstructionCategory category = getInstructionCategory(text);

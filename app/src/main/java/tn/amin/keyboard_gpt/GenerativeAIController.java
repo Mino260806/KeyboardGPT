@@ -1,5 +1,7 @@
 package tn.amin.keyboard_gpt;
 
+import android.text.InputType;
+
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
@@ -99,6 +101,7 @@ public class GenerativeAIController implements ConfigChangeListener {
 
         mInteracter.post(() -> {
             mInteracter.setText("Generating Response...");
+            mInteracter.setInputType(InputType.TYPE_NULL);
         });
 
         Publisher<String> publisher = mModelClient.submitPrompt(prompt, systemMessage);
@@ -141,10 +144,11 @@ public class GenerativeAIController implements ConfigChangeListener {
                 }
                 completed = true;
 
-                mInteracter.releaseEditTextOwnership(InstructionCategory.Prompt);
                 mInteracter.post(() -> {
+                    mInteracter.setInputType(InputType.TYPE_CLASS_TEXT);
                     mInteracter.setText("? ");
                 });
+                mInteracter.releaseEditTextOwnership(InstructionCategory.Prompt);
                 MainHook.log("Done");
             }
         });

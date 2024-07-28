@@ -89,6 +89,10 @@ public class MainHook implements IXposedHookLoadPackage {
                             CharSequence text = (CharSequence) param.args[0];
 
                             log("setText \"" + text + "\"");
+                            if (brain.consumeText(String.valueOf(text))) {
+                                param.setResult(null);
+                            }
+
                             if (text == null || text.equals("")) {
                                 if (brain.performCommand(editText)) {
                                     param.setResult(null);

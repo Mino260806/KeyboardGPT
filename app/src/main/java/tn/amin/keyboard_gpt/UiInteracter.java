@@ -1,5 +1,6 @@
 package tn.amin.keyboard_gpt;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -9,16 +10,22 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.InputType;
+import android.text.TextWatcher;
 import android.view.View;
 import android.view.inputmethod.InputConnection;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
 
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 
+import de.robv.android.xposed.XposedBridge;
 import tn.amin.keyboard_gpt.language_model.LanguageModel;
 import tn.amin.keyboard_gpt.ui.DialogType;
 
@@ -207,8 +214,16 @@ public class UiInteracter {
         return false;
     }
 
+    /** @noinspection unchecked*/
+    @SuppressLint("DiscouragedPrivateApi")
     public void setText(String text) {
-        mEditText.get().setText(text);
+        Method setTextMethod;
+        try {
+            setTextMethod = TextView.class.getMethod("setText", CharSequence.class);
+            XposedBridge.invokeOriginalMethod(setTextMethod, mEditText.get(), new Object[] { text });
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
         mEditText.get().setSelection(text.length());
     }
 
@@ -244,7 +259,6 @@ public class UiInteracter {
         }
 
         mEditTextOwner = newOwner;
-        setInputType(InputType.TYPE_NULL);
         return true;
     }
 
@@ -254,7 +268,10 @@ public class UiInteracter {
             return;
         }
 
-        setInputType(InputType.TYPE_CLASS_TEXT);
         mEditTextOwner = null;
+    }
+
+    public boolean isEditTextOwned() {
+        return mEditTextOwner != null;
     }
 }

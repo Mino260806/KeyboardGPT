@@ -54,7 +54,7 @@ public class GeminiClient extends LanguageModelClient {
         Publisher<GenerateContentResponse> publisher;
         Content.Builder systemContentBuilder = new Content.Builder()
                 .addText(systemMessage);
-        systemContentBuilder.setRole("system");
+        systemContentBuilder.setRole("model");
         Content systemContent = systemContentBuilder.build();
 
         publisher = model.generateContentStream(systemContent, userContent);

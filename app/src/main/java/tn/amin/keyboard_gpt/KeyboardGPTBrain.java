@@ -26,7 +26,7 @@ public class KeyboardGPTBrain {
     }
 
     public boolean consumeText(String text) {
-        return !isEditTextOwned();
+        return mInstructionTreater.isInstruction(text) || isEditTextOwned();
     }
 
     public boolean performCommand(EditText editText) {
@@ -37,7 +37,7 @@ public class KeyboardGPTBrain {
     }
 
     public boolean isEditTextOwned() {
-        return false;
+        return mInteracter.isEditTextOwned();
     }
 
     public UiInteracter getInteracter() {
