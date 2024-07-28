@@ -197,12 +197,7 @@ public class UiInteracter {
     }
 
     public void post(Runnable runnable) {
-        if (mRootView != null && mRootView.get() != null) {
-            mRootView.get().post(runnable);
-        }
-        else {
-            new Handler(Looper.getMainLooper()).post(runnable);
-        }
+        new Handler(Looper.getMainLooper()).post(runnable);
     }
 
     public InputConnection getInputConnection() {

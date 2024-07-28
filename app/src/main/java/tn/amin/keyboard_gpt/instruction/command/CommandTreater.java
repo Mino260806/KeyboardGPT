@@ -1,5 +1,6 @@
 package tn.amin.keyboard_gpt.instruction.command;
 
+import tn.amin.keyboard_gpt.GenerativeAIController;
 import tn.amin.keyboard_gpt.SPManager;
 import tn.amin.keyboard_gpt.UiInteracter;
 import tn.amin.keyboard_gpt.instruction.TextTreater;
@@ -11,10 +12,12 @@ public class CommandTreater implements TextTreater {
 
     private final SPManager mSPManager;
     private final UiInteracter mInteracter;
+    private final GenerativeAIController mAIController;
 
-    public CommandTreater(SPManager spManager, UiInteracter interacter) {
+    public CommandTreater(SPManager spManager, UiInteracter interacter, GenerativeAIController aiController) {
         mSPManager = spManager;
         mInteracter = interacter;
+        mAIController = aiController;
     }
 
     @Override

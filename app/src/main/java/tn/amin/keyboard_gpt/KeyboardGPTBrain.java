@@ -14,16 +14,15 @@ public class KeyboardGPTBrain {
 
     private final SPManager mSPManager;
     private final UiInteracter mInteracter;
+    private final GenerativeAIController mAIController;
     private final InstructionTreater mInstructionTreater;
 
     public KeyboardGPTBrain(Context context) {
         mSPManager = new SPManager(context);
         mInteracter = new UiInteracter(context, mSPManager);
 
-        mInstructionTreater = new InstructionTreater(mSPManager, mInteracter);
-
-//        mInteracter.setOnDismissListener(this);
-//        mInteracter.registerConfigChangeListener(this);
+        mAIController = new GenerativeAIController(mSPManager, mInteracter);
+        mInstructionTreater = new InstructionTreater(mSPManager, mInteracter, mAIController);
     }
 
     public boolean consumeText(String text) {
