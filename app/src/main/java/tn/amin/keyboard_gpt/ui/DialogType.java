@@ -4,11 +4,13 @@ public enum DialogType {
     ChoseModel(true),
     ConfigureModel(true),
     WebSearch(false),
+    EditCommandsList(false),
+    EditCommand(false),
     ;
 
-    final boolean isConfiguration;
+    final boolean isModelConfig;
 
-    DialogType (boolean isConfiguration) {
-        this.isConfiguration = isConfiguration;
+    DialogType (boolean isModelConfig) {
+        this.isModelConfig = isModelConfig;
     }
 }

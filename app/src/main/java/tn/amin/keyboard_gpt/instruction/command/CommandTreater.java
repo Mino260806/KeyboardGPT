@@ -1,12 +1,18 @@
 package tn.amin.keyboard_gpt.instruction.command;
 
+import org.checkerframework.checker.units.qual.A;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import tn.amin.keyboard_gpt.GenerativeAIController;
 import tn.amin.keyboard_gpt.SPManager;
 import tn.amin.keyboard_gpt.UiInteracter;
+import tn.amin.keyboard_gpt.instruction.InstructionCategory;
 import tn.amin.keyboard_gpt.instruction.TextTreater;
 
 public class CommandTreater implements TextTreater {
-    private static final AbstractCommand[] COMMANDS = {
+    private static final List<AbstractCommand> BUILTIN_COMMANDS = List.of(
             new WebSearchCommand(),
             new SimpleGenerativeAICommand("t", "You are a specialized language model designed to perform mathematical calculations with precision and accuracy. Your task is to interpret math problems, compute the solutions, and output only the result of the computation.\n" +
                     "\n" +
@@ -52,22 +58,31 @@ public class CommandTreater implements TextTreater {
                     "\n" +
                     "\n" +
                     "\n" +
-                    "\n"),
-    };
+                    "\n")
+            );
 
     private final SPManager mSPManager;
     private final UiInteracter mInteracter;
     private final GenerativeAIController mAIController;
 
+    private final ArrayList<AbstractCommand> mCommands = new ArrayList<>();
+
     public CommandTreater(SPManager spManager, UiInteracter interacter, GenerativeAIController aiController) {
         mSPManager = spManager;
         mInteracter = interacter;
         mAIController = aiController;
+
+        mCommands.addAll(BUILTIN_COMMANDS);
+        mCommands.addAll(mSPManager.getGenerativeAICommands());
     }
 
     @Override
     public boolean treat(String text) {
-        for (AbstractCommand command: COMMANDS) {
+        if (text.startsWith(InstructionCategory.Command.prefix)) {
+            return mInteracter.showEditCommandsDialog(mSPManager.getGenerativeAICommandsRaw());
+        }
+
+        for (AbstractCommand command: BUILTIN_COMMANDS) {
             if (text.startsWith(command.getCommandPrefix())) {
                 text = text.substring(command.getCommandPrefix().length()).trim();
                 command.consume(text, mInteracter, mAIController);

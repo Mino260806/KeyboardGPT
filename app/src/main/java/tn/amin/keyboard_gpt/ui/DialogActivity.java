@@ -16,10 +16,16 @@ import android.widget.LinearLayout;
 
 import androidx.annotation.Nullable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Stream;
 
 import tn.amin.keyboard_gpt.R;
 import tn.amin.keyboard_gpt.UiInteracter;
+import tn.amin.keyboard_gpt.instruction.command.AbstractCommand;
+import tn.amin.keyboard_gpt.instruction.command.Commands;
+import tn.amin.keyboard_gpt.instruction.command.GenerativeAICommand;
 import tn.amin.keyboard_gpt.language_model.LanguageModel;
 
 public class DialogActivity extends Activity {
@@ -28,6 +34,10 @@ public class DialogActivity extends Activity {
     private Bundle mLanguageModelsConfig;
 
     private LanguageModel mSelectedModel;
+
+    private ArrayList<GenerativeAICommand> mCommands;
+
+    private int mCommandIndex = -2;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -52,11 +62,43 @@ public class DialogActivity extends Activity {
             case WebSearch:
                 dialog = buildWebSearchDialog();
                 break;
+            case EditCommandsList:
+                dialog = buildCommandsListDialog();
+                break;
+            case EditCommand:
+                dialog = buildEditCommandDialog();
+                break;
             default:
                 dialog = buildChoseModelDialog();
                 break;
         }
         return dialog;
+    }
+
+    private Dialog buildCommandsListDialog() {
+        ensureHasCommands();
+
+        CharSequence[] names = Stream.concat(mCommands.stream()
+                .map(AbstractCommand::getCommandPrefix), Stream.of("New Command"))
+                .toArray(CharSequence[]::new);
+
+        return new AlertDialog.Builder(this)
+                .setTitle("Select Command")
+                .setItems(names, (dialog, which) -> {
+                    mCommandIndex = which - 1;
+
+                    Dialog editCommandDialog = buildEditCommandDialog();
+                    showDialog(editCommandDialog, DialogType.EditCommand);
+
+                    dialog.dismiss();
+                })
+                .setOnDismissListener(d -> returnToKeyboard(DialogType.EditCommandsList))
+                .create();
+    }
+
+    private Dialog buildEditCommandDialog() {
+        ensureHasCommands();
+        return null;
     }
 
     private Dialog buildWebSearchDialog() {
@@ -174,6 +216,17 @@ public class DialogActivity extends Activity {
         if (mLanguageModelsConfig == null)
             mLanguageModelsConfig =
                     getIntent().getBundleExtra(UiInteracter.EXTRA_CONFIG_LANGUAGE_MODEL);
+    }
+
+    private void ensureHasCommands() {
+        if (mCommands == null) {
+            mCommands = Commands.decodeCommands(
+                    getIntent().getStringExtra(UiInteracter.EXTRA_COMMAND_LIST));
+        }
+
+        if (mCommandIndex == -2) {
+            mCommandIndex = getIntent().getIntExtra(UiInteracter.EXTRA_COMMAND_INDEX, -2);
+        }
     }
 
     private void showDialog(Dialog dialog, DialogType dialogType) {

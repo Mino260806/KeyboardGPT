@@ -45,6 +45,11 @@ public class UiInteracter {
     public static final String EXTRA_WEBVIEW_URL = "tn.amin.keyboard_gpt.webview.URL";
 
 
+    public static final String EXTRA_COMMAND_LIST = "tn.amin.keyboard_gpt.command.LIST";
+
+    public static final String EXTRA_COMMAND_INDEX = "tn.amin.keyboard_gpt.command.INDEX";
+
+
     private final ConfigInfoProvider mConfigInfoProvider;
     private final ArrayList<ConfigChangeListener> mConfigChangeListeners = new ArrayList<>();
     private final ArrayList<DialogDismissListener> mOnDismissListeners = new ArrayList<>();
@@ -130,6 +135,22 @@ public class UiInteracter {
         intent.putExtra(EXTRA_WEBVIEW_URL, url);
 
         MainHook.log("Launching web search");
+        mContext.startActivity(intent);
+
+        return true;
+    }
+
+    public boolean showEditCommandsDialog(String rawCommands) {
+        if (isDialogOnCooldown()) {
+            return false;
+        }
+
+        Intent intent = new Intent("tn.amin.keyboard_gpt.OVERLAY");
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra(EXTRA_DIALOG_TYPE, DialogType.EditCommandsList.name());
+        intent.putExtra(EXTRA_COMMAND_LIST, rawCommands);
+
+        MainHook.log("Launching commands edit");
         mContext.startActivity(intent);
 
         return true;

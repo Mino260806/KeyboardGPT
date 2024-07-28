@@ -3,6 +3,11 @@ package tn.amin.keyboard_gpt;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.renderscript.ScriptIntrinsicYuvToRGB;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,6 +16,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import tn.amin.keyboard_gpt.instruction.command.Commands;
+import tn.amin.keyboard_gpt.instruction.command.GenerativeAICommand;
+import tn.amin.keyboard_gpt.instruction.command.SimpleGenerativeAICommand;
 import tn.amin.keyboard_gpt.language_model.LanguageModel;
 
 public class SPManager implements ConfigInfoProvider {
@@ -23,6 +31,8 @@ public class SPManager implements ConfigInfoProvider {
     private static final String PREF_SUB_MODEL = "%s.sub_model";
 
     private static final String PREF_BASE_URL = "%s.base_url";
+
+    private static final String PREF_GEN_AI_COMMANDS = "gen_ai_commands";
 
     private final SharedPreferences mSP;
 
@@ -71,6 +81,22 @@ public class SPManager implements ConfigInfoProvider {
     public String getBaseUrl(LanguageModel model) {
         String key = String.format(PREF_BASE_URL, model.name());
         return mSP.getString(key, null);
+    }
+
+    public void setGenerativeAICommandsRaw(String commands) {
+        mSP.edit().putString(PREF_GEN_AI_COMMANDS, commands).apply();
+    }
+
+    public String getGenerativeAICommandsRaw() {
+        return mSP.getString(PREF_GEN_AI_COMMANDS, "[]");
+    }
+
+    public void setGenerativeAICommands(List<GenerativeAICommand> commands) {
+        mSP.edit().putString(PREF_GEN_AI_COMMANDS, Commands.encodeCommands(commands)).apply();
+    }
+
+    public List<GenerativeAICommand> getGenerativeAICommands() {
+        return Commands.decodeCommands(mSP.getString(PREF_GEN_AI_COMMANDS, "[]"));
     }
 
     public Map<LanguageModel, String> getApiKeyMap() {
