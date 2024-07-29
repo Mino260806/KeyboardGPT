@@ -43,7 +43,9 @@ public class CommandTreater implements TextTreater, ConfigChangeListener, Dialog
         }
 
         for (AbstractCommand command: mCommands) {
-            if (text.startsWith(command.getCommandPrefix())) {
+            if (text.startsWith(command.getCommandPrefix())
+                    && (text.length() == command.getCommandPrefix().length()
+                        || !Character.isLetterOrDigit(text.charAt(command.getCommandPrefix().length())))) {
                 text = text.substring(command.getCommandPrefix().length()).trim();
                 command.consume(text, mInteracter, mAIController);
                 return false;
