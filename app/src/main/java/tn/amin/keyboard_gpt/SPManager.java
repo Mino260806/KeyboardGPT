@@ -41,6 +41,9 @@ public class SPManager implements ConfigInfoProvider {
     @Override
     public LanguageModel getLanguageModel() {
         String languageModelName = mSP.getString(PREF_LANGUAGE_MODEL, null);
+        if (languageModelName == null) {
+            languageModelName = LanguageModel.Gemini.name();
+        }
         return LanguageModel.valueOf(languageModelName);
     }
 
