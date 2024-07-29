@@ -94,4 +94,5 @@ More suggestions are welcome !
 
 ## Links
 [XDA Link](https://xdaforums.com/t/mod-xposed-integrate-generative-ai-like-chatgpt-in-keyboard.4683421/)
+
 [Telegram Discussion](https://t.me/keyboard_gpt)
