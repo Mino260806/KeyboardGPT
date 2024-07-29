@@ -153,4 +153,8 @@ public class GenerativeAIController implements ConfigChangeListener {
     public LanguageModel getLanguageModel() {
         return mModelClient.getLanguageModel();
     }
+
+    public LanguageModelClient getModelClient() {
+        return mModelClient;
+    }
 }

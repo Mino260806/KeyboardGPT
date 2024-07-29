@@ -56,7 +56,8 @@ public class PromptTreater implements TextTreater, DialogDismissListener {
 
         MainHook.log("Selected " + mAIController.getLanguageModel());
         mInteracter.post(() -> {
-            mInteracter.toastShort("Selected " + mAIController.getLanguageModel());
+            mInteracter.toastShort("Selected " + mAIController.getLanguageModel()
+                    + " (" + mAIController.getModelClient().getSubModel() + ")");
         });
     }
 }
