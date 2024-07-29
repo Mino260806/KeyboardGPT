@@ -24,6 +24,11 @@ public class MainHook implements IXposedHookLoadPackage {
             return;
         }
 
+        if (lpparam.packageName.equals("tn.amin.keyboard_gpt")) {
+            MainHook.log("Not hooking own module");
+            return;
+        }
+
         switch (lpparam.packageName) {
             case "com.google.android.inputmethod.latin":
             case "com.touchtype.swiftkey":
