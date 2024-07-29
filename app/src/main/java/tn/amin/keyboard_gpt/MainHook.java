@@ -5,6 +5,7 @@ import android.app.Instrumentation;
 import android.inputmethodservice.InputMethodService;
 import android.text.Editable;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -33,12 +34,15 @@ public class MainHook implements IXposedHookLoadPackage {
             case "com.touchtype.swiftkey":
             case "com.syntellia.fleksy.keyboard":
             default:
-                hookKeyboardWithTranslateFeature(lpparam);
+                hookKeyboardWithEditText(lpparam, InstructionTrigger.EditTextClear);
+                break;
+            case "com.samsung.android.honeyboard":
+                hookKeyboardWithEditText(lpparam, InstructionTrigger.LineBreak);
                 break;
         }
     }
 
-    private void hookKeyboardWithTranslateFeature(XC_LoadPackage.LoadPackageParam lpparam) {
+    private void hookKeyboardWithEditText(XC_LoadPackage.LoadPackageParam lpparam, InstructionTrigger trigger) {
         XposedHelpers.findAndHookMethod(TextView.class, "sendBeforeTextChanged",
                 CharSequence.class, int.class, int.class, int.class, new XC_MethodHook() {
             @Override
@@ -47,6 +51,11 @@ public class MainHook implements IXposedHookLoadPackage {
                     CharSequence text = (CharSequence) param.args[0];
 
 //                    log("sendBeforeTextChanged \"" + text + "\"");
+                    if (trigger == InstructionTrigger.LineBreak) {
+                        EditText editText = (EditText) param.thisObject;
+                        brain.setEditText(editText);
+                    }
+
                     if (brain.consumeText(String.valueOf(text))) {
                         param.setResult(null);
                     }
@@ -84,28 +93,6 @@ public class MainHook implements IXposedHookLoadPackage {
             }
         });
 
-        XposedHelpers.findAndHookMethod(TextView.class, "setText", CharSequence.class,
-                new XC_MethodHook() {
-                    @Override
-                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                        if (param.thisObject instanceof EditText) {
-                            EditText editText = (EditText) param.thisObject;
-                            CharSequence text = (CharSequence) param.args[0];
-
-                            log("setText \"" + text + "\"");
-                            if (brain.consumeText(String.valueOf(text))) {
-                                param.setResult(null);
-                            }
-
-                            if (text == null || text.equals("")) {
-                                if (brain.performCommand(editText)) {
-                                    param.setResult(null);
-                                }
-                            }
-                        }
-                    }
-                });
-
         XposedHelpers.findAndHookMethod(InputMethodService.class, "onCreate", new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
@@ -128,6 +115,57 @@ public class MainHook implements IXposedHookLoadPackage {
                     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                         Application app = (Application) param.args[0];
                         brain = new KeyboardGPTBrain(app.getApplicationContext());
+                    }
+                });
+
+        switch (trigger) {
+            case EditTextClear:
+                hookKeyboardWithClearText(lpparam);
+                break;
+            case LineBreak:
+                hookKeyboardWithLineBreak(lpparam);
+                break;
+        }
+    }
+
+    private void hookKeyboardWithClearText(XC_LoadPackage.LoadPackageParam lpparam) {
+        XposedHelpers.findAndHookMethod(TextView.class, "setText", CharSequence.class,
+                new XC_MethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                        if (param.thisObject instanceof EditText) {
+                            EditText editText = (EditText) param.thisObject;
+                            CharSequence text = (CharSequence) param.args[0];
+
+                            log("setText \"" + text + "\"");
+                            if (brain.consumeText(String.valueOf(text))) {
+                                param.setResult(null);
+                            }
+
+                            if (text == null || text.equals("")) {
+                                brain.setEditText(editText);
+                                if (brain.performCommand()) {
+                                    param.setResult(null);
+                                }
+                            }
+                        }
+                    }
+                });
+    }
+
+    private void hookKeyboardWithLineBreak(XC_LoadPackage.LoadPackageParam lpparam) {
+        XposedHelpers.findAndHookMethod("android.inputmethodservice.RemoteInputConnection", lpparam.classLoader,
+                "sendKeyEvent", KeyEvent.class, new XC_MethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                        KeyEvent event = (KeyEvent) param.args[0];
+                        MainHook.log("sendKeyEvent " + event);
+                        if (event.getAction() == KeyEvent.ACTION_DOWN &&
+                            event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+                            if (brain.performCommand()) {
+                                param.setResult(null);
+                            }
+                        }
                     }
                 });
     }

@@ -24,9 +24,12 @@ public class KeyboardGPTBrain {
         return mInstructionTreater.isInstruction(text) || isEditTextOwned();
     }
 
-    public boolean performCommand(EditText editText) {
+    public void setEditText(EditText editText) {
         mInteracter.setEditText(editText);
-        String text = editText.getText().toString();
+    }
+
+    public boolean performCommand() {
+        String text = mInteracter.getEditText().getText().toString();
 
         return mInstructionTreater.treat(text);
     }

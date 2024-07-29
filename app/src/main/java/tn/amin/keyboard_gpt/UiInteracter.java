@@ -177,6 +177,13 @@ public class UiInteracter {
         updateRootView(editText.getRootView());
     }
 
+    public EditText getEditText() {
+        if (mEditText == null) {
+            return null;
+        }
+        return mEditText.get();
+    }
+
     public void registerConfigChangeListener(ConfigChangeListener listener) {
         mConfigChangeListeners.add(listener);
     }
