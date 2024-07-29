@@ -42,6 +42,8 @@ https://github.com/user-attachments/assets/0ee8e75c-753a-448a-bd8a-a0afe2e0ca12
 
 - [Fleksy](https://play.google.com/store/apps/details?id=com.syntellia.fleksy.keyboard)
 
+- [Samsung Keyboard](https://galaxystore.samsung.com/prepost/000005967885?appId=com.samsung.android.honeyboard)
+
 ## Features
 
 - Realtime AI response (supports normal and custom prompts)
