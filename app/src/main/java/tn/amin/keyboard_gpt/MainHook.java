@@ -9,7 +9,6 @@ import android.view.KeyEvent;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.google.ai.client.generativeai.BuildConfig;
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
@@ -31,7 +30,6 @@ public class MainHook implements IXposedHookLoadPackage {
             return;
         }
 
-        MainHook.log("KeyboardGPT version " + BuildConfig.VERSION_NAME);
         switch (lpparam.packageName) {
             case "com.google.android.inputmethod.latin":
             case "com.touchtype.swiftkey":
