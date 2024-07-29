@@ -18,7 +18,7 @@ public class KeyboardGPTBrain {
     private final InstructionTreater mInstructionTreater;
 
     public KeyboardGPTBrain(Context context) {
-        mSPManager = new SPManager(context);
+        mSPManager = new SPManagerCompat(context);
         mInteracter = new UiInteracter(context, mSPManager);
 
         mAIController = new GenerativeAIController(mSPManager, mInteracter);

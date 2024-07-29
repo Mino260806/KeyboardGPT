@@ -3,38 +3,32 @@ package tn.amin.keyboard_gpt;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.renderscript.ScriptIntrinsicYuvToRGB;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import tn.amin.keyboard_gpt.instruction.command.Commands;
 import tn.amin.keyboard_gpt.instruction.command.GenerativeAICommand;
-import tn.amin.keyboard_gpt.instruction.command.SimpleGenerativeAICommand;
 import tn.amin.keyboard_gpt.language_model.LanguageModel;
 
 public class SPManager implements ConfigInfoProvider {
-    private static final String PREF_NAME = "keyboard_gpt";
+    protected static final String PREF_NAME = "keyboard_gpt";
 
-    private static final String PREF_LANGUAGE_MODEL = "language_model";
+    protected static final String PREF_LANGUAGE_MODEL_COMPAT = "language_model";
 
-    private static final String PREF_API_KEY = "%s.api_key";
+    protected static final String PREF_LANGUAGE_MODEL = "language_model_v2";
 
-    private static final String PREF_SUB_MODEL = "%s.sub_model";
+    protected static final String PREF_API_KEY = "%s.api_key";
 
-    private static final String PREF_BASE_URL = "%s.base_url";
+    protected static final String PREF_SUB_MODEL = "%s.sub_model";
 
-    private static final String PREF_GEN_AI_COMMANDS = "gen_ai_commands";
+    protected static final String PREF_BASE_URL = "%s.base_url";
 
-    private final SharedPreferences mSP;
+    protected static final String PREF_GEN_AI_COMMANDS = "gen_ai_commands";
+
+    protected final SharedPreferences mSP;
 
     public SPManager(Context context) {
         mSP = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
@@ -46,11 +40,12 @@ public class SPManager implements ConfigInfoProvider {
 
     @Override
     public LanguageModel getLanguageModel() {
-        return LanguageModel.values()[mSP.getInt(PREF_LANGUAGE_MODEL, 0)];
+        String languageModelName = mSP.getString(PREF_LANGUAGE_MODEL, null);
+        return LanguageModel.valueOf(languageModelName);
     }
 
     public void setLanguageModel(LanguageModel model) {
-        mSP.edit().putInt(PREF_LANGUAGE_MODEL, model.ordinal()).apply();
+        mSP.edit().putString(PREF_LANGUAGE_MODEL, model.name()).apply();
     }
 
     public void setApiKey(LanguageModel model, String apiKey) {
