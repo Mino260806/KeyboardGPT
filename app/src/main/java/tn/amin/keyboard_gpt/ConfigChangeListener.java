@@ -1,8 +1,5 @@
 package tn.amin.keyboard_gpt;
 
-import java.util.ArrayList;
-
-import tn.amin.keyboard_gpt.instruction.command.GenerativeAICommand;
 import tn.amin.keyboard_gpt.language_model.LanguageModel;
 
 public interface ConfigChangeListener {

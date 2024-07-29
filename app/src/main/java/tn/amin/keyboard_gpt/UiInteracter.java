@@ -9,8 +9,6 @@ import android.inputmethodservice.InputMethodService;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.text.InputType;
-import android.text.TextWatcher;
 import android.view.View;
 import android.view.inputmethod.InputConnection;
 import android.widget.EditText;
@@ -20,7 +18,6 @@ import android.widget.Toast;
 import androidx.core.content.ContextCompat;
 
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -214,7 +211,6 @@ public class UiInteracter {
         return false;
     }
 
-    /** @noinspection unchecked*/
     @SuppressLint("DiscouragedPrivateApi")
     public void setText(String text) {
         Method setTextMethod;
