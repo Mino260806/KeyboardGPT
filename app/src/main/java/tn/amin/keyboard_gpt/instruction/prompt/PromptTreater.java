@@ -26,7 +26,7 @@ public class PromptTreater implements TextTreater, DialogDismissListener {
             if (mInteracter.showChoseModelDialog()) {
                 mInteracter.toastLong("Chose and configure your language model");
             }
-            return true;
+            return false;
         }
 
         if (mAIController.needModelClient()) {

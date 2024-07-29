@@ -38,14 +38,15 @@ public class CommandTreater implements TextTreater, ConfigChangeListener, Dialog
     @Override
     public boolean treat(String text) {
         if (text.startsWith(InstructionCategory.Command.prefix)) {
-            return mInteracter.showEditCommandsDialog(mSPManager.getGenerativeAICommandsRaw());
+            mInteracter.showEditCommandsDialog(mSPManager.getGenerativeAICommandsRaw());
+            return false;
         }
 
         for (AbstractCommand command: mCommands) {
             if (text.startsWith(command.getCommandPrefix())) {
                 text = text.substring(command.getCommandPrefix().length()).trim();
                 command.consume(text, mInteracter, mAIController);
-                return true;
+                return false;
             }
         }
 
