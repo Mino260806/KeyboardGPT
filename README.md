@@ -74,9 +74,9 @@ Open any editable text (like translate, search gif, etc) in your keyboard, and t
 
 - `!!` to configure custom AI prompts
 
-- `!{p}` to submit a custom prompt where `{p}` is the prefix you chose
+- `!{p} your prompt` to submit a custom prompt where `{p}` is the prefix you chose
 
-- `!s` to do a web search
+- `!s anything` to do a web search
 
 See "Demo Video" above
 
