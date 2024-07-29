@@ -9,6 +9,27 @@ https://github.com/user-attachments/assets/d00d362d-078f-4d8f-8b17-1544fb62cb37
 
 </details>
 
+<details>
+  <summary>Demo Video: Custom Prompts</summary>
+
+
+https://github.com/user-attachments/assets/6143837f-9896-4f60-b97a-730fd2aa0fde
+
+
+</details>
+
+
+<details>
+  <summary>Demo Video: Web Search</summary>
+
+
+
+https://github.com/user-attachments/assets/0ee8e75c-753a-448a-bd8a-a0afe2e0ca12
+
+
+
+</details>
+
 <p align="center">
   <img src="demo/icon_border.png" alt="Icon" style="border: 10px solid black;"/>
 </p>
@@ -20,6 +41,12 @@ https://github.com/user-attachments/assets/d00d362d-078f-4d8f-8b17-1544fb62cb37
 - [Swiftkey](https://play.google.com/store/apps/details?id=com.touchtype.swiftkey)
 
 - [Fleksy](https://play.google.com/store/apps/details?id=com.syntellia.fleksy.keyboard)
+
+## Features
+
+- Realtime AI response (supports normal and custom prompts)
+
+- Web Search
 
 ## Install Guide
 
@@ -39,23 +66,17 @@ https://github.com/user-attachments/assets/d00d362d-078f-4d8f-8b17-1544fb62cb37
 
 ## Usage Guide
 
-Open any editable text (like translate, search gif, etc) in your keyboard, and type
+Open any editable text (like translate, search gif, etc) in your keyboard, and type your preferred instruction before pressing Enter
 
-```
-? your prompt
-```
+- `??` to configure your API provider (api key, language model...)
 
-Select enter to submit your prompt.
+- `? your prompt` to submit a normal prompt
 
-- If first time, a dialog should appear that lets you select your preferred language model then input your API Key. Select enter again when finished.
+- `!!` to configure custom AI prompts
 
-- You will get a realtime AI Generated response typed automatically typed by the keyboard.
+- `!{p}` to submit a custom prompt where `{p}` is the prefix you chose
 
-If you want to select / configure a language model, then type before selecting Enter
-
-```
-??
-```
+- `!s` to do a web search
 
 See "Demo Video" above
 
@@ -73,3 +94,4 @@ More suggestions are welcome !
 
 ## Links
 [XDA Link](https://xdaforums.com/t/mod-xposed-integrate-generative-ai-like-chatgpt-in-keyboard.4683421/)
+[Telegram Discussion](https://t.me/keyboard_gpt)
