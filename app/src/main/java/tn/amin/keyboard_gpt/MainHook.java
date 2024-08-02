@@ -23,7 +23,9 @@ public class MainHook implements IXposedHookLoadPackage {
 
     private InstructionTrigger trigger;
 
-    private String editTextClass = EditText.class.getName();
+    private String editTextClassLiteral = EditText.class.getName();
+
+    private Class<?> editTextClass = null;
 
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
@@ -60,6 +62,8 @@ public class MainHook implements IXposedHookLoadPackage {
     }
 
     private void hookKeyboard(XC_LoadPackage.LoadPackageParam lpparam) {
+        editTextClass = XposedHelpers.findClass(editTextClassLiteral, lpparam.classLoader);
+
         XposedHelpers.findAndHookMethod(InputMethodService.class, "onCreate", new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
@@ -111,7 +115,7 @@ public class MainHook implements IXposedHookLoadPackage {
         XposedHelpers.findAndHookMethod(TextView.class, "setText", CharSequence.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                if (param.thisObject.getClass().getName().equals(editTextClass)) {
+                if (editTextClass.isInstance(param.thisObject)) {
 //                    log("setText " + param.args[0]);
                     CharSequence text = (CharSequence) param.args[0];
 
@@ -131,7 +135,7 @@ public class MainHook implements IXposedHookLoadPackage {
                 CharSequence.class, int.class, int.class, int.class, new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                        if (editTextClass.equals(param.thisObject.getClass().getName())) {
+                        if (editTextClass.isInstance(param.thisObject)) {
                             CharSequence text = (CharSequence) param.args[0];
 
 //                    log("sendBeforeTextChanged \"" + text + "\"");
@@ -151,7 +155,7 @@ public class MainHook implements IXposedHookLoadPackage {
                 CharSequence.class, int.class, int.class, int.class, new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                        if (editTextClass.equals(param.thisObject.getClass().getName())) {
+                        if (editTextClass.isInstance(param.thisObject)) {
                             CharSequence text = (CharSequence) param.args[0];
 
 //                    log("sendOnTextChanged \"" + text + "\"");
@@ -166,7 +170,7 @@ public class MainHook implements IXposedHookLoadPackage {
                 Editable.class, new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                        if (editTextClass.equals(param.thisObject.getClass().getName())) {
+                        if (editTextClass.isInstance(param.thisObject)) {
                             Editable text = (Editable) param.args[0];
 
 //                    log("sendAfterTextChanged \"" + text + "\"");
@@ -183,7 +187,7 @@ public class MainHook implements IXposedHookLoadPackage {
                 new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                        if (editTextClass.equals(param.thisObject.getClass().getName())) {
+                        if (editTextClass.isInstance(param.thisObject)) {
                             EditText editText = (EditText) param.thisObject;
                             CharSequence text = (CharSequence) param.args[0];
 
