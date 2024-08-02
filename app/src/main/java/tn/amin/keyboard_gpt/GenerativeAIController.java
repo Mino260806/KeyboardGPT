@@ -118,7 +118,7 @@ public class GenerativeAIController implements ConfigChangeListener {
 
                 MainHook.log("onNext: \"" + s + "\"");
 
-                mInteracter.getInputConnection().commitText(s, 1);
+                mInteracter.post(() -> mInteracter.getInputConnection().commitText(s, 1));
             }
 
             @Override

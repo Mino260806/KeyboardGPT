@@ -2,7 +2,7 @@ package tn.amin.keyboard_gpt;
 
 import android.content.Context;
 import android.inputmethodservice.InputMethodService;
-import android.widget.EditText;
+import android.widget.TextView;
 
 import tn.amin.keyboard_gpt.instruction.InstructionTreater;
 
@@ -24,7 +24,7 @@ public class KeyboardGPTBrain {
         return mInstructionTreater.isInstruction(text) || isEditTextOwned();
     }
 
-    public void setEditText(EditText editText) {
+    public void setEditText(TextView editText) {
         mInteracter.setEditText(editText);
     }
 

@@ -62,7 +62,7 @@ public class UiInteracter {
     private Object mEditTextOwner = null;
 
     private WeakReference<View> mRootView = null;
-    private WeakReference<EditText> mEditText = null;
+    private WeakReference<TextView> mEditText = null;
     private InputMethodService mInputMethodService;
 
     public UiInteracter(Context context, ConfigInfoProvider configInfoProvider) {
@@ -172,12 +172,12 @@ public class UiInteracter {
         mRootView = new WeakReference<>(view);
     }
 
-    public void setEditText(EditText editText) {
+    public void setEditText(TextView editText) {
         mEditText = new WeakReference<>(editText);
         updateRootView(editText.getRootView());
     }
 
-    public EditText getEditText() {
+    public TextView getEditText() {
         if (mEditText == null) {
             return null;
         }
@@ -222,12 +222,14 @@ public class UiInteracter {
     public void setText(String text) {
         Method setTextMethod;
         try {
-            setTextMethod = TextView.class.getMethod("setText", CharSequence.class);
-            XposedBridge.invokeOriginalMethod(setTextMethod, mEditText.get(), new Object[] { text });
+            setTextMethod = TextView.class.getMethod("setText", CharSequence.class, TextView.BufferType.class);
+            XposedBridge.invokeOriginalMethod(setTextMethod, mEditText.get(), new Object[] { text, TextView.BufferType.EDITABLE });
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
-        mEditText.get().setSelection(text.length());
+        if (mEditText.get() instanceof EditText) {
+            ((EditText)mEditText.get()).setSelection(text.length());
+        }
     }
 
     public void setInputType(int inputType) {
