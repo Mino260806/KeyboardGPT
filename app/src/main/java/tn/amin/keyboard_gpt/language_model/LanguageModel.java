@@ -22,20 +22,4 @@ public enum LanguageModel {
         this.defaultSubModel = defaultSubModel;
         this.defaultBaseUrl = defaultBaseUrl;
     }
-
-    public static Map<LanguageModel, String> decodeMap(String raw) {
-        if (raw == null) {
-            return Collections.emptyMap();
-        }
-
-        return Arrays.stream(raw.split("#####", -1))
-                .collect(Collectors.toMap(
-                        value -> LanguageModel.valueOf(value.split("~~~~~~~~~", -1)[0]),
-                        value -> value.split("~~~~~~~~~", -1)[1]));
-    }
-
-    public static String encodeMap(Map<LanguageModel, String> map) {
-        return map.keySet().stream().map(model -> model.name() + "~~~~~~~~~" + map.get(model))
-                .collect(Collectors.joining("#####"));
-    }
 }
