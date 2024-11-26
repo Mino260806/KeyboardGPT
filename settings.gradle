@@ -3,6 +3,8 @@ pluginManagement {
         google()
         mavenCentral()
         gradlePluginPortal()
+        maven { url("https://api.xposed.info/") }
+        maven { url("https://s01.oss.sonatype.org/content/repositories/releases/") }
     }
 }
 dependencyResolutionManagement {
@@ -11,6 +13,8 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         jcenter();
+        maven { url("https://api.xposed.info/") }
+        maven { url("https://s01.oss.sonatype.org/content/repositories/releases/") }
     }
 }
 rootProject.name = "KeyboardGPT"
