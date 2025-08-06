@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace 'tn.amin.keyboard_gpt'
-    compileSdk 34
+    compileSdk 36
 
     defaultConfig {
         applicationId "tn.amin.keyboard_gpt"
         minSdk 24
-        targetSdk 34
+        targetSdkVersion 36
         versionCode 12
         versionName "1.1.1"
 
@@ -30,6 +30,11 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+    packaging {
+        jniLibs {
+            useLegacyPackaging false
+        }
+    }
 }
 
 dependencies {
@@ -46,4 +51,9 @@ dependencies {
     implementation("org.reactivestreams:reactive-streams:1.0.4")
 
     compileOnly 'de.robv.android.xposed:api:82'
+}
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }

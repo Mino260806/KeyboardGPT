@@ -38,6 +38,7 @@ public class MainHook implements IXposedHookLoadPackage {
             return;
         }
 
+        MainHook.log("Loading KeyboardGPT for package " + lpparam.packageName);
         switch (lpparam.packageName) {
             case "com.samsung.android.honeyboard":
                 intercept = InstructionIntercept.EditTextListener;

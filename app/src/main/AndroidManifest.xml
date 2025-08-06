@@ -12,8 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.KeyboardGPT"
         tools:targetApi="31"
-        android:multiArch="true"
-        android:extractNativeLibs="false">
+        android:multiArch="true">
 
         <activity android:name=".ui.DialogActivity"
             android:theme="@style/Theme.KeyboardGPT.Translucent"
