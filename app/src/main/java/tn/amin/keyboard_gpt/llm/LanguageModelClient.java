@@ -49,6 +49,8 @@ public abstract class LanguageModelClient {
 //                return new HuggingChatClient();
             case Groq:
                 return new GroqClient();
+            case OpenRouter:
+                return new OpenRouterClient();
             case Claude:
                 return new ClaudeClient();
             default:
