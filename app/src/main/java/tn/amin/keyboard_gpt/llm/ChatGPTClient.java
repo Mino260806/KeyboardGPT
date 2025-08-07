@@ -1,4 +1,4 @@
-package tn.amin.keyboard_gpt.language_model;
+package tn.amin.keyboard_gpt.llm;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,8 +14,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 
 import tn.amin.keyboard_gpt.MainHook;
-import tn.amin.keyboard_gpt.language_model.publisher.ExceptionPublisher;
-import tn.amin.keyboard_gpt.language_model.publisher.InputStreamPublisher;
+import tn.amin.keyboard_gpt.llm.publisher.ExceptionPublisher;
+import tn.amin.keyboard_gpt.llm.publisher.InputStreamPublisher;
 
 public class ChatGPTClient extends LanguageModelClient {
     @Override

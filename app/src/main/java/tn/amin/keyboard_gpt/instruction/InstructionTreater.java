@@ -3,7 +3,7 @@ package tn.amin.keyboard_gpt.instruction;
 import tn.amin.keyboard_gpt.GenerativeAIController;
 import tn.amin.keyboard_gpt.MainHook;
 import tn.amin.keyboard_gpt.SPManager;
-import tn.amin.keyboard_gpt.UiInteracter;
+import tn.amin.keyboard_gpt.UiInteractor;
 import tn.amin.keyboard_gpt.instruction.command.CommandTreater;
 import tn.amin.keyboard_gpt.instruction.prompt.PromptTreater;
 
@@ -11,7 +11,7 @@ public class InstructionTreater implements TextTreater {
     private final CommandTreater mCommandTreater;
     private final PromptTreater mPromptTreater;
 
-    public InstructionTreater(SPManager spManager, UiInteracter interacter, GenerativeAIController aiController) {
+    public InstructionTreater(SPManager spManager, UiInteractor interacter, GenerativeAIController aiController) {
         mPromptTreater = new PromptTreater(spManager, interacter, aiController);
         mCommandTreater = new CommandTreater(spManager, interacter, aiController);
     }

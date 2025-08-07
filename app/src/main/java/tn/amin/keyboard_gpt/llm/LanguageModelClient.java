@@ -1,4 +1,4 @@
-package tn.amin.keyboard_gpt.language_model;
+package tn.amin.keyboard_gpt.llm;
 
 import androidx.annotation.NonNull;
 

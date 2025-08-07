@@ -1,18 +1,18 @@
 package tn.amin.keyboard_gpt.instruction.prompt;
 
-import tn.amin.keyboard_gpt.DialogDismissListener;
+import tn.amin.keyboard_gpt.listener.DialogDismissListener;
 import tn.amin.keyboard_gpt.GenerativeAIController;
 import tn.amin.keyboard_gpt.MainHook;
 import tn.amin.keyboard_gpt.SPManager;
-import tn.amin.keyboard_gpt.UiInteracter;
+import tn.amin.keyboard_gpt.UiInteractor;
 import tn.amin.keyboard_gpt.instruction.TextTreater;
 
 public class PromptTreater implements TextTreater, DialogDismissListener {
     private final SPManager mSPManager;
-    private final UiInteracter mInteracter;
+    private final UiInteractor mInteracter;
     private final GenerativeAIController mAIController;
 
-    public PromptTreater(SPManager spManager, UiInteracter interacter, GenerativeAIController aiController) {
+    public PromptTreater(SPManager spManager, UiInteractor interacter, GenerativeAIController aiController) {
         mSPManager = spManager;
         mInteracter = interacter;
         mAIController = aiController;

@@ -9,26 +9,20 @@ import android.inputmethodservice.InputMethodService;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.view.View;
 import android.view.inputmethod.InputConnection;
-import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
 
-import java.lang.ref.WeakReference;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 
-import de.robv.android.xposed.XposedBridge;
-import tn.amin.keyboard_gpt.language_model.LanguageModel;
+import tn.amin.keyboard_gpt.llm.LanguageModel;
+import tn.amin.keyboard_gpt.listener.ConfigChangeListener;
+import tn.amin.keyboard_gpt.listener.ConfigInfoProvider;
+import tn.amin.keyboard_gpt.listener.DialogDismissListener;
 import tn.amin.keyboard_gpt.ui.DialogType;
 
-public class UiInteracter {
-    private final Context mContext;
-
+public class UiInteractor {
     public static final String ACTION_DIALOG_RESULT = "tn.amin.keyboard_gpt.DIALOG_RESULT";
 
     public static final String EXTRA_DIALOG_TYPE = "tn.amin.keyboard_gpt.overlay.DIALOG_TYPE";
@@ -53,21 +47,44 @@ public class UiInteracter {
 
     public static final String EXTRA_COMMAND_INDEX = "tn.amin.keyboard_gpt.command.INDEX";
 
-
-    private final ConfigInfoProvider mConfigInfoProvider;
+    private Context mContext = null;
+    private ConfigInfoProvider mConfigInfoProvider = null;
     private final ArrayList<ConfigChangeListener> mConfigChangeListeners = new ArrayList<>();
     private final ArrayList<DialogDismissListener> mOnDismissListeners = new ArrayList<>();
 
     private long mLastDialogLaunch = 0L;
-    private Object mEditTextOwner = null;
 
-    private WeakReference<View> mRootView = null;
-    private WeakReference<TextView> mEditText = null;
     private InputMethodService mInputMethodService;
 
-    public UiInteracter(Context context, ConfigInfoProvider configInfoProvider) {
+    private IMSController mIMSController;
+
+    private static UiInteractor instance = null;
+
+    public static UiInteractor getInstance() {
+        if (instance == null) {
+            throw new RuntimeException("Missing call to UiInteracter.init(Context)");
+        }
+        return instance;
+    }
+
+    private UiInteractor(Context context, ConfigInfoProvider configInfoProvider) {
         mContext = context;
         mConfigInfoProvider = configInfoProvider;
+        mIMSController = new IMSController();
+    }
+
+    public static void init(Context context) {
+        instance = new UiInteractor(context, SPManager.getInstance());
+    }
+
+    public void onInputMethodCreate(InputMethodService inputMethodService) {
+        registerService(inputMethodService);
+        mIMSController.registerService(inputMethodService);
+    }
+
+    public void onInputMethodDestroy(InputMethodService inputMethodService) {
+        unregisterService(inputMethodService);
+        mIMSController.unregisterService(inputMethodService);
     }
 
     private final BroadcastReceiver mDialogResultReceiver = new BroadcastReceiver() {
@@ -167,23 +184,6 @@ public class UiInteracter {
         return true;
     }
 
-    public void updateRootView(View view) {
-        MainHook.log("Root View is " + view.getRootView().getClass().getName());
-        mRootView = new WeakReference<>(view);
-    }
-
-    public void setEditText(TextView editText) {
-        mEditText = new WeakReference<>(editText);
-        updateRootView(editText.getRootView());
-    }
-
-    public TextView getEditText() {
-        if (mEditText == null) {
-            return null;
-        }
-        return mEditText.get();
-    }
-
     public void registerConfigChangeListener(ConfigChangeListener listener) {
         mConfigChangeListeners.add(listener);
     }
@@ -218,24 +218,6 @@ public class UiInteracter {
         return false;
     }
 
-    @SuppressLint("DiscouragedPrivateApi")
-    public void setText(String text) {
-        Method setTextMethod;
-        try {
-            setTextMethod = TextView.class.getMethod("setText", CharSequence.class, TextView.BufferType.class);
-            XposedBridge.invokeOriginalMethod(setTextMethod, mEditText.get(), new Object[] { text, TextView.BufferType.EDITABLE });
-        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-        if (mEditText.get() instanceof EditText) {
-            ((EditText)mEditText.get()).setSelection(text.length());
-        }
-    }
-
-    public void setInputType(int inputType) {
-        mEditText.get().setInputType(inputType);
-    }
-
     public void toastShort(String message) {
         Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
     }
@@ -252,31 +234,7 @@ public class UiInteracter {
         return mInputMethodService.getCurrentInputConnection();
     }
 
-    public boolean requestEditTextOwnership(Object newOwner) {
-        if (mEditText == null || mEditText.get() == null) {
-            MainHook.log("Refused EditText ownership to " + newOwner + " because EditText is null");
-            return false;
-        }
-
-        if (mEditTextOwner != null && !newOwner.equals(mEditTextOwner)) {
-            MainHook.log("Refused EditText ownership to " + newOwner + " because owned by " + mEditTextOwner);
-            return false;
-        }
-
-        mEditTextOwner = newOwner;
-        return true;
-    }
-
-    public void releaseEditTextOwnership(Object owner) {
-        if (owner != mEditTextOwner) {
-            MainHook.log("EditText owner " + owner + " cannot release EditText");
-            return;
-        }
-
-        mEditTextOwner = null;
-    }
-
-    public boolean isEditTextOwned() {
-        return mEditTextOwner != null;
+    public IMSController getIMSController() {
+        return mIMSController;
     }
 }

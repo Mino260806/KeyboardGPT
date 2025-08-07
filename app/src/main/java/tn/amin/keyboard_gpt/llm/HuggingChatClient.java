@@ -1,4 +1,4 @@
-package tn.amin.keyboard_gpt.language_model;
+package tn.amin.keyboard_gpt.llm;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,8 +11,8 @@ import java.net.URL;
 import java.util.UUID;
 
 import de.robv.android.xposed.XposedBridge;
-import tn.amin.keyboard_gpt.language_model.publisher.ExceptionPublisher;
-import tn.amin.keyboard_gpt.language_model.publisher.InputStreamPublisher;
+import tn.amin.keyboard_gpt.llm.publisher.ExceptionPublisher;
+import tn.amin.keyboard_gpt.llm.publisher.InputStreamPublisher;
 
 // TODO not working
 public class HuggingChatClient extends LanguageModelClient {
