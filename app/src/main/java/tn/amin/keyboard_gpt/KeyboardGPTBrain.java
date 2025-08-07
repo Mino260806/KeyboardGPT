@@ -17,6 +17,9 @@ import tn.amin.keyboard_gpt.text.parse.result.ParseResult;
 import tn.amin.keyboard_gpt.text.transform.format.TextUnicodeConverter;
 
 public class KeyboardGPTBrain implements InputEventListener, GenerativeAIListener, DialogDismissListener {
+    private final static String STR_GENERATING_CONTENT = "<Generating Content...>";
+    private boolean justPrepared = true;
+
     private final GenerativeAIController mAIController;
     private final CommandManager mCommandManager;
 //    private final InstructionTreater mInstructionTreater;
@@ -99,25 +102,41 @@ public class KeyboardGPTBrain implements InputEventListener, GenerativeAIListene
     @Override
     public void onAIPrepare() {
         MainHook.log("[Brain] ONPREPARE");
+        IMSController.getInstance().flush();
+        IMSController.getInstance().commit(STR_GENERATING_CONTENT);
+
         IMSController.getInstance().stopNotifyInput();
+        IMSController.getInstance().startInputLock();
+
+        justPrepared = true;
     }
 
     @Override
     public void onAINext(String chunk) {
         MainHook.log("[Brain] ONNEXT");
+        IMSController.getInstance().endInputLock();
+        if (justPrepared) {
+            justPrepared = false;
+
+            IMSController.getInstance().flush();
+            IMSController.getInstance().delete(STR_GENERATING_CONTENT.length());
+        }
         IMSController.getInstance().flush();
         IMSController.getInstance().commit(chunk);
+        IMSController.getInstance().startInputLock();
     }
 
     @Override
     public void onAIError(Throwable t) {
         MainHook.log("[Brain] ONERROR");
+        IMSController.getInstance().endInputLock();
         IMSController.getInstance().startNotifyInput();
     }
 
     @Override
     public void onAIComplete() {
         MainHook.log("[Brain] ONCOMPLETE");
+        IMSController.getInstance().endInputLock();
         IMSController.getInstance().startNotifyInput();
     }
 

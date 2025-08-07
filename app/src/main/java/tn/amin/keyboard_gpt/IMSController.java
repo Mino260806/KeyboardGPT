@@ -15,6 +15,7 @@ public class IMSController {
     private String typedText = "";
     private int cursor = 0;
     private boolean inputNotify = false;
+    private boolean inputLock = false;
 
     private List<InputEventListener> mListeners = new ArrayList<>();
 
@@ -95,5 +96,17 @@ public class IMSController {
         if (ic != null) {
             ic.finishComposingText();
         }
+    }
+
+    public boolean isInputLocked() {
+        return inputLock;
+    }
+
+    public void startInputLock() {
+        inputLock = true;
+    }
+
+    public void endInputLock() {
+        inputLock = false;
     }
 }

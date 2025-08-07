@@ -111,8 +111,10 @@ public class MainHook implements IXposedHookLoadPackage {
                     );
                 }));
 
-        hookManager.hook(InputMethodService.class, "onStartInput",
+        hookManager.hook(inputMethodServiceClass, "onStartInput",
                 new Class<?>[] { EditorInfo.class, boolean.class } , MethodHook.after(param -> {
+                hookManager.unhook(m -> m.getClass().equals(inputConnectionClass));
+
                 MainHook.log("InputMethodService onStartInput");
                 InputMethodService ims = (InputMethodService) param.thisObject;
 
@@ -120,39 +122,37 @@ public class MainHook implements IXposedHookLoadPackage {
                 inputConnectionClass = ims.getCurrentInputConnection().getClass();
                 MainHook.log("InputMethodService InputConnection : " + inputConnectionClass.getName());
 
-//                hookInputConnection();
+                hookInputConnection();
         }));
-
     }
 
     private void hookInputConnection() {
         hookManager.hook(inputConnectionClass, "commitText",
-                new Class<?>[]{ CharSequence.class, int.class }, MethodHook.after(param -> {
-//                    brain.getIMSController().onCommitText((CharSequence) param.args[0], (Integer) param.args[1]);
-//                    MainHook.log("[" + brain.getIMSController().getCursorPos() + "] commitText " + param.args[1] + " : " + param.args[0]);
+                new Class<?>[]{ CharSequence.class, int.class }, MethodHook.before(param -> {
+                    if (IMSController.getInstance().isInputLocked()) {
+                        param.setResult(false);
+                    }
                 }));
 
         hookManager.hook(inputConnectionClass, "setComposingText",
-                new Class<?>[]{ CharSequence.class, int.class }, MethodHook.after(param -> {
-//                    brain.getIMSController().onSetComposingText((CharSequence) param.args[0], (Integer) param.args[1]);
-//                    MainHook.log("[" + brain.getIMSController().getCursorPos() + "] setComposingText " + param.args[1] + " : " + param.args[0]);
+                new Class<?>[]{ CharSequence.class, int.class }, MethodHook.before(param -> {
+                    if (IMSController.getInstance().isInputLocked()) {
+                        param.setResult(false);
+                    }
                 }));
 
         hookManager.hook(inputConnectionClass, "finishComposingText",
-                new Class<?>[]{ }, MethodHook.after(param -> {
-//                    MainHook.log("[" + brain.getIMSController().getCursorPos() + "] finishComposingText");
+                new Class<?>[]{ }, MethodHook.before(param -> {
+                    if (IMSController.getInstance().isInputLocked()) {
+                        param.setResult(false);
+                    }
                 }));
 
         hookManager.hook(inputConnectionClass, "deleteSurroundingText",
-                new Class<?>[]{ int.class, int.class }, MethodHook.after(param -> {
-//                    brain.getIMSController().onDeleteSurroundingText((Integer) param.args[0], (Integer) param.args[1]);
-//                    MainHook.log("[" + brain.getIMSController().getCursorPos() + "] deleteSurroundingText " + param.args[0] + " , " + param.args[1]);
-                }));
-
-        hookManager.hook(inputConnectionClass, "deleteSurroundingText",
-                new Class<?>[]{ int.class, int.class }, MethodHook.after(param -> {
-//                    brain.getIMSController().onDeleteSurroundingText((Integer) param.args[0], (Integer) param.args[1]);
-//                    MainHook.log("[" + brain.getIMSController().getCursorPos() + "] deleteSurroundingText " + param.args[0] + " , " + param.args[1]);
+                new Class<?>[]{ int.class, int.class }, MethodHook.before(param -> {
+                    if (IMSController.getInstance().isInputLocked()) {
+                        param.setResult(false);
+                    }
                 }));
     }
 
