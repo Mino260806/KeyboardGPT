@@ -1,10 +1,14 @@
 package tn.amin.keyboard_gpt.llm;
 
 import com.google.genai.Client;
+import com.google.genai.ResponseStream;
 import com.google.genai.types.GenerateContentResponse;
 
 import org.reactivestreams.Publisher;
 
+import java.util.concurrent.CompletableFuture;
+
+import tn.amin.keyboard_gpt.llm.publisher.GeminiPublisherWrapper;
 import tn.amin.keyboard_gpt.llm.publisher.SimpleStringPublisher;
 
 public class GeminiClient extends LanguageModelClient {
@@ -21,10 +25,11 @@ public class GeminiClient extends LanguageModelClient {
         Client client = new Client.Builder()
                 .apiKey(getApiKey())
                 .build();
-        GenerateContentResponse response =
-                client.models.generateContent(getSubModel(), prompt, null);
 
-        return new SimpleStringPublisher(response.text());
+        ResponseStream<GenerateContentResponse> responseStream =
+                client.models.generateContentStream(getSubModel(), prompt, null);
+
+        return new GeminiPublisherWrapper(responseStream);
     }
 
     @Override

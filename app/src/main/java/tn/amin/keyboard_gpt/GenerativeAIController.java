@@ -123,7 +123,7 @@ public class GenerativeAIController implements ConfigChangeListener {
 
             @Override
             public void onNext(String s) {
-                if (s.isEmpty()) {
+                if (s == null || s.isEmpty()) {
                     return;
                 }
 
