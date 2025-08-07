@@ -22,13 +22,13 @@ import java.util.Arrays;
 import java.util.stream.Stream;
 
 import tn.amin.keyboard_gpt.R;
-import tn.amin.keyboard_gpt.UiInteracter;
+import tn.amin.keyboard_gpt.UiInteractor;
 import tn.amin.keyboard_gpt.instruction.InstructionCategory;
 import tn.amin.keyboard_gpt.instruction.command.AbstractCommand;
 import tn.amin.keyboard_gpt.instruction.command.Commands;
 import tn.amin.keyboard_gpt.instruction.command.GenerativeAICommand;
 import tn.amin.keyboard_gpt.instruction.command.SimpleGenerativeAICommand;
-import tn.amin.keyboard_gpt.language_model.LanguageModel;
+import tn.amin.keyboard_gpt.llm.LanguageModel;
 
 public class DialogActivity extends Activity {
     private DialogType mLastDialogType = null;
@@ -46,7 +46,7 @@ public class DialogActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         DialogType dialogType = DialogType.valueOf(
-                getIntent().getStringExtra(UiInteracter.EXTRA_DIALOG_TYPE));
+                getIntent().getStringExtra(UiInteractor.EXTRA_DIALOG_TYPE));
 
         Dialog dialog = buildDialog(dialogType);
         showDialog(dialog, dialogType);
@@ -162,14 +162,14 @@ public class DialogActivity extends Activity {
     }
 
     private Dialog buildWebSearchDialog() {
-        String title = getIntent().getStringExtra(UiInteracter.EXTRA_WEBVIEW_TITLE);
+        String title = getIntent().getStringExtra(UiInteractor.EXTRA_WEBVIEW_TITLE);
         if (title == null) {
             title = "Untitled";
         }
 
-        String url = getIntent().getStringExtra(UiInteracter.EXTRA_WEBVIEW_URL);
+        String url = getIntent().getStringExtra(UiInteractor.EXTRA_WEBVIEW_URL);
         if (url == null) {
-            throw new NullPointerException(UiInteracter.EXTRA_WEBVIEW_URL + " cannot be null");
+            throw new NullPointerException(UiInteractor.EXTRA_WEBVIEW_URL + " cannot be null");
         }
 
         WebView webView = new WebView(this);
@@ -196,10 +196,10 @@ public class DialogActivity extends Activity {
             throw new RuntimeException("No model " + mSelectedModel.name());
         }
 
-        String subModel = modelConfig.getString(UiInteracter.EXTRA_CONFIG_LANGUAGE_MODEL_SUB_MODEL);
+        String subModel = modelConfig.getString(UiInteractor.EXTRA_CONFIG_LANGUAGE_MODEL_SUB_MODEL);
         subModel = subModel != null ? subModel : mSelectedModel.defaultSubModel;
-        String apiKey = modelConfig.getString(UiInteracter.EXTRA_CONFIG_LANGUAGE_MODEL_API_KEY);
-        String baseUrl = modelConfig.getString(UiInteracter.EXTRA_CONFIG_LANGUAGE_MODEL_BASE_URL);
+        String apiKey = modelConfig.getString(UiInteractor.EXTRA_CONFIG_LANGUAGE_MODEL_API_KEY);
+        String baseUrl = modelConfig.getString(UiInteractor.EXTRA_CONFIG_LANGUAGE_MODEL_BASE_URL);
         baseUrl = baseUrl != null ? baseUrl : mSelectedModel.defaultBaseUrl;
 
         LinearLayout layout = (LinearLayout)
@@ -216,11 +216,11 @@ public class DialogActivity extends Activity {
                 .setTitle(mSelectedModel.label + " configuration")
                 .setView(layout)
                 .setPositiveButton("Ok", (dialog, which) -> {
-                    modelConfig.putString(UiInteracter.EXTRA_CONFIG_LANGUAGE_MODEL_API_KEY,
+                    modelConfig.putString(UiInteractor.EXTRA_CONFIG_LANGUAGE_MODEL_API_KEY,
                             apiKeyEditText.getText().toString());
-                    modelConfig.putString(UiInteracter.EXTRA_CONFIG_LANGUAGE_MODEL_SUB_MODEL,
+                    modelConfig.putString(UiInteractor.EXTRA_CONFIG_LANGUAGE_MODEL_SUB_MODEL,
                             subModelEditText.getText().toString());
-                    modelConfig.putString(UiInteracter.EXTRA_CONFIG_LANGUAGE_MODEL_BASE_URL,
+                    modelConfig.putString(UiInteractor.EXTRA_CONFIG_LANGUAGE_MODEL_BASE_URL,
                             baseUrlEditText.getText().toString());
                     dialog.dismiss();
                 })
@@ -255,14 +255,14 @@ public class DialogActivity extends Activity {
     private void returnToKeyboard(DialogType dialogType) {
         Log.d("LSPosed-Bridge", dialogType + " : " + mLanguageModelsConfig);
         if (dialogType == mLastDialogType) {
-            Intent broadcastIntent = new Intent(UiInteracter.ACTION_DIALOG_RESULT);
+            Intent broadcastIntent = new Intent(UiInteractor.ACTION_DIALOG_RESULT);
 
             if (mSelectedModel != null)
-                broadcastIntent.putExtra(UiInteracter.EXTRA_CONFIG_SELECTED_MODEL, mSelectedModel.name());
+                broadcastIntent.putExtra(UiInteractor.EXTRA_CONFIG_SELECTED_MODEL, mSelectedModel.name());
             if (mLanguageModelsConfig != null)
-                broadcastIntent.putExtra(UiInteracter.EXTRA_CONFIG_LANGUAGE_MODEL, mLanguageModelsConfig);
+                broadcastIntent.putExtra(UiInteractor.EXTRA_CONFIG_LANGUAGE_MODEL, mLanguageModelsConfig);
             if (mCommands != null)
-                broadcastIntent.putExtra(UiInteracter.EXTRA_COMMAND_LIST, Commands.encodeCommands(mCommands));
+                broadcastIntent.putExtra(UiInteractor.EXTRA_COMMAND_LIST, Commands.encodeCommands(mCommands));
 
             sendBroadcast(broadcastIntent);
             finish();
@@ -272,20 +272,20 @@ public class DialogActivity extends Activity {
     private void ensureHasReadModelData() {
         if (mSelectedModel == null)
             mSelectedModel =
-                    LanguageModel.valueOf(getIntent().getStringExtra(UiInteracter.EXTRA_CONFIG_SELECTED_MODEL));
+                    LanguageModel.valueOf(getIntent().getStringExtra(UiInteractor.EXTRA_CONFIG_SELECTED_MODEL));
         if (mLanguageModelsConfig == null)
             mLanguageModelsConfig =
-                    getIntent().getBundleExtra(UiInteracter.EXTRA_CONFIG_LANGUAGE_MODEL);
+                    getIntent().getBundleExtra(UiInteractor.EXTRA_CONFIG_LANGUAGE_MODEL);
     }
 
     private void ensureHasCommands() {
         if (mCommands == null) {
             mCommands = Commands.decodeCommands(
-                    getIntent().getStringExtra(UiInteracter.EXTRA_COMMAND_LIST));
+                    getIntent().getStringExtra(UiInteractor.EXTRA_COMMAND_LIST));
         }
 
         if (mCommandIndex == -2) {
-            mCommandIndex = getIntent().getIntExtra(UiInteracter.EXTRA_COMMAND_INDEX, -2);
+            mCommandIndex = getIntent().getIntExtra(UiInteractor.EXTRA_COMMAND_INDEX, -2);
         }
     }
 

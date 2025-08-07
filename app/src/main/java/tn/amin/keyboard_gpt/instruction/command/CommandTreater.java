@@ -3,14 +3,14 @@ package tn.amin.keyboard_gpt.instruction.command;
 import java.util.ArrayList;
 import java.util.List;
 
-import tn.amin.keyboard_gpt.ConfigChangeListener;
-import tn.amin.keyboard_gpt.DialogDismissListener;
+import tn.amin.keyboard_gpt.listener.ConfigChangeListener;
+import tn.amin.keyboard_gpt.listener.DialogDismissListener;
 import tn.amin.keyboard_gpt.GenerativeAIController;
 import tn.amin.keyboard_gpt.SPManager;
-import tn.amin.keyboard_gpt.UiInteracter;
+import tn.amin.keyboard_gpt.UiInteractor;
 import tn.amin.keyboard_gpt.instruction.InstructionCategory;
 import tn.amin.keyboard_gpt.instruction.TextTreater;
-import tn.amin.keyboard_gpt.language_model.LanguageModel;
+import tn.amin.keyboard_gpt.llm.LanguageModel;
 
 public class CommandTreater implements TextTreater, ConfigChangeListener, DialogDismissListener {
     private static final List<AbstractCommand> BUILTIN_COMMANDS = List.of(
@@ -18,12 +18,12 @@ public class CommandTreater implements TextTreater, ConfigChangeListener, Dialog
             );
 
     private final SPManager mSPManager;
-    private final UiInteracter mInteracter;
+    private final UiInteractor mInteracter;
     private final GenerativeAIController mAIController;
 
     private final ArrayList<AbstractCommand> mCommands = new ArrayList<>();
 
-    public CommandTreater(SPManager spManager, UiInteracter interacter, GenerativeAIController aiController) {
+    public CommandTreater(SPManager spManager, UiInteractor interacter, GenerativeAIController aiController) {
         mSPManager = spManager;
         mInteracter = interacter;
         mAIController = aiController;

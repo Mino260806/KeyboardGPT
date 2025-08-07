@@ -1,7 +1,7 @@
 package tn.amin.keyboard_gpt.instruction.command;
 
 import tn.amin.keyboard_gpt.GenerativeAIController;
-import tn.amin.keyboard_gpt.UiInteracter;
+import tn.amin.keyboard_gpt.UiInteractor;
 
 public class WebSearchCommand extends AbstractCommand {
     @Override
@@ -10,7 +10,7 @@ public class WebSearchCommand extends AbstractCommand {
     }
 
     @Override
-    public void consume(String text, UiInteracter interacter, GenerativeAIController aiController) {
+    public void consume(String text, UiInteractor interacter, GenerativeAIController aiController) {
         String url = "https://www.google.com/search?q=" + text;
         interacter.showWebSearchDialog("Web Search", url);
     }

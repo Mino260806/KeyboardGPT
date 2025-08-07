@@ -1,6 +1,6 @@
-package tn.amin.keyboard_gpt.language_model.publisher;
+package tn.amin.keyboard_gpt.llm.publisher;
 
-import com.google.ai.client.generativeai.type.GenerateContentResponse;
+import com.google.genai.types.GenerateContentResponse;
 
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
@@ -23,7 +23,7 @@ public class GeminiPublisherWrapper implements Publisher<String> {
 
             @Override
             public void onNext(GenerateContentResponse generateContentResponse) {
-                subscriber.onNext(generateContentResponse.getText());
+                subscriber.onNext(generateContentResponse.text());
             }
 
             @Override

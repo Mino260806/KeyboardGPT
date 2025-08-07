@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId "tn.amin.keyboard_gpt"
-        minSdk 24
+        minSdk 26
         targetSdkVersion 36
         versionCode 12
         versionName "1.1.1"
@@ -35,6 +35,18 @@ android {
             useLegacyPackaging false
         }
     }
+    packagingOptions {
+        exclude('META-INF/INDEX.LIST')
+        exclude("META-INF/DEPENDENCIES")
+        exclude("META-INF/LICENSE")
+        exclude("META-INF/LICENSE.txt")
+        exclude("META-INF/license.txt")
+        exclude("META-INF/NOTICE")
+        exclude("META-INF/NOTICE.txt")
+        exclude("META-INF/notice.txt")
+        exclude("META-INF/ASL2.0")
+        exclude("META-INF/*.kotlin_module")
+    }
 }
 
 dependencies {
@@ -46,7 +58,8 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
-    implementation("com.google.ai.client.generativeai:generativeai:0.9.0")
+    implementation('com.google.genai:google-genai:1.11.0')
+
     implementation("com.google.guava:guava:31.0.1-android")
     implementation("org.reactivestreams:reactive-streams:1.0.4")
 

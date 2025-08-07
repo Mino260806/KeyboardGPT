@@ -1,4 +1,4 @@
-package tn.amin.keyboard_gpt.language_model.publisher;
+package tn.amin.keyboard_gpt.llm.publisher;
 
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;

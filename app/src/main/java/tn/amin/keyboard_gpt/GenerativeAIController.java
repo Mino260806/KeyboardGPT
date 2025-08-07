@@ -1,27 +1,31 @@
 package tn.amin.keyboard_gpt;
 
-import android.text.InputType;
-
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 
-import de.robv.android.xposed.XposedBridge;
-import tn.amin.keyboard_gpt.instruction.InstructionCategory;
-import tn.amin.keyboard_gpt.language_model.LanguageModel;
-import tn.amin.keyboard_gpt.language_model.LanguageModelClient;
+import java.util.ArrayList;
+import java.util.List;
+
+import tn.amin.keyboard_gpt.listener.GenerativeAIListener;
+import tn.amin.keyboard_gpt.llm.GeminiClient;
+import tn.amin.keyboard_gpt.llm.LanguageModel;
+import tn.amin.keyboard_gpt.llm.LanguageModelClient;
+import tn.amin.keyboard_gpt.listener.ConfigChangeListener;
 
 public class GenerativeAIController implements ConfigChangeListener {
-    private LanguageModelClient mModelClient = null;
+    private LanguageModelClient mModelClient = LanguageModelClient.forModel(LanguageModel.Gemini);
 
     private final SPManager mSPManager;
-    private final UiInteracter mInteracter;
+    private final UiInteractor mInteractor;
 
-    public GenerativeAIController(SPManager spManager, UiInteracter interacter) {
-        mSPManager = spManager;
-        mInteracter = interacter;
+    private List<GenerativeAIListener> mListeners = new ArrayList<>();
 
-        mInteracter.registerConfigChangeListener(this);
+    public GenerativeAIController() {
+        mSPManager = SPManager.getInstance();
+        mInteractor = UiInteractor.getInstance();
+
+        mInteractor.registerConfigChangeListener(this);
         if (mSPManager.hasLanguageModel()) {
             setModel(mSPManager.getLanguageModel());
         }
@@ -36,6 +40,7 @@ public class GenerativeAIController implements ConfigChangeListener {
     }
 
     private void setModel(LanguageModel model) {
+        MainHook.log("setModel " + model.label);
         mModelClient = LanguageModelClient.forModel(model);
         mModelClient.setApiKey(mSPManager.getApiKey(model));
         mModelClient.setSubModel(mSPManager.getSubModel(model));
@@ -80,6 +85,14 @@ public class GenerativeAIController implements ConfigChangeListener {
         mSPManager.setGenerativeAICommandsRaw(commandsRaw);
     }
 
+    public void addListener(GenerativeAIListener listener) {
+        mListeners.add(listener);
+    }
+
+    public void removeListener(GenerativeAIListener listener) {
+        mListeners.remove(listener);
+    }
+
     public void generateResponse(String prompt) {
         generateResponse(prompt, null);
     }
@@ -91,14 +104,12 @@ public class GenerativeAIController implements ConfigChangeListener {
             return;
         }
 
-        if (!mInteracter.requestEditTextOwnership(InstructionCategory.Prompt)) {
-            return;
+        if (needModelClient()) {
+
         }
 
-        mInteracter.post(() -> {
-            mInteracter.setText("Generating Response...");
-            mInteracter.setInputType(InputType.TYPE_NULL);
-        });
+        mInteractor.post(() ->
+                mListeners.forEach(GenerativeAIListener::onAIPrepare));
 
         Publisher<String> publisher = mModelClient.submitPrompt(prompt, systemMessage);
 
@@ -118,16 +129,16 @@ public class GenerativeAIController implements ConfigChangeListener {
 
                 MainHook.log("onNext: \"" + s + "\"");
 
-                mInteracter.post(() -> mInteracter.getInputConnection().commitText(s, 1));
+                mInteractor.post(() -> mListeners.forEach(
+                        l -> l.onAINext(s)));
             }
 
             @Override
             public void onError(Throwable t) {
-                XposedBridge.log(t);
+                MainHook.log(t);
 
-                mInteracter.post(() -> {
-                    mInteracter.toastLong(t.getClass().getSimpleName() + " : " + t.getMessage() + " (see logs)");
-                });
+                mInteractor.post(() ->
+                        mInteractor.toastLong(t.getClass().getSimpleName() + " : " + t.getMessage() + " (see logs)"));
 
                 onComplete();
             }
@@ -140,11 +151,8 @@ public class GenerativeAIController implements ConfigChangeListener {
                 }
                 completed = true;
 
-                mInteracter.post(() -> {
-                    mInteracter.setInputType(InputType.TYPE_CLASS_TEXT);
-                    mInteracter.setText("? ");
-                });
-                mInteracter.releaseEditTextOwnership(InstructionCategory.Prompt);
+                mInteractor.post(() ->
+                        mListeners.forEach(GenerativeAIListener::onAIComplete));
                 MainHook.log("Done");
             }
         });

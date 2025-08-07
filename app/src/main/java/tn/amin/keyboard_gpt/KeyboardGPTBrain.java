@@ -1,54 +1,95 @@
 package tn.amin.keyboard_gpt;
 
 import android.content.Context;
-import android.inputmethodservice.InputMethodService;
-import android.widget.TextView;
 
-import tn.amin.keyboard_gpt.instruction.InstructionTreater;
+import tn.amin.keyboard_gpt.listener.GenerativeAIListener;
+import tn.amin.keyboard_gpt.listener.InputEventListener;
+import tn.amin.keyboard_gpt.text.TextParser;
+import tn.amin.keyboard_gpt.text.parse.result.AIParseResult;
+import tn.amin.keyboard_gpt.text.parse.result.FormatParseResult;
+import tn.amin.keyboard_gpt.text.parse.result.ParseResult;
+import tn.amin.keyboard_gpt.text.transform.format.TextUnicodeConverter;
 
-public class KeyboardGPTBrain {
-    private final SPManager mSPManager;
-    private final UiInteracter mInteracter;
+public class KeyboardGPTBrain implements InputEventListener, GenerativeAIListener {
     private final GenerativeAIController mAIController;
-    private final InstructionTreater mInstructionTreater;
+//    private final InstructionTreater mInstructionTreater;
+    private final TextParser mTextParser;
 
     public KeyboardGPTBrain(Context context) {
-        mSPManager = new SPManagerCompat(context);
-        mInteracter = new UiInteracter(context, mSPManager);
+        IMSController.getInstance().addListener(this);
 
-        mAIController = new GenerativeAIController(mSPManager, mInteracter);
-        mInstructionTreater = new InstructionTreater(mSPManager, mInteracter, mAIController);
+        mAIController = new GenerativeAIController();
+        mAIController.addListener(this);
+//        mInstructionTreater = new InstructionTreater(mSPManager, mInteracter, mAIController);
+        mTextParser = new TextParser();
     }
 
-    public boolean consumeText(String text) {
-        return mInstructionTreater.isInstruction(text) || isEditTextOwned();
+//    public boolean consumeText(String text) {
+//        return mInstructionTreater.isInstruction(text);
+//    }
+//
+//    public boolean performCommand() {
+//        return mInstructionTreater.treat("");
+//    }
+
+    @Override
+    public void onTextUpdate(String text, int cursor) {
+        MainHook.log("[IMSController] User typed \"" + text + "\"");
+
+        IMSController imsController = UiInteractor.getInstance().getIMSController();
+        ParseResult result = mTextParser.parse(text, cursor);
+        if (result != null) {
+            MainHook.log("indexEnd(" + result.indexEnd + "), cursor (" + cursor + ")");
+            if (result.indexEnd == cursor) {
+                int deleteCount = result.indexEnd - result.indexStart;
+
+                imsController.stopNotifyInput();
+                imsController.delete(deleteCount);
+                imsController.startNotifyInput();
+
+                processParsedText(text, result);
+            }
+        }
     }
 
-    public void setEditText(TextView editText) {
-        mInteracter.setEditText(editText);
+    public void processParsedText(String text, ParseResult parseResult) {
+        IMSController imsController = UiInteractor.getInstance().getIMSController();
+        if (parseResult instanceof FormatParseResult) {
+            FormatParseResult formatParseResult = (FormatParseResult) parseResult;
+            String newText = TextUnicodeConverter.convert(formatParseResult.target, formatParseResult.conversionMethod);
+
+            imsController.stopNotifyInput();
+            imsController.commit(newText);
+            imsController.startNotifyInput();
+        } else if (parseResult instanceof AIParseResult) {
+            AIParseResult aiParseResult = (AIParseResult) parseResult;
+            if (aiParseResult.prompt.isEmpty()) {
+                UiInteractor.getInstance().showChoseModelDialog();
+            } else {
+                new Thread(() ->
+                        mAIController.generateResponse(aiParseResult.prompt)).start();
+            }
+        }
     }
 
-    public boolean performCommand() {
-        String text = mInteracter.getEditText().getText().toString();
-
-        return mInstructionTreater.treat(text);
+    @Override
+    public void onAIPrepare() {
+        MainHook.log("[Brain] ONPREPARE");
     }
 
-    public boolean isEditTextOwned() {
-        return mInteracter.isEditTextOwned();
+    @Override
+    public void onAINext(String chunk) {
+        MainHook.log("[Brain] ONNEXT");
+        IMSController.getInstance().commit(chunk);
     }
 
-    public UiInteracter getInteracter() {
-        return mInteracter;
+    @Override
+    public void onAIError(Throwable t) {
+        MainHook.log("[Brain] ONERROR");
     }
 
-    public void onInputMethodDestroy(InputMethodService inputMethodService) {
-        getInteracter().unregisterService(inputMethodService);
+    @Override
+    public void onAIComplete() {
+        MainHook.log("[Brain] ONCOMPLETE");
     }
-
-    public void onInputMethodCreate(InputMethodService inputMethodService) {
-        getInteracter().registerService(inputMethodService);
-    }
-
-
 }

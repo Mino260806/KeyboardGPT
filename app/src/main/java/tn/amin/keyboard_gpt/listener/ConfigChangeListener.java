@@ -1,6 +1,6 @@
-package tn.amin.keyboard_gpt;
+package tn.amin.keyboard_gpt.listener;
 
-import tn.amin.keyboard_gpt.language_model.LanguageModel;
+import tn.amin.keyboard_gpt.llm.LanguageModel;
 
 public interface ConfigChangeListener {
     void onLanguageModelChange(LanguageModel model);
