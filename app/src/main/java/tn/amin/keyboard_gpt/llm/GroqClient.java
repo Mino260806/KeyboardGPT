@@ -51,7 +51,6 @@ public class GroqClient extends ChatGPTClient {
             rootJson.put("model", getSubModel());
             rootJson.put("messages", messagesJson);
             rootJson.put("stream", true);
-            rootJson.put("tradeoff", "cost");
 
             con.setDoOutput(true);
 
