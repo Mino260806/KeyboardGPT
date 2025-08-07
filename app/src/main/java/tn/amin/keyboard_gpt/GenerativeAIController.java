@@ -12,6 +12,7 @@ import tn.amin.keyboard_gpt.llm.GeminiClient;
 import tn.amin.keyboard_gpt.llm.LanguageModel;
 import tn.amin.keyboard_gpt.llm.LanguageModelClient;
 import tn.amin.keyboard_gpt.listener.ConfigChangeListener;
+import tn.amin.keyboard_gpt.llm.publisher.SimpleStringPublisher;
 
 public class GenerativeAIController implements ConfigChangeListener {
     private LanguageModelClient mModelClient = LanguageModelClient.forModel(LanguageModel.Gemini);
@@ -104,14 +105,16 @@ public class GenerativeAIController implements ConfigChangeListener {
             return;
         }
 
-        if (needModelClient()) {
-
-        }
-
         mInteractor.post(() ->
                 mListeners.forEach(GenerativeAIListener::onAIPrepare));
 
-        Publisher<String> publisher = mModelClient.submitPrompt(prompt, systemMessage);
+        Publisher<String> publisher;
+        if (needModelClient()) {
+            publisher = new SimpleStringPublisher("Missing API Key");
+        }
+        else {
+            publisher = mModelClient.submitPrompt(prompt, systemMessage);
+        }
 
         publisher.subscribe(new Subscriber<String>() {
             boolean completed = false;

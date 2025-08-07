@@ -23,7 +23,6 @@ import java.util.stream.Stream;
 
 import tn.amin.keyboard_gpt.R;
 import tn.amin.keyboard_gpt.UiInteractor;
-import tn.amin.keyboard_gpt.instruction.InstructionCategory;
 import tn.amin.keyboard_gpt.instruction.command.AbstractCommand;
 import tn.amin.keyboard_gpt.instruction.command.Commands;
 import tn.amin.keyboard_gpt.instruction.command.GenerativeAICommand;
@@ -112,7 +111,7 @@ public class DialogActivity extends Activity {
             GenerativeAICommand command = mCommands.get(mCommandIndex);
             prefixEditText.setText(command.getCommandPrefix());
             messageEditText.setText(command.getTweakMessage());
-            title = "Edit " + InstructionCategory.Command.prefix + command.getCommandPrefix();
+            title = "Edit command " + command.getCommandPrefix();
         }
         else {
             title = "New command";

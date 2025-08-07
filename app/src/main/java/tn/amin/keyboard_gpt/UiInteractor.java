@@ -168,10 +168,12 @@ public class UiInteractor {
         return true;
     }
 
-    public boolean showEditCommandsDialog(String rawCommands) {
+    public boolean showEditCommandsDialog() {
         if (isDialogOnCooldown()) {
             return false;
         }
+
+        String rawCommands = SPManager.getInstance().getGenerativeAICommandsRaw();
 
         Intent intent = new Intent("tn.amin.keyboard_gpt.OVERLAY");
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

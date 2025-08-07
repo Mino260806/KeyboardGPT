@@ -2,35 +2,35 @@ package tn.amin.keyboard_gpt;
 
 import android.content.Context;
 
+import tn.amin.keyboard_gpt.instruction.command.AbstractCommand;
+import tn.amin.keyboard_gpt.instruction.command.CommandManager;
+import tn.amin.keyboard_gpt.instruction.command.GenerativeAICommand;
+import tn.amin.keyboard_gpt.instruction.command.WebSearchCommand;
+import tn.amin.keyboard_gpt.listener.DialogDismissListener;
 import tn.amin.keyboard_gpt.listener.GenerativeAIListener;
 import tn.amin.keyboard_gpt.listener.InputEventListener;
 import tn.amin.keyboard_gpt.text.TextParser;
 import tn.amin.keyboard_gpt.text.parse.result.AIParseResult;
+import tn.amin.keyboard_gpt.text.parse.result.CommandParseResult;
 import tn.amin.keyboard_gpt.text.parse.result.FormatParseResult;
 import tn.amin.keyboard_gpt.text.parse.result.ParseResult;
 import tn.amin.keyboard_gpt.text.transform.format.TextUnicodeConverter;
 
-public class KeyboardGPTBrain implements InputEventListener, GenerativeAIListener {
+public class KeyboardGPTBrain implements InputEventListener, GenerativeAIListener, DialogDismissListener {
     private final GenerativeAIController mAIController;
+    private final CommandManager mCommandManager;
 //    private final InstructionTreater mInstructionTreater;
     private final TextParser mTextParser;
 
     public KeyboardGPTBrain(Context context) {
         IMSController.getInstance().addListener(this);
+        UiInteractor.getInstance().registerOnDismissListener(this);
 
         mAIController = new GenerativeAIController();
         mAIController.addListener(this);
-//        mInstructionTreater = new InstructionTreater(mSPManager, mInteracter, mAIController);
         mTextParser = new TextParser();
+        mCommandManager = new CommandManager();
     }
-
-//    public boolean consumeText(String text) {
-//        return mInstructionTreater.isInstruction(text);
-//    }
-//
-//    public boolean performCommand() {
-//        return mInstructionTreater.treat("");
-//    }
 
     @Override
     public void onTextUpdate(String text, int cursor) {
@@ -63,13 +63,37 @@ public class KeyboardGPTBrain implements InputEventListener, GenerativeAIListene
             imsController.startNotifyInput();
         } else if (parseResult instanceof AIParseResult) {
             AIParseResult aiParseResult = (AIParseResult) parseResult;
-            if (aiParseResult.prompt.isEmpty()) {
-                UiInteractor.getInstance().showChoseModelDialog();
-            } else {
-                new Thread(() ->
-                        mAIController.generateResponse(aiParseResult.prompt)).start();
+            generateResponse(aiParseResult.prompt, null);
+        } else if (parseResult instanceof CommandParseResult) {
+            CommandParseResult commandParseResult = (CommandParseResult) parseResult;
+            AbstractCommand command = mCommandManager.get(commandParseResult.command);
+            if (command instanceof GenerativeAICommand) {
+                GenerativeAICommand genAICommand = (GenerativeAICommand) command;
+                generateResponse(commandParseResult.prompt, genAICommand.getTweakMessage());
+            } else if (command instanceof WebSearchCommand){
+                String url = "https://www.google.com/search?q=" + commandParseResult.prompt;
+                UiInteractor.getInstance().showWebSearchDialog("Web Search", url);
             }
         }
+    }
+
+    private void generateResponse(String prompt, String systemMessage) {
+        if (prompt.isEmpty() || mAIController.needModelClient()) {
+            if (UiInteractor.getInstance().showChoseModelDialog()) {
+                UiInteractor.getInstance().toastLong("Chose and configure your language model");
+            }
+            return;
+        }
+
+        if (mAIController.needApiKey()) {
+            if (UiInteractor.getInstance().showChoseModelDialog()) {
+                UiInteractor.getInstance().toastLong(mAIController.getLanguageModel().label +
+                        " is Missing API Key");
+            }
+            return;
+        }
+
+        new Thread(() -> mAIController.generateResponse(prompt, systemMessage)).start();
     }
 
     @Override
@@ -95,5 +119,20 @@ public class KeyboardGPTBrain implements InputEventListener, GenerativeAIListene
     public void onAIComplete() {
         MainHook.log("[Brain] ONCOMPLETE");
         IMSController.getInstance().startNotifyInput();
+    }
+
+    @Override
+    public void onDismiss(boolean isPrompt, boolean isCommand) {
+        if (isPrompt) {
+            MainHook.log("Selected " + mAIController.getLanguageModel());
+            UiInteractor.getInstance().post(() -> {
+                UiInteractor.getInstance().toastShort("Selected " + mAIController.getLanguageModel()
+                        + " (" + mAIController.getModelClient().getSubModel() + ")");
+            });
+        } else if (isCommand) {
+            UiInteractor.getInstance().post(() -> {
+                UiInteractor.getInstance().toastShort("New Commands Saved");
+            });
+        }
     }
 }

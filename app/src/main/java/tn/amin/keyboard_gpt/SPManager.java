@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -31,6 +32,8 @@ public class SPManager implements ConfigInfoProvider {
 
     protected final SharedPreferences sp;
 
+    private List<GenerativeAICommand> generativeAICommands = List.of();
+
     private static SPManager instance = null;
 
     public static void init(Context context) {
@@ -46,6 +49,7 @@ public class SPManager implements ConfigInfoProvider {
 
     private SPManager(Context context) {
         sp = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        updateGenerativeAICommands();
     }
 
     public boolean hasLanguageModel() {
@@ -97,6 +101,7 @@ public class SPManager implements ConfigInfoProvider {
 
     public void setGenerativeAICommandsRaw(String commands) {
         sp.edit().putString(PREF_GEN_AI_COMMANDS, commands).apply();
+        updateGenerativeAICommands();
     }
 
     public String getGenerativeAICommandsRaw() {
@@ -104,11 +109,16 @@ public class SPManager implements ConfigInfoProvider {
     }
 
     public void setGenerativeAICommands(List<GenerativeAICommand> commands) {
-        sp.edit().putString(PREF_GEN_AI_COMMANDS, Commands.encodeCommands(commands)).apply();
+        setGenerativeAICommandsRaw(Commands.encodeCommands(commands));
     }
 
     public List<GenerativeAICommand> getGenerativeAICommands() {
-        return Commands.decodeCommands(sp.getString(PREF_GEN_AI_COMMANDS, "[]"));
+        return generativeAICommands;
+    }
+
+    private void updateGenerativeAICommands() {
+        generativeAICommands = Collections.unmodifiableList(
+                Commands.decodeCommands(sp.getString(PREF_GEN_AI_COMMANDS, "[]")));
     }
 
     public Map<LanguageModel, String> getApiKeyMap() {
