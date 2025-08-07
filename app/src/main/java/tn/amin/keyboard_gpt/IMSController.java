@@ -89,4 +89,11 @@ public class IMSController {
     public void startNotifyInput() {
         inputNotify = false;
     }
+
+    public void flush() {
+        InputConnection ic = ims.getCurrentInputConnection();
+        if (ic != null) {
+            ic.finishComposingText();
+        }
+    }
 }

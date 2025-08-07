@@ -75,21 +75,25 @@ public class KeyboardGPTBrain implements InputEventListener, GenerativeAIListene
     @Override
     public void onAIPrepare() {
         MainHook.log("[Brain] ONPREPARE");
+        IMSController.getInstance().stopNotifyInput();
     }
 
     @Override
     public void onAINext(String chunk) {
         MainHook.log("[Brain] ONNEXT");
+        IMSController.getInstance().flush();
         IMSController.getInstance().commit(chunk);
     }
 
     @Override
     public void onAIError(Throwable t) {
         MainHook.log("[Brain] ONERROR");
+        IMSController.getInstance().startNotifyInput();
     }
 
     @Override
     public void onAIComplete() {
         MainHook.log("[Brain] ONCOMPLETE");
+        IMSController.getInstance().startNotifyInput();
     }
 }
