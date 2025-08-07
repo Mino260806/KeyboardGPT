@@ -69,13 +69,17 @@ public class KeyboardGPTBrain implements InputEventListener, GenerativeAIListene
             generateResponse(aiParseResult.prompt, null);
         } else if (parseResult instanceof CommandParseResult) {
             CommandParseResult commandParseResult = (CommandParseResult) parseResult;
-            AbstractCommand command = mCommandManager.get(commandParseResult.command);
-            if (command instanceof GenerativeAICommand) {
-                GenerativeAICommand genAICommand = (GenerativeAICommand) command;
-                generateResponse(commandParseResult.prompt, genAICommand.getTweakMessage());
-            } else if (command instanceof WebSearchCommand){
-                String url = "https://www.google.com/search?q=" + commandParseResult.prompt;
-                UiInteractor.getInstance().showWebSearchDialog("Web Search", url);
+            if (commandParseResult.command.isEmpty()) {
+                UiInteractor.getInstance().showEditCommandsDialog();
+            } else {
+                AbstractCommand command = mCommandManager.get(commandParseResult.command);
+                if (command instanceof GenerativeAICommand) {
+                    GenerativeAICommand genAICommand = (GenerativeAICommand) command;
+                    generateResponse(commandParseResult.prompt, genAICommand.getTweakMessage());
+                } else if (command instanceof WebSearchCommand){
+                    String url = "https://www.google.com/search?q=" + commandParseResult.prompt;
+                    UiInteractor.getInstance().showWebSearchDialog("Web Search", url);
+                }
             }
         }
     }
