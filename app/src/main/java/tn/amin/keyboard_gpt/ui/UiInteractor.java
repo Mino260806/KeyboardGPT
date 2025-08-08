@@ -21,7 +21,7 @@ import tn.amin.keyboard_gpt.llm.client.LanguageModel;
 import tn.amin.keyboard_gpt.listener.ConfigChangeListener;
 import tn.amin.keyboard_gpt.listener.ConfigInfoProvider;
 import tn.amin.keyboard_gpt.listener.DialogDismissListener;
-import tn.amin.keyboard_gpt.ui.external.DialogType;
+import tn.amin.keyboard_gpt.external.DialogType;
 
 public class UiInteractor {
     public static final String ACTION_DIALOG_RESULT = "tn.amin.keyboard_gpt.DIALOG_RESULT";

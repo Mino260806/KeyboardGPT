@@ -13,7 +13,10 @@ import tn.amin.keyboard_gpt.listener.GenerativeAIListener;
 import tn.amin.keyboard_gpt.llm.client.LanguageModel;
 import tn.amin.keyboard_gpt.llm.client.LanguageModelClient;
 import tn.amin.keyboard_gpt.listener.ConfigChangeListener;
+import tn.amin.keyboard_gpt.llm.internet.InternetProvider;
+import tn.amin.keyboard_gpt.llm.internet.SimpleInternetProvider;
 import tn.amin.keyboard_gpt.llm.publisher.SimpleStringPublisher;
+import tn.amin.keyboard_gpt.llm.service.ExternalInternetProvider;
 import tn.amin.keyboard_gpt.ui.UiInteractor;
 
 public class GenerativeAIController implements ConfigChangeListener {
@@ -21,8 +24,10 @@ public class GenerativeAIController implements ConfigChangeListener {
 
     private final SPManager mSPManager;
     private final UiInteractor mInteractor;
+    private final ExternalInternetProvider mClient;
 
     private List<GenerativeAIListener> mListeners = new ArrayList<>();
+    private InternetProvider mInternetProvider = new SimpleInternetProvider();
 
     public GenerativeAIController() {
         mSPManager = SPManager.getInstance();
@@ -32,6 +37,11 @@ public class GenerativeAIController implements ConfigChangeListener {
         if (mSPManager.hasLanguageModel()) {
             setModel(mSPManager.getLanguageModel());
         }
+
+        mClient = new ExternalInternetProvider(MainHook.getApplicationContext());
+        mClient.connect();
+
+        mInternetProvider = mClient;
     }
 
     public boolean needModelClient() {
@@ -48,6 +58,7 @@ public class GenerativeAIController implements ConfigChangeListener {
         mModelClient.setApiKey(mSPManager.getApiKey(model));
         mModelClient.setSubModel(mSPManager.getSubModel(model));
         mModelClient.setBaseUrl(mSPManager.getBaseUrl(model));
+        mModelClient.setInternetProvider(mInternetProvider);
     }
 
     @Override

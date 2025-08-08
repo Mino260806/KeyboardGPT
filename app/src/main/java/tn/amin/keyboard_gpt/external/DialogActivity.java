@@ -1,4 +1,4 @@
-package tn.amin.keyboard_gpt.ui.external;
+package tn.amin.keyboard_gpt.external;
 
 import android.app.Activity;
 import android.app.AlertDialog;

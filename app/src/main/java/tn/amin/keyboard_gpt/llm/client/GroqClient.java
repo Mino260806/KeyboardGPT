@@ -32,7 +32,7 @@ public class GroqClient extends ChatGPTClient {
             systemMessage = getDefaultSystemMessage();
         }
 
-        String url = getBaseUrl() + "/v1/chat/completions";
+        String url = getBaseUrl() + "/chat/completions";
         HttpURLConnection con;
         try {
             con = (HttpURLConnection) new URL(url).openConnection();

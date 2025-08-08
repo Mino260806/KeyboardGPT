@@ -4,12 +4,26 @@ import androidx.annotation.NonNull;
 
 import org.reactivestreams.Publisher;
 
-public abstract class LanguageModelClient {
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
+
+import tn.amin.keyboard_gpt.llm.internet.InternetProvider;
+import tn.amin.keyboard_gpt.llm.internet.SimpleInternetProvider;
+import tn.amin.keyboard_gpt.llm.service.InternetRequestListener;
+
+public abstract class LanguageModelClient implements InternetRequestListener {
     private String mApiKey = null;
 
     private String mSubModel = null;
 
     private String mBaseUrl = null;
+
+    private InternetProvider mInternetProvider = new SimpleInternetProvider();
+    private int mLastStatusCode;
 
     abstract public Publisher<String> submitPrompt(String prompt, String systemMessage);
 
@@ -71,5 +85,27 @@ public abstract class LanguageModelClient {
 
     protected static String getDefaultSystemMessage() {
         return "You are a helpful assitant.";
+    }
+
+    public void setInternetProvider(InternetProvider internetProvider) {
+        mInternetProvider = internetProvider;
+    }
+
+    protected InputStream sendRequest(HttpURLConnection con, String body) throws IOException {
+        return mInternetProvider.sendRequest(con, body, this);
+    }
+
+    @Override
+    public void onRequestStatusCode(int code) {
+        mLastStatusCode = code;
+    }
+
+    @Override
+    public void onRequestComplete() {
+
+    }
+
+    protected int getLastStatusCode() {
+        return mLastStatusCode;
     }
 }

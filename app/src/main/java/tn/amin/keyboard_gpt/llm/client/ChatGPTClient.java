@@ -28,7 +28,7 @@ public class ChatGPTClient extends LanguageModelClient {
             systemMessage = getDefaultSystemMessage();
         }
 
-        String url = getBaseUrl() + "/v1/chat/completions";
+        String url = getBaseUrl() + "/chat/completions";
         HttpURLConnection con;
         try {
             con = (HttpURLConnection) new URL(url).openConnection();
@@ -86,24 +86,28 @@ public class ChatGPTClient extends LanguageModelClient {
             } else {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(con.getErrorStream()));
                 String response = reader.lines().collect(Collectors.joining(""));
-                JSONObject responseJson = new JSONObject(response);
-                if (responseJson.has("error")) {
-                    JSONObject errorJson = responseJson
-                            .getJSONObject("error");
-                    String message = errorJson.getString("message");
-                    String type = "";
-                    if (errorJson.has("type")) {
-                        type = errorJson.getString("type");
-                    }
+                try {
+                    JSONObject responseJson = new JSONObject(response);
+                    if (responseJson.has("error")) {
+                        JSONObject errorJson = responseJson
+                                .getJSONObject("error");
+                        String message = errorJson.getString("message");
+                        String type = "";
+                        if (errorJson.has("type")) {
+                            type = errorJson.getString("type");
+                        }
 
-                    throw new IllegalArgumentException("(" + type + ") " + message);
-                }
-                else {
-                    throw new IllegalArgumentException(response);
+                        throw new IllegalArgumentException("(" + type + ") " + message);
+                    }
+                    else {
+                        throw new IllegalArgumentException(response);
+                    }
+                } catch (JSONException e) {
+                    throw new IllegalArgumentException("Received status code " + responseCode);
                 }
             }
-        } catch (Exception e) {
-            return new ExceptionPublisher(e);
+        } catch (Throwable t) {
+            return new ExceptionPublisher(t);
         }
     }
 

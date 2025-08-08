@@ -20,6 +20,8 @@ import tn.amin.keyboard_gpt.ui.IMSController;
 import tn.amin.keyboard_gpt.ui.UiInteractor;
 
 public class MainHook implements IXposedHookLoadPackage {
+    private static Context applicationContext = null;
+
     private KeyboardGPTBrain brain;
 
     private HookManager hookManager;
@@ -46,7 +48,8 @@ public class MainHook implements IXposedHookLoadPackage {
     }
 
     private void ensureInitialized(Context applicationContext) {
-        if (brain == null) {
+        if (MainHook.applicationContext == null) {
+            MainHook.applicationContext = applicationContext;
             SPManager.init(applicationContext);
             UiInteractor.init(applicationContext);
 
@@ -158,15 +161,25 @@ public class MainHook implements IXposedHookLoadPackage {
                 }));
     }
 
+    public static Context getApplicationContext() {
+        return applicationContext;
+    }
+
     public static void logST() {
-        XposedBridge.log(Log.getStackTraceString(new Throwable()));
+//        if (false) {
+            XposedBridge.log(Log.getStackTraceString(new Throwable()));
+//        }
     }
 
     public static void log(String message) {
-        XposedBridge.log("(KeyboardGPT) " + message);
+//        if (false) {
+            XposedBridge.log("(KeyboardGPT) " + message);
+//        }
     }
 
     public static void log(Throwable t) {
-        XposedBridge.log(t);
+//        if (false) {
+            XposedBridge.log(t);
+//        }
     }
 }

@@ -118,16 +118,20 @@ public class KeyboardGPTBrain implements InputEventListener, GenerativeAIListene
         justPrepared = true;
     }
 
-    @Override
-    public void onAINext(String chunk) {
-        MainHook.log("[Brain] ONNEXT");
-        IMSController.getInstance().endInputLock();
+    private void clearGeneratingContent() {
         if (justPrepared) {
             justPrepared = false;
 
             IMSController.getInstance().flush();
             IMSController.getInstance().delete(STR_GENERATING_CONTENT.length());
         }
+    }
+
+    @Override
+    public void onAINext(String chunk) {
+        MainHook.log("[Brain] ONNEXT");
+        IMSController.getInstance().endInputLock();
+        clearGeneratingContent();
         IMSController.getInstance().flush();
         IMSController.getInstance().commit(chunk);
         IMSController.getInstance().startInputLock();
@@ -137,6 +141,7 @@ public class KeyboardGPTBrain implements InputEventListener, GenerativeAIListene
     public void onAIError(Throwable t) {
         MainHook.log("[Brain] ONERROR");
         IMSController.getInstance().endInputLock();
+        clearGeneratingContent();
         IMSController.getInstance().startNotifyInput();
     }
 
@@ -144,6 +149,7 @@ public class KeyboardGPTBrain implements InputEventListener, GenerativeAIListene
     public void onAIComplete() {
         MainHook.log("[Brain] ONCOMPLETE");
         IMSController.getInstance().endInputLock();
+        clearGeneratingContent();
         IMSController.getInstance().startNotifyInput();
     }
 
