@@ -14,7 +14,7 @@
         tools:targetApi="31"
         android:multiArch="true">
 
-        <activity android:name=".ui.DialogActivity"
+        <activity android:name=".ui.external.DialogActivity"
             android:theme="@style/Theme.KeyboardGPT.Translucent"
             android:excludeFromRecents="true"
             android:taskAffinity=""
@@ -24,6 +24,14 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".llm.service.LlmService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="tn.amin.keyboard_gpt.LLM_SERVICE" />
+            </intent-filter>
+        </service>
 
         <meta-data
             android:name="xposedmodule"

@@ -9,12 +9,15 @@ import tn.amin.keyboard_gpt.instruction.command.WebSearchCommand;
 import tn.amin.keyboard_gpt.listener.DialogDismissListener;
 import tn.amin.keyboard_gpt.listener.GenerativeAIListener;
 import tn.amin.keyboard_gpt.listener.InputEventListener;
+import tn.amin.keyboard_gpt.llm.GenerativeAIController;
 import tn.amin.keyboard_gpt.text.TextParser;
 import tn.amin.keyboard_gpt.text.parse.result.AIParseResult;
 import tn.amin.keyboard_gpt.text.parse.result.CommandParseResult;
 import tn.amin.keyboard_gpt.text.parse.result.FormatParseResult;
 import tn.amin.keyboard_gpt.text.parse.result.ParseResult;
 import tn.amin.keyboard_gpt.text.transform.format.TextUnicodeConverter;
+import tn.amin.keyboard_gpt.ui.IMSController;
+import tn.amin.keyboard_gpt.ui.UiInteractor;
 
 public class KeyboardGPTBrain implements InputEventListener, GenerativeAIListener, DialogDismissListener {
     private final static String STR_GENERATING_CONTENT = "<Generating Content...>";

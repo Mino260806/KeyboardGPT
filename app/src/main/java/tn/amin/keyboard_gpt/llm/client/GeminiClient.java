@@ -1,4 +1,4 @@
-package tn.amin.keyboard_gpt.llm;
+package tn.amin.keyboard_gpt.llm.client;
 
 import com.google.genai.Client;
 import com.google.genai.ResponseStream;
@@ -12,10 +12,7 @@ import com.google.genai.types.SafetySetting;
 
 import org.reactivestreams.Publisher;
 
-import java.util.concurrent.CompletableFuture;
-
 import tn.amin.keyboard_gpt.llm.publisher.GeminiPublisherWrapper;
-import tn.amin.keyboard_gpt.llm.publisher.SimpleStringPublisher;
 
 public class GeminiClient extends LanguageModelClient {
     @Override

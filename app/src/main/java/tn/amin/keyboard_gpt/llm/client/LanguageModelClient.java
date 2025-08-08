@@ -1,4 +1,4 @@
-package tn.amin.keyboard_gpt.llm;
+package tn.amin.keyboard_gpt.llm.client;
 
 import androidx.annotation.NonNull;
 

@@ -1,4 +1,4 @@
-package tn.amin.keyboard_gpt.llm;
+package tn.amin.keyboard_gpt.llm.client;
 
 public enum LanguageModel {
     Gemini("Gemini", "gemini-2.5-flash-lite", "Not configurable"),

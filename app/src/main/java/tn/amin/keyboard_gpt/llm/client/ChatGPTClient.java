@@ -1,4 +1,4 @@
-package tn.amin.keyboard_gpt.llm;
+package tn.amin.keyboard_gpt.llm.client;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -15,14 +15,10 @@ import java.util.stream.Collectors;
 
 import tn.amin.keyboard_gpt.MainHook;
 import tn.amin.keyboard_gpt.llm.publisher.ExceptionPublisher;
-import tn.amin.keyboard_gpt.llm.publisher.InputStreamPublisher;
+import tn.amin.keyboard_gpt.llm.publisher.SimpleStringPublisher;
 
-public class GroqClient extends ChatGPTClient {
+public class ChatGPTClient extends LanguageModelClient {
     @Override
-    public LanguageModel getLanguageModel() {
-        return LanguageModel.Groq;
-    }
-
     public Publisher<String> submitPrompt(String prompt, String systemMessage) {
         if (getApiKey() == null || getApiKey().isEmpty()) {
             return LanguageModelClient.MISSING_API_KEY_PUBLISHER;
@@ -50,7 +46,7 @@ public class GroqClient extends ChatGPTClient {
             JSONObject rootJson = new JSONObject();
             rootJson.put("model", getSubModel());
             rootJson.put("messages", messagesJson);
-            rootJson.put("stream", true);
+            rootJson.put("stream", false);
 
             con.setDoOutput(true);
 
@@ -63,31 +59,31 @@ public class GroqClient extends ChatGPTClient {
             MainHook.log("Received response with code " + responseCode);
 
             if (responseCode == 200) {
-                return new InputStreamPublisher(con.getInputStream(), line -> {
-                    line = line.trim();
-//                    MainHook.log("line is " + line);
-                    if (line.isEmpty() || line.endsWith("[DONE]")) {
-                        return "";
-                    }
-                    if (line.startsWith("data:")) {
-                        line = line.substring("data:".length()).trim();
-                    }
-                    try {
-                        JSONObject choice = new JSONObject(line)
-                                .getJSONArray("choices")
-                                .getJSONObject(0);
-                        if (choice.has("delta")) {
-                            return extractContent(choice.getJSONObject("delta"));
+                BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                String response = reader.lines().collect(Collectors.joining(""));
+                JSONObject responseJson = new JSONObject(response);
+                if (responseJson.has("choices")) {
+                    JSONArray choices = responseJson.getJSONArray("choices");
+                    for (int i = 0; i < choices.length(); i++) {
+                        JSONObject choice = choices.getJSONObject(i);
+                        if (choice.has("role") && "assistant".equals(choice.getString("role"))) {
+                            return new SimpleStringPublisher(choice
+                                    .getJSONObject("message")
+                                    .getString("content"));
                         }
-                        return extractContent(choice.getJSONObject("message"));
-                    } catch (JSONException e) {
-                        MainHook.log(e);
-                        return "";
                     }
-                });
-            }
-
-            else {
+                    if (choices.length() > 0) {
+                        return new SimpleStringPublisher(choices.getJSONObject(0)
+                                .getJSONObject("message")
+                                .getString("content"));
+                    }
+                    else {
+                        throw new JSONException("choices has length 0");
+                    }
+                } else {
+                    throw new JSONException("no \"choices\" attribute found");
+                }
+            } else {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(con.getErrorStream()));
                 String response = reader.lines().collect(Collectors.joining(""));
                 JSONObject responseJson = new JSONObject(response);
@@ -95,7 +91,10 @@ public class GroqClient extends ChatGPTClient {
                     JSONObject errorJson = responseJson
                             .getJSONObject("error");
                     String message = errorJson.getString("message");
-                    String type = errorJson.getString("type");
+                    String type = "";
+                    if (errorJson.has("type")) {
+                        type = errorJson.getString("type");
+                    }
 
                     throw new IllegalArgumentException("(" + type + ") " + message);
                 }
@@ -108,12 +107,8 @@ public class GroqClient extends ChatGPTClient {
         }
     }
 
-    private String extractContent(JSONObject message) throws JSONException {
-        if (!message.has("content")) {
-            return "";
-        }
-
-        return message.getString("content");
+    @Override
+    public LanguageModel getLanguageModel() {
+        return LanguageModel.ChatGPT;
     }
-
 }

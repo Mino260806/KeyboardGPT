@@ -16,6 +16,8 @@ import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import tn.amin.keyboard_gpt.hook.HookManager;
 import tn.amin.keyboard_gpt.hook.MethodHook;
+import tn.amin.keyboard_gpt.ui.IMSController;
+import tn.amin.keyboard_gpt.ui.UiInteractor;
 
 public class MainHook implements IXposedHookLoadPackage {
     private KeyboardGPTBrain brain;

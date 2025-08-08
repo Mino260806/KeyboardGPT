@@ -1,4 +1,4 @@
-package tn.amin.keyboard_gpt;
+package tn.amin.keyboard_gpt.llm;
 
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
@@ -7,12 +7,14 @@ import org.reactivestreams.Subscription;
 import java.util.ArrayList;
 import java.util.List;
 
+import tn.amin.keyboard_gpt.MainHook;
+import tn.amin.keyboard_gpt.SPManager;
 import tn.amin.keyboard_gpt.listener.GenerativeAIListener;
-import tn.amin.keyboard_gpt.llm.GeminiClient;
-import tn.amin.keyboard_gpt.llm.LanguageModel;
-import tn.amin.keyboard_gpt.llm.LanguageModelClient;
+import tn.amin.keyboard_gpt.llm.client.LanguageModel;
+import tn.amin.keyboard_gpt.llm.client.LanguageModelClient;
 import tn.amin.keyboard_gpt.listener.ConfigChangeListener;
 import tn.amin.keyboard_gpt.llm.publisher.SimpleStringPublisher;
+import tn.amin.keyboard_gpt.ui.UiInteractor;
 
 public class GenerativeAIController implements ConfigChangeListener {
     private LanguageModelClient mModelClient = LanguageModelClient.forModel(LanguageModel.Gemini);
