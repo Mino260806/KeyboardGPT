@@ -9,10 +9,15 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
+import tn.amin.keyboard_gpt.MainHook;
 import tn.amin.keyboard_gpt.llm.service.InternetRequestListener;
 
 public class SimpleInternetProvider implements InternetProvider {
+    ExecutorService executor = Executors.newSingleThreadExecutor();
+
     @Override
     public InputStream sendRequest(HttpURLConnection con, String body, InternetRequestListener irl) throws IOException {
         try (OutputStream os = con.getOutputStream()) {
@@ -26,13 +31,18 @@ public class SimpleInternetProvider implements InternetProvider {
         PipedInputStream inputStream = new PipedInputStream();
         PipedOutputStream outputStream = new PipedOutputStream(inputStream);
 
-
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                outputStream.write(line.getBytes());
+        executor.execute(() -> {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    outputStream.write((line + System.lineSeparator()).getBytes());
+                    outputStream.flush();
+                }
+                outputStream.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-        }
+        });
 
         return inputStream;
     }

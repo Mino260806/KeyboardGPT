@@ -40,8 +40,7 @@ public class KeyboardGPTBrain implements InputEventListener, GenerativeAIListene
 
     @Override
     public void onTextUpdate(String text, int cursor) {
-        MainHook.log("[IMSController] User typed \"" + text + "\"");
-
+//        MainHook.log("[IMSController] User typed \"" + text + "\"");
         IMSController imsController = UiInteractor.getInstance().getIMSController();
         ParseResult result = mTextParser.parse(text, cursor);
         if (result != null) {

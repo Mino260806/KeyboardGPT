@@ -6,6 +6,7 @@ import org.json.JSONObject;
 import org.reactivestreams.Publisher;
 
 import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -48,18 +49,10 @@ public class ChatGPTClient extends LanguageModelClient {
             rootJson.put("messages", messagesJson);
             rootJson.put("stream", false);
 
-            con.setDoOutput(true);
+            InputStream inputStream = sendRequest(con, rootJson.toString());
 
-            try (OutputStream os = con.getOutputStream()) {
-                byte[] input = rootJson.toString().getBytes(StandardCharsets.UTF_8);
-                os.write(input, 0, input.length);
-            }
-
-            int responseCode = con.getResponseCode();
-            MainHook.log("Received response with code " + responseCode);
-
-            if (responseCode == 200) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            if (true) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
                 String response = reader.lines().collect(Collectors.joining(""));
                 JSONObject responseJson = new JSONObject(response);
                 if (responseJson.has("choices")) {
@@ -103,7 +96,7 @@ public class ChatGPTClient extends LanguageModelClient {
                         throw new IllegalArgumentException(response);
                     }
                 } catch (JSONException e) {
-                    throw new IllegalArgumentException("Received status code " + responseCode);
+                    throw new IllegalArgumentException("Received status code " + "...");
                 }
             }
         } catch (Throwable t) {

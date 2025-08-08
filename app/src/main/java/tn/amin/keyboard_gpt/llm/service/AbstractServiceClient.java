@@ -86,6 +86,7 @@ public abstract class AbstractServiceClient {
             queueMessage(message, what);
             return;
         }
+
         Message msg = Message.obtain(null, what);
         msg.setData(message);
         msg.replyTo = incomingMessenger;

@@ -34,14 +34,14 @@ public class GenerativeAIController implements ConfigChangeListener {
         mInteractor = UiInteractor.getInstance();
 
         mInteractor.registerConfigChangeListener(this);
-        if (mSPManager.hasLanguageModel()) {
-            setModel(mSPManager.getLanguageModel());
-        }
 
         mClient = new ExternalInternetProvider(MainHook.getApplicationContext());
         mClient.connect();
 
         mInternetProvider = mClient;
+        if (mSPManager.hasLanguageModel()) {
+            setModel(mSPManager.getLanguageModel());
+        }
     }
 
     public boolean needModelClient() {
