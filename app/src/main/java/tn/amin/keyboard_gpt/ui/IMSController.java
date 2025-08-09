@@ -1,4 +1,4 @@
-package tn.amin.keyboard_gpt;
+package tn.amin.keyboard_gpt.ui;
 
 import android.inputmethodservice.InputMethodService;
 import android.view.inputmethod.ExtractedText;

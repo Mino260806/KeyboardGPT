@@ -1,4 +1,9 @@
-package tn.amin.keyboard_gpt;
+package tn.amin.keyboard_gpt.llm;
+
+import android.Manifest;
+import android.content.pm.PackageManager;
+
+import androidx.core.content.ContextCompat;
 
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
@@ -7,28 +12,50 @@ import org.reactivestreams.Subscription;
 import java.util.ArrayList;
 import java.util.List;
 
+import tn.amin.keyboard_gpt.MainHook;
+import tn.amin.keyboard_gpt.SPManager;
 import tn.amin.keyboard_gpt.listener.GenerativeAIListener;
-import tn.amin.keyboard_gpt.llm.GeminiClient;
-import tn.amin.keyboard_gpt.llm.LanguageModel;
-import tn.amin.keyboard_gpt.llm.LanguageModelClient;
+import tn.amin.keyboard_gpt.llm.client.LanguageModel;
+import tn.amin.keyboard_gpt.llm.client.LanguageModelClient;
 import tn.amin.keyboard_gpt.listener.ConfigChangeListener;
+import tn.amin.keyboard_gpt.llm.internet.InternetProvider;
+import tn.amin.keyboard_gpt.llm.internet.SimpleInternetProvider;
 import tn.amin.keyboard_gpt.llm.publisher.SimpleStringPublisher;
+import tn.amin.keyboard_gpt.llm.service.ExternalInternetProvider;
+import tn.amin.keyboard_gpt.ui.UiInteractor;
 
 public class GenerativeAIController implements ConfigChangeListener {
-    private LanguageModelClient mModelClient = LanguageModelClient.forModel(LanguageModel.Gemini);
+    private LanguageModelClient mModelClient = null;
 
     private final SPManager mSPManager;
     private final UiInteractor mInteractor;
+    private ExternalInternetProvider mExternalClient = null;
 
     private List<GenerativeAIListener> mListeners = new ArrayList<>();
+    private InternetProvider mInternetProvider = null;
 
     public GenerativeAIController() {
         mSPManager = SPManager.getInstance();
         mInteractor = UiInteractor.getInstance();
 
         mInteractor.registerConfigChangeListener(this);
+
+        if (ContextCompat.checkSelfPermission(MainHook.getApplicationContext(),
+                Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
+            MainHook.log("Missing INTERNET permission, using ExternalInternetProvider");
+            mExternalClient = new ExternalInternetProvider(MainHook.getApplicationContext());
+            mExternalClient.connect();
+            mInternetProvider = mExternalClient;
+        } else {
+            MainHook.log("Found INTERNET permission, using SimpleInternetProvider");
+            mInternetProvider = new SimpleInternetProvider();
+        }
+
         if (mSPManager.hasLanguageModel()) {
             setModel(mSPManager.getLanguageModel());
+        } else {
+            mModelClient = LanguageModelClient.forModel(LanguageModel.Gemini);
+            mModelClient.setInternetProvider(mInternetProvider);
         }
     }
 
@@ -46,6 +73,7 @@ public class GenerativeAIController implements ConfigChangeListener {
         mModelClient.setApiKey(mSPManager.getApiKey(model));
         mModelClient.setSubModel(mSPManager.getSubModel(model));
         mModelClient.setBaseUrl(mSPManager.getBaseUrl(model));
+        mModelClient.setInternetProvider(mInternetProvider);
     }
 
     @Override
@@ -130,7 +158,7 @@ public class GenerativeAIController implements ConfigChangeListener {
                     return;
                 }
 
-                MainHook.log("onNext: \"" + s + "\"");
+                MainHook.log("onNext: string with length " + s.length());
 
                 mInteractor.post(() -> mListeners.forEach(
                         l -> l.onAINext(s)));
@@ -139,10 +167,6 @@ public class GenerativeAIController implements ConfigChangeListener {
             @Override
             public void onError(Throwable t) {
                 MainHook.log(t);
-
-                mInteractor.post(() ->
-                        mInteractor.toastLong(t.getClass().getSimpleName() + " : " + t.getMessage() + " (see logs)"));
-
                 onComplete();
             }
 

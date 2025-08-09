@@ -1,4 +1,4 @@
-package tn.amin.keyboard_gpt.ui;
+package tn.amin.keyboard_gpt.external;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -22,12 +22,12 @@ import java.util.Arrays;
 import java.util.stream.Stream;
 
 import tn.amin.keyboard_gpt.R;
-import tn.amin.keyboard_gpt.UiInteractor;
 import tn.amin.keyboard_gpt.instruction.command.AbstractCommand;
 import tn.amin.keyboard_gpt.instruction.command.Commands;
 import tn.amin.keyboard_gpt.instruction.command.GenerativeAICommand;
 import tn.amin.keyboard_gpt.instruction.command.SimpleGenerativeAICommand;
-import tn.amin.keyboard_gpt.llm.LanguageModel;
+import tn.amin.keyboard_gpt.llm.client.LanguageModel;
+import tn.amin.keyboard_gpt.ui.UiInteractor;
 
 public class DialogActivity extends Activity {
     private DialogType mLastDialogType = null;

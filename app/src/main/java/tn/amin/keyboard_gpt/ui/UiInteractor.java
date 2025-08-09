@@ -1,6 +1,5 @@
-package tn.amin.keyboard_gpt;
+package tn.amin.keyboard_gpt.ui;
 
-import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -16,11 +15,13 @@ import androidx.core.content.ContextCompat;
 
 import java.util.ArrayList;
 
-import tn.amin.keyboard_gpt.llm.LanguageModel;
+import tn.amin.keyboard_gpt.MainHook;
+import tn.amin.keyboard_gpt.SPManager;
+import tn.amin.keyboard_gpt.llm.client.LanguageModel;
 import tn.amin.keyboard_gpt.listener.ConfigChangeListener;
 import tn.amin.keyboard_gpt.listener.ConfigInfoProvider;
 import tn.amin.keyboard_gpt.listener.DialogDismissListener;
-import tn.amin.keyboard_gpt.ui.DialogType;
+import tn.amin.keyboard_gpt.external.DialogType;
 
 public class UiInteractor {
     public static final String ACTION_DIALOG_RESULT = "tn.amin.keyboard_gpt.DIALOG_RESULT";

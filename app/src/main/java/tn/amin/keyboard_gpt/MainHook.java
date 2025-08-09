@@ -16,8 +16,12 @@ import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import tn.amin.keyboard_gpt.hook.HookManager;
 import tn.amin.keyboard_gpt.hook.MethodHook;
+import tn.amin.keyboard_gpt.ui.IMSController;
+import tn.amin.keyboard_gpt.ui.UiInteractor;
 
 public class MainHook implements IXposedHookLoadPackage {
+    private static Context applicationContext = null;
+
     private KeyboardGPTBrain brain;
 
     private HookManager hookManager;
@@ -44,7 +48,8 @@ public class MainHook implements IXposedHookLoadPackage {
     }
 
     private void ensureInitialized(Context applicationContext) {
-        if (brain == null) {
+        if (MainHook.applicationContext == null) {
+            MainHook.applicationContext = applicationContext;
             SPManager.init(applicationContext);
             UiInteractor.init(applicationContext);
 
@@ -156,6 +161,10 @@ public class MainHook implements IXposedHookLoadPackage {
                 }));
     }
 
+    public static Context getApplicationContext() {
+        return applicationContext;
+    }
+
     public static void logST() {
         XposedBridge.log(Log.getStackTraceString(new Throwable()));
     }
@@ -166,5 +175,8 @@ public class MainHook implements IXposedHookLoadPackage {
 
     public static void log(Throwable t) {
         XposedBridge.log(t);
+
+        UiInteractor.getInstance().post(() ->
+                UiInteractor.getInstance().toastLong(t.getClass().getSimpleName() + " : " + t.getMessage()));
     }
 }

@@ -1,4 +1,4 @@
-package tn.amin.keyboard_gpt.llm;
+package tn.amin.keyboard_gpt.llm.client;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -17,12 +17,8 @@ import tn.amin.keyboard_gpt.MainHook;
 import tn.amin.keyboard_gpt.llm.publisher.ExceptionPublisher;
 import tn.amin.keyboard_gpt.llm.publisher.InputStreamPublisher;
 
-public class GroqClient extends ChatGPTClient {
+public class ClaudeClient extends LanguageModelClient {
     @Override
-    public LanguageModel getLanguageModel() {
-        return LanguageModel.Groq;
-    }
-
     public Publisher<String> submitPrompt(String prompt, String systemMessage) {
         if (getApiKey() == null || getApiKey().isEmpty()) {
             return LanguageModelClient.MISSING_API_KEY_PUBLISHER;
@@ -32,13 +28,13 @@ public class GroqClient extends ChatGPTClient {
             systemMessage = getDefaultSystemMessage();
         }
 
-        String url = getBaseUrl() + "/v1/chat/completions";
+        String url = getBaseUrl() + "/v1/messages";
         HttpURLConnection con;
         try {
             con = (HttpURLConnection) new URL(url).openConnection();
             con.setRequestMethod("POST");
-            con.setRequestProperty("Content-Type", "application/json");
-            con.setRequestProperty("Authorization", "Bearer " + getApiKey());
+            con.setRequestProperty("content-type", "application/json");
+            con.setRequestProperty("x-api-key", getApiKey());
 
             JSONArray messagesJson = new JSONArray();
             messagesJson.put(new JSONObject()
@@ -47,6 +43,7 @@ public class GroqClient extends ChatGPTClient {
             messagesJson.put(new JSONObject()
                     .accumulate("role", "user")
                     .accumulate("content", prompt));
+
             JSONObject rootJson = new JSONObject();
             rootJson.put("model", getSubModel());
             rootJson.put("messages", messagesJson);
@@ -65,7 +62,7 @@ public class GroqClient extends ChatGPTClient {
             if (responseCode == 200) {
                 return new InputStreamPublisher(con.getInputStream(), line -> {
                     line = line.trim();
-//                    MainHook.log("line is " + line);
+                    MainHook.log("line is " + line);
                     if (line.isEmpty() || line.endsWith("[DONE]")) {
                         return "";
                     }
@@ -108,6 +105,11 @@ public class GroqClient extends ChatGPTClient {
         }
     }
 
+    @Override
+    public LanguageModel getLanguageModel() {
+        return LanguageModel.ChatGPT;
+    }
+
     private String extractContent(JSONObject message) throws JSONException {
         if (!message.has("content")) {
             return "";
@@ -115,5 +117,4 @@ public class GroqClient extends ChatGPTClient {
 
         return message.getString("content");
     }
-
 }
