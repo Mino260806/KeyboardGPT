@@ -167,10 +167,6 @@ public class GenerativeAIController implements ConfigChangeListener {
             @Override
             public void onError(Throwable t) {
                 MainHook.log(t);
-
-                mInteractor.post(() ->
-                        mInteractor.toastLong(t.getClass().getSimpleName() + " : " + t.getMessage() + " (see logs)"));
-
                 onComplete();
             }
 

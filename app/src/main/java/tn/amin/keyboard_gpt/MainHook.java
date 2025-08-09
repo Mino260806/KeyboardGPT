@@ -166,20 +166,17 @@ public class MainHook implements IXposedHookLoadPackage {
     }
 
     public static void logST() {
-//        if (false) {
-            XposedBridge.log(Log.getStackTraceString(new Throwable()));
-//        }
+        XposedBridge.log(Log.getStackTraceString(new Throwable()));
     }
 
     public static void log(String message) {
-//        if (false) {
-            XposedBridge.log("(KeyboardGPT) " + message);
-//        }
+        XposedBridge.log("(KeyboardGPT) " + message);
     }
 
     public static void log(Throwable t) {
-//        if (false) {
-            XposedBridge.log(t);
-//        }
+        XposedBridge.log(t);
+
+        UiInteractor.getInstance().post(() ->
+                UiInteractor.getInstance().toastLong(t.getClass().getSimpleName() + " : " + t.getMessage()));
     }
 }
