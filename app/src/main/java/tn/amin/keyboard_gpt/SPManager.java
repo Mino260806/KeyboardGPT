@@ -19,6 +19,8 @@ import tn.amin.keyboard_gpt.ui.UiInteractor;
 public class SPManager implements ConfigInfoProvider {
     protected static final String PREF_NAME = "keyboard_gpt";
 
+    protected static final String PREF_MODULE_VERSION = "module_version";
+
     protected static final String PREF_LANGUAGE_MODEL_COMPAT = "language_model";
 
     protected static final String PREF_LANGUAGE_MODEL = "language_model_v2";
@@ -50,7 +52,26 @@ public class SPManager implements ConfigInfoProvider {
 
     private SPManager(Context context) {
         sp = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        updateVersion();
         updateGenerativeAICommands();
+    }
+
+    private void updateVersion() {
+        SharedPreferences.Editor editor = sp.edit();
+        int version = getVersion();
+        if (version == -1) {
+            MainHook.log("Clearing SP because no version found");
+            editor.clear();
+        }
+
+        if (version != BuildConfig.VERSION_CODE) {
+            editor.putInt(PREF_MODULE_VERSION, BuildConfig.VERSION_CODE);
+        }
+        editor.apply();
+    }
+
+    public int getVersion() {
+        return sp.getInt(PREF_MODULE_VERSION, -1);
     }
 
     public boolean hasLanguageModel() {
