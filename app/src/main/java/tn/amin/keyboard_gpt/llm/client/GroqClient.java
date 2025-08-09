@@ -6,6 +6,7 @@ import org.json.JSONObject;
 import org.reactivestreams.Publisher;
 
 import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 import tn.amin.keyboard_gpt.MainHook;
 import tn.amin.keyboard_gpt.llm.publisher.ExceptionPublisher;
 import tn.amin.keyboard_gpt.llm.publisher.InputStreamPublisher;
+import tn.amin.keyboard_gpt.llm.publisher.InternetRequestPublisher;
 
 public class GroqClient extends ChatGPTClient {
     @Override
@@ -52,59 +54,48 @@ public class GroqClient extends ChatGPTClient {
             rootJson.put("messages", messagesJson);
             rootJson.put("stream", true);
 
-            con.setDoOutput(true);
-
-            try (OutputStream os = con.getOutputStream()) {
-                byte[] input = rootJson.toString().getBytes(StandardCharsets.UTF_8);
-                os.write(input, 0, input.length);
-            }
-
-            int responseCode = con.getResponseCode();
-            MainHook.log("Received response with code " + responseCode);
-
-            if (responseCode == 200) {
-                return new InputStreamPublisher(con.getInputStream(), line -> {
-                    line = line.trim();
-//                    MainHook.log("line is " + line);
-                    if (line.isEmpty() || line.endsWith("[DONE]")) {
-                        return "";
-                    }
-                    if (line.startsWith("data:")) {
-                        line = line.substring("data:".length()).trim();
-                    }
-                    try {
-                        JSONObject choice = new JSONObject(line)
-                                .getJSONArray("choices")
-                                .getJSONObject(0);
-                        if (choice.has("delta")) {
-                            return extractContent(choice.getJSONObject("delta"));
+            InternetRequestPublisher publisher = new InternetRequestPublisher(
+                    (s, reader) -> {
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            line = line.trim();
+                            if (line.isEmpty() || line.endsWith("[DONE]")) {
+                                continue;
+                            }
+                            if (line.startsWith("data:")) {
+                                line = line.substring("data:".length()).trim();
+                            }
+                            JSONObject choice = new JSONObject(line)
+                                    .getJSONArray("choices")
+                                    .getJSONObject(0);
+                            if (choice.has("delta")) {
+                                s.onNext(extractContent(choice.getJSONObject("delta")));
+                            } else {
+                                s.onNext(extractContent(choice.getJSONObject("message")));
+                            }
                         }
-                        return extractContent(choice.getJSONObject("message"));
-                    } catch (JSONException e) {
-                        MainHook.log(e);
-                        return "";
+                    },
+                    (s, reader) -> {
+                        String response = reader.lines().collect(Collectors.joining(""));
+                        JSONObject responseJson = new JSONObject(response);
+                        if (responseJson.has("error")) {
+                            JSONObject errorJson = responseJson
+                                    .getJSONObject("error");
+                            String message = errorJson.getString("message");
+                            String type = errorJson.getString("type");
+
+                            throw new IllegalArgumentException("(" + type + ") " + message);
+                        }
+                        else {
+                            throw new IllegalArgumentException(response);
+                        }
                     }
-                });
-            }
-
-            else {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(con.getErrorStream()));
-                String response = reader.lines().collect(Collectors.joining(""));
-                JSONObject responseJson = new JSONObject(response);
-                if (responseJson.has("error")) {
-                    JSONObject errorJson = responseJson
-                            .getJSONObject("error");
-                    String message = errorJson.getString("message");
-                    String type = errorJson.getString("type");
-
-                    throw new IllegalArgumentException("(" + type + ") " + message);
-                }
-                else {
-                    throw new IllegalArgumentException(response);
-                }
-            }
-        } catch (Exception e) {
-            return new ExceptionPublisher(e);
+            );
+            InputStream inputStream = sendRequest(con, rootJson.toString(), publisher);
+            publisher.setInputStream(inputStream);
+            return publisher;
+        } catch (Throwable t) {
+            return new ExceptionPublisher(t);
         }
     }
 

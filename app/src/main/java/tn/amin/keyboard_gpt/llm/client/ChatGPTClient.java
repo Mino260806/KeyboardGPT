@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import tn.amin.keyboard_gpt.MainHook;
 import tn.amin.keyboard_gpt.llm.publisher.ExceptionPublisher;
+import tn.amin.keyboard_gpt.llm.publisher.InternetRequestPublisher;
 import tn.amin.keyboard_gpt.llm.publisher.SimpleStringPublisher;
 
 public class ChatGPTClient extends LanguageModelClient {
@@ -49,56 +50,54 @@ public class ChatGPTClient extends LanguageModelClient {
             rootJson.put("messages", messagesJson);
             rootJson.put("stream", false);
 
-            InputStream inputStream = sendRequest(con, rootJson.toString());
-
-            if (true) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-                String response = reader.lines().collect(Collectors.joining(""));
-                JSONObject responseJson = new JSONObject(response);
-                if (responseJson.has("choices")) {
-                    JSONArray choices = responseJson.getJSONArray("choices");
-                    for (int i = 0; i < choices.length(); i++) {
-                        JSONObject choice = choices.getJSONObject(i);
-                        if (choice.has("role") && "assistant".equals(choice.getString("role"))) {
-                            return new SimpleStringPublisher(choice
-                                    .getJSONObject("message")
-                                    .getString("content"));
+            InternetRequestPublisher publisher = new InternetRequestPublisher(
+                    (s, reader) -> {
+                        String response = reader.lines().collect(Collectors.joining(""));
+                        JSONObject responseJson = new JSONObject(response);
+                        if (responseJson.has("choices")) {
+                            JSONArray choices = responseJson.getJSONArray("choices");
+                            for (int i = 0; i < choices.length(); i++) {
+                                JSONObject choice = choices.getJSONObject(i);
+                                if (choice.has("role") && "assistant".equals(choice.getString("role"))) {
+                                    s.onNext(choice
+                                            .getJSONObject("message")
+                                            .getString("content"));
+                                    return;
+                                }
+                            }
+                            if (choices.length() > 0) {
+                                s.onNext(choices.getJSONObject(0)
+                                        .getJSONObject("message")
+                                        .getString("content"));
+                            }
+                            else {
+                                throw new JSONException("choices has length 0");
+                            }
+                        } else {
+                            throw new JSONException("no \"choices\" attribute found");
                         }
-                    }
-                    if (choices.length() > 0) {
-                        return new SimpleStringPublisher(choices.getJSONObject(0)
-                                .getJSONObject("message")
-                                .getString("content"));
-                    }
-                    else {
-                        throw new JSONException("choices has length 0");
-                    }
-                } else {
-                    throw new JSONException("no \"choices\" attribute found");
-                }
-            } else {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(con.getErrorStream()));
-                String response = reader.lines().collect(Collectors.joining(""));
-                try {
-                    JSONObject responseJson = new JSONObject(response);
-                    if (responseJson.has("error")) {
-                        JSONObject errorJson = responseJson
-                                .getJSONObject("error");
-                        String message = errorJson.getString("message");
-                        String type = "";
-                        if (errorJson.has("type")) {
-                            type = errorJson.getString("type");
-                        }
+                    },
+                    (s, reader) -> {
+                        String response = reader.lines().collect(Collectors.joining(""));
+                        JSONObject responseJson = new JSONObject(response);
+                        if (responseJson.has("error")) {
+                            JSONObject errorJson = responseJson
+                                    .getJSONObject("error");
+                            String message = errorJson.getString("message");
+                            String type = "";
+                            if (errorJson.has("type")) {
+                                type = errorJson.getString("type");
+                            }
 
-                        throw new IllegalArgumentException("(" + type + ") " + message);
-                    }
-                    else {
-                        throw new IllegalArgumentException(response);
-                    }
-                } catch (JSONException e) {
-                    throw new IllegalArgumentException("Received status code " + "...");
-                }
-            }
+                            throw new IllegalArgumentException("(" + type + ") " + message);
+                        }
+                        else {
+                            throw new IllegalArgumentException(response);
+                        }
+                    });
+            InputStream inputStream = sendRequest(con, rootJson.toString(), publisher);
+            publisher.setInputStream(inputStream);
+            return publisher;
         } catch (Throwable t) {
             return new ExceptionPublisher(t);
         }

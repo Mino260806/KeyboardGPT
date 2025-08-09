@@ -11,11 +11,12 @@ import java.net.HttpURLConnection;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 
+import tn.amin.keyboard_gpt.MainHook;
 import tn.amin.keyboard_gpt.llm.internet.InternetProvider;
 import tn.amin.keyboard_gpt.llm.internet.SimpleInternetProvider;
 import tn.amin.keyboard_gpt.llm.service.InternetRequestListener;
 
-public abstract class LanguageModelClient implements InternetRequestListener {
+public abstract class LanguageModelClient {
     private String mApiKey = null;
 
     private String mSubModel = null;
@@ -23,7 +24,6 @@ public abstract class LanguageModelClient implements InternetRequestListener {
     private String mBaseUrl = null;
 
     private InternetProvider mInternetProvider = new SimpleInternetProvider();
-    private int mLastStatusCode;
 
     abstract public Publisher<String> submitPrompt(String prompt, String systemMessage);
 
@@ -91,21 +91,7 @@ public abstract class LanguageModelClient implements InternetRequestListener {
         mInternetProvider = internetProvider;
     }
 
-    protected InputStream sendRequest(HttpURLConnection con, String body) throws IOException {
-        return mInternetProvider.sendRequest(con, body, this);
-    }
-
-    @Override
-    public void onRequestStatusCode(int code) {
-        mLastStatusCode = code;
-    }
-
-    @Override
-    public void onRequestComplete() {
-
-    }
-
-    protected int getLastStatusCode() {
-        return mLastStatusCode;
+    protected InputStream sendRequest(HttpURLConnection con, String body, InternetRequestListener irl) throws IOException {
+        return mInternetProvider.sendRequest(con, body, irl);
     }
 }
