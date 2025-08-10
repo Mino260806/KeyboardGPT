@@ -16,7 +16,7 @@ public class TextParser {
     private Pattern patternCrossout = Pattern.compile("~([^~]+)~$");
     private Pattern patternUnderline = Pattern.compile("ū([^~]+)ū$");
     private Pattern patternAI = Pattern.compile("\\$([^$]*)\\$$");
-    private Pattern patternAICommand = Pattern.compile("©(?:([^ ©]+) *)?([^ ©]+)?©$");
+    private Pattern patternAICommand = Pattern.compile("©(?:([^ ©]+) *)?([^©]+)?©$");
 
     private List<ParseDirective> directives = List.of(
             new ParseDirective(patternBold, new FormatParseResultFactory(ConversionMethod.BOLD)),
