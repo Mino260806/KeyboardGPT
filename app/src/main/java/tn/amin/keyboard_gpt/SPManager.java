@@ -14,6 +14,7 @@ import tn.amin.keyboard_gpt.instruction.command.Commands;
 import tn.amin.keyboard_gpt.instruction.command.GenerativeAICommand;
 import tn.amin.keyboard_gpt.llm.LanguageModel;
 import tn.amin.keyboard_gpt.listener.ConfigInfoProvider;
+import tn.amin.keyboard_gpt.llm.LanguageModelField;
 import tn.amin.keyboard_gpt.ui.UiInteractor;
 
 public class SPManager implements ConfigInfoProvider {
@@ -91,34 +92,38 @@ public class SPManager implements ConfigInfoProvider {
         sp.edit().putString(PREF_LANGUAGE_MODEL, model.name()).apply();
     }
 
+    public void setLanguageModelField(LanguageModel model, LanguageModelField field, String value) {
+        String entryName = String.format("%s." + field, model.name());
+        sp.edit().putString(entryName, value).apply();
+    }
+
+    public String getLanguageModelField(LanguageModel model, LanguageModelField field) {
+        String entryName = String.format("%s." + field, model.name());
+        return sp.getString(entryName, model.getDefault(field));
+    }
+
     public void setApiKey(LanguageModel model, String apiKey) {
-        String key = String.format(PREF_API_KEY, model.name());
-        sp.edit().putString(key, apiKey).apply();
+        setLanguageModelField(model, LanguageModelField.ApiKey, apiKey);
     }
 
     public String getApiKey(LanguageModel model) {
-        String key = String.format(PREF_API_KEY, model.name());
-        return sp.getString(key, null);
+        return getLanguageModelField(model, LanguageModelField.ApiKey);
     }
 
     public void setSubModel(LanguageModel model, String subModel) {
-        String key = String.format(PREF_SUB_MODEL, model.name());
-        sp.edit().putString(key, subModel).apply();
+        setLanguageModelField(model, LanguageModelField.SubModel, subModel);
     }
 
     public String getSubModel(LanguageModel model) {
-        String key = String.format(PREF_SUB_MODEL, model.name());
-        return sp.getString(key, null);
+        return getLanguageModelField(model, LanguageModelField.SubModel);
     }
 
     public void setBaseUrl(LanguageModel model, String baseUrl) {
-        String key = String.format(PREF_BASE_URL, model.name());
-        sp.edit().putString(key, baseUrl).apply();
+        setLanguageModelField(model, LanguageModelField.BaseUrl, baseUrl);
     }
 
     public String getBaseUrl(LanguageModel model) {
-        String key = String.format(PREF_BASE_URL, model.name());
-        return sp.getString(key, null);
+        return getLanguageModelField(model, LanguageModelField.BaseUrl);
     }
 
     public void setGenerativeAICommandsRaw(String commands) {
@@ -159,9 +164,9 @@ public class SPManager implements ConfigInfoProvider {
         for (LanguageModel model: LanguageModel.values()) {
             Bundle configBundle = new Bundle();
 
-            configBundle.putString(UiInteractor.EXTRA_CONFIG_LANGUAGE_MODEL_API_KEY, getApiKey(model));
-            configBundle.putString(UiInteractor.EXTRA_CONFIG_LANGUAGE_MODEL_SUB_MODEL, getSubModel(model));
-            configBundle.putString(UiInteractor.EXTRA_CONFIG_LANGUAGE_MODEL_BASE_URL, getBaseUrl(model));
+            for (LanguageModelField field: LanguageModelField.values()) {
+                configBundle.putString(field.name, getLanguageModelField(model, field));
+            }
 
             bundle.putBundle(model.name(), configBundle);
         }

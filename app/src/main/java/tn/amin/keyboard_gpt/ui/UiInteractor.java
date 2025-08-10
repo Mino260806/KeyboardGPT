@@ -22,6 +22,7 @@ import tn.amin.keyboard_gpt.listener.ConfigChangeListener;
 import tn.amin.keyboard_gpt.listener.ConfigInfoProvider;
 import tn.amin.keyboard_gpt.listener.DialogDismissListener;
 import tn.amin.keyboard_gpt.external.DialogType;
+import tn.amin.keyboard_gpt.llm.LanguageModelField;
 
 public class UiInteractor {
     public static final String ACTION_DIALOG_RESULT = "tn.amin.keyboard_gpt.DIALOG_RESULT";
@@ -32,11 +33,7 @@ public class UiInteractor {
 
     public static final String EXTRA_CONFIG_LANGUAGE_MODEL = "tn.amin.keyboard_gpt.config.model";
 
-    public static final String EXTRA_CONFIG_LANGUAGE_MODEL_BASE_URL = "tn.amin.keyboard_gpt.config.model.BASE_URL";
-
-    public static final String EXTRA_CONFIG_LANGUAGE_MODEL_API_KEY = "tn.amin.keyboard_gpt.config.model.API_KEY";
-
-    public static final String EXTRA_CONFIG_LANGUAGE_MODEL_SUB_MODEL = "tn.amin.keyboard_gpt.config.model.SUB_MODEL";
+    public static final String EXTRA_CONFIG_LANGUAGE_MODEL_FIELD = "tn.amin.keyboard_gpt.config.model.%s";
 
 
     public static final String EXTRA_WEBVIEW_TITLE = "tn.amin.keyboard_gpt.webview.TITLE";
@@ -110,13 +107,13 @@ public class UiInteractor {
                                     LanguageModel configuredlanguageModel = LanguageModel.valueOf(modelName);
                                     Bundle languageModelBundle = bundle.getBundle(modelName);
 
-                                    String apiKey = languageModelBundle.getString(EXTRA_CONFIG_LANGUAGE_MODEL_API_KEY);
-                                    String subModel = languageModelBundle.getString(EXTRA_CONFIG_LANGUAGE_MODEL_SUB_MODEL);
-                                    String baseUrl = languageModelBundle.getString(EXTRA_CONFIG_LANGUAGE_MODEL_BASE_URL);
-
-                                    mConfigChangeListeners.forEach((l) -> l.onApiKeyChange(configuredlanguageModel, apiKey));
-                                    mConfigChangeListeners.forEach((l) -> l.onSubModelChange(configuredlanguageModel, subModel));
-                                    mConfigChangeListeners.forEach((l) -> l.onBaseUrlChange(configuredlanguageModel, baseUrl));
+                                    for (LanguageModelField field: LanguageModelField.values()) {
+                                        if (languageModelBundle.containsKey(field.name)) {
+                                            String fieldValue = languageModelBundle.getString(field.name);
+                                            mConfigChangeListeners.forEach(l ->
+                                                    l.onLanguageModelFieldChange(configuredlanguageModel, field, fieldValue));
+                                        }
+                                    }
                                 }
                                 isPrompt = true;
                                 break;

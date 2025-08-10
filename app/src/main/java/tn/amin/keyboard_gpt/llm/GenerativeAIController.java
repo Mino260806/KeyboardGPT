@@ -69,9 +69,9 @@ public class GenerativeAIController implements ConfigChangeListener {
     private void setModel(LanguageModel model) {
         MainHook.log("setModel " + model.label);
         mModelClient = LanguageModelClient.forModel(model);
-        mModelClient.setApiKey(mSPManager.getApiKey(model));
-        mModelClient.setSubModel(mSPManager.getSubModel(model));
-        mModelClient.setBaseUrl(mSPManager.getBaseUrl(model));
+        for (LanguageModelField field: LanguageModelField.values()) {
+            mModelClient.setField(field, mSPManager.getLanguageModelField(model, field));
+        }
         mModelClient.setInternetProvider(mInternetProvider);
     }
 
@@ -85,26 +85,10 @@ public class GenerativeAIController implements ConfigChangeListener {
     }
 
     @Override
-    public void onApiKeyChange(LanguageModel languageModel, String apiKey) {
-        mSPManager.setApiKey(languageModel, apiKey);
-        if (mModelClient != null && mModelClient.getLanguageModel() == languageModel) {
-            mModelClient.setApiKey(apiKey);
-        }
-    }
-
-    @Override
-    public void onSubModelChange(LanguageModel languageModel, String subModel) {
-        mSPManager.setSubModel(languageModel, subModel);
-        if (mModelClient != null && mModelClient.getLanguageModel() == languageModel) {
-            mModelClient.setSubModel(subModel);
-        }
-    }
-
-    @Override
-    public void onBaseUrlChange(LanguageModel languageModel, String baseUrl) {
-        mSPManager.setBaseUrl(languageModel, baseUrl);
-        if (mModelClient != null && mModelClient.getLanguageModel() == languageModel) {
-            mModelClient.setBaseUrl(baseUrl);
+    public void onLanguageModelFieldChange(LanguageModel model, LanguageModelField field, String value) {
+        mSPManager.setLanguageModelField(model, field, value);
+        if (mModelClient != null && mModelClient.getLanguageModel() == model) {
+            mModelClient.setField(field, value);
         }
     }
 

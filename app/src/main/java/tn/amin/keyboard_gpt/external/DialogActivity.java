@@ -8,17 +8,23 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.InsetDrawable;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import tn.amin.keyboard_gpt.R;
@@ -27,6 +33,7 @@ import tn.amin.keyboard_gpt.instruction.command.Commands;
 import tn.amin.keyboard_gpt.instruction.command.GenerativeAICommand;
 import tn.amin.keyboard_gpt.instruction.command.SimpleGenerativeAICommand;
 import tn.amin.keyboard_gpt.llm.LanguageModel;
+import tn.amin.keyboard_gpt.llm.LanguageModelField;
 import tn.amin.keyboard_gpt.ui.UiInteractor;
 
 public class DialogActivity extends Activity {
@@ -195,32 +202,43 @@ public class DialogActivity extends Activity {
             throw new RuntimeException("No model " + mSelectedModel.name());
         }
 
-        String subModel = modelConfig.getString(UiInteractor.EXTRA_CONFIG_LANGUAGE_MODEL_SUB_MODEL);
-        subModel = subModel != null ? subModel : mSelectedModel.defaultSubModel;
-        String apiKey = modelConfig.getString(UiInteractor.EXTRA_CONFIG_LANGUAGE_MODEL_API_KEY);
-        String baseUrl = modelConfig.getString(UiInteractor.EXTRA_CONFIG_LANGUAGE_MODEL_BASE_URL);
-        baseUrl = baseUrl != null ? baseUrl : mSelectedModel.defaultBaseUrl;
-
         LinearLayout layout = (LinearLayout)
                 getLayoutInflater().inflate(R.layout.dialog_configue_model, null);
 
-        EditText apiKeyEditText = layout.findViewById(R.id.edit_apikey);
-        EditText subModelEditText = layout.findViewById(R.id.edit_model);
-        EditText baseUrlEditText = layout.findViewById(R.id.edit_baseurl);
-        apiKeyEditText.setText(apiKey);
-        subModelEditText.setText(subModel);
-        baseUrlEditText.setText(baseUrl);
+        Bundle tempModelConfig = new Bundle();
+        for (LanguageModelField field: LanguageModelField.values()) {
+            RelativeLayout fieldLayout = (RelativeLayout)
+                    getLayoutInflater().inflate(R.layout.dialog_configure_model_field, layout, false);
+            layout.addView(fieldLayout);
+            TextView fieldTitle = fieldLayout.findViewById(R.id.field_tile);
+            EditText fieldEdit = fieldLayout.findViewById(R.id.field_edit);
+
+            fieldTitle.setText(field.title);
+            String fieldValue = modelConfig.getString(field.name);
+            fieldEdit.setText(fieldValue != null ? fieldValue : mSelectedModel.getDefault(field));
+            fieldEdit.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void afterTextChanged(Editable s) {
+
+                }
+
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    tempModelConfig.putString(field.name, s.toString());
+                }
+            });
+        }
 
         return new AlertDialog.Builder(this)
                 .setTitle(mSelectedModel.label + " configuration")
                 .setView(layout)
                 .setPositiveButton("Ok", (dialog, which) -> {
-                    modelConfig.putString(UiInteractor.EXTRA_CONFIG_LANGUAGE_MODEL_API_KEY,
-                            apiKeyEditText.getText().toString());
-                    modelConfig.putString(UiInteractor.EXTRA_CONFIG_LANGUAGE_MODEL_SUB_MODEL,
-                            subModelEditText.getText().toString());
-                    modelConfig.putString(UiInteractor.EXTRA_CONFIG_LANGUAGE_MODEL_BASE_URL,
-                            baseUrlEditText.getText().toString());
+                    modelConfig.putAll(tempModelConfig);
                     dialog.dismiss();
                 })
                 .setNegativeButton("Cancel", (dialog, which) -> {

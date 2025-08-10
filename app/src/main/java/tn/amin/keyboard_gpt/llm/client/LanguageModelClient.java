@@ -7,18 +7,17 @@ import org.reactivestreams.Publisher;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.util.HashMap;
+import java.util.Map;
 
 import tn.amin.keyboard_gpt.llm.LanguageModel;
+import tn.amin.keyboard_gpt.llm.LanguageModelField;
 import tn.amin.keyboard_gpt.llm.internet.InternetProvider;
 import tn.amin.keyboard_gpt.llm.internet.SimpleInternetProvider;
 import tn.amin.keyboard_gpt.llm.service.InternetRequestListener;
 
 public abstract class LanguageModelClient {
-    private String mApiKey = null;
-
-    private String mSubModel = null;
-
-    private String mBaseUrl = null;
+    private Map<LanguageModelField, String> mFields = new HashMap<>();
 
     private InternetProvider mInternetProvider = new SimpleInternetProvider();
 
@@ -26,28 +25,24 @@ public abstract class LanguageModelClient {
 
     abstract public LanguageModel getLanguageModel();
 
-    public void setApiKey(String apiKey) {
-        mApiKey = apiKey;
+    public void setField(LanguageModelField field, String value) {
+        mFields.put(field, value);
     }
 
-    public void setSubModel(String subModel) {
-        mSubModel = subModel;
-    }
-
-    public void setBaseUrl(String baseUrl) {
-        mBaseUrl = baseUrl;
+    public String getField(LanguageModelField field) {
+        return mFields.getOrDefault(field, getLanguageModel().getDefault(field));
     }
 
     public String getSubModel() {
-        return mSubModel != null ? mSubModel : getLanguageModel().defaultSubModel;
+        return getField(LanguageModelField.SubModel);
     }
 
     public String getApiKey() {
-        return mApiKey;
+        return getField(LanguageModelField.ApiKey);
     }
 
     public String getBaseUrl() {
-        return mBaseUrl != null ? mBaseUrl : getLanguageModel().defaultBaseUrl;
+        return getField(LanguageModelField.BaseUrl);
     }
 
     public static LanguageModelClient forModel(LanguageModel model) {

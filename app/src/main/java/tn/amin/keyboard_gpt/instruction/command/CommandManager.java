@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import tn.amin.keyboard_gpt.SPManager;
+import tn.amin.keyboard_gpt.llm.LanguageModelField;
 import tn.amin.keyboard_gpt.ui.UiInteractor;
 import tn.amin.keyboard_gpt.listener.ConfigChangeListener;
 import tn.amin.keyboard_gpt.llm.LanguageModel;
@@ -41,17 +42,7 @@ public class CommandManager implements ConfigChangeListener {
     }
 
     @Override
-    public void onApiKeyChange(LanguageModel languageModel, String apiKey) {
-
-    }
-
-    @Override
-    public void onSubModelChange(LanguageModel languageModel, String subModel) {
-
-    }
-
-    @Override
-    public void onBaseUrlChange(LanguageModel languageModel, String baseUrl) {
+    public void onLanguageModelFieldChange(LanguageModel model, LanguageModelField field, String value) {
 
     }
 

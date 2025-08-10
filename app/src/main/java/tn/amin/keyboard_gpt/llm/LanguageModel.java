@@ -1,5 +1,9 @@
 package tn.amin.keyboard_gpt.llm;
 
+import com.google.common.collect.ImmutableMap;
+
+import java.util.Map;
+
 public enum LanguageModel {
     Gemini("Gemini", "gemini-2.5-flash-lite", "https://generativelanguage.googleapis.com/v1beta/openai"),
     ChatGPT("ChatGPT", "gpt-4o-mini", "https://api.openai.com/v1"),
@@ -10,12 +14,19 @@ public enum LanguageModel {
     ;
 
     public final String label;
-    public final String defaultSubModel;
-    public final String defaultBaseUrl;
+
+    public final Map<LanguageModelField, String> defaults;
 
     LanguageModel(String label, String defaultSubModel, String defaultBaseUrl) {
         this.label = label;
-        this.defaultSubModel = defaultSubModel;
-        this.defaultBaseUrl = defaultBaseUrl;
+
+        defaults = ImmutableMap.of(
+                LanguageModelField.SubModel, defaultSubModel,
+                LanguageModelField.BaseUrl, defaultBaseUrl
+        );
+    }
+
+    public String getDefault(LanguageModelField field) {
+        return defaults.getOrDefault(field, null);
     }
 }
