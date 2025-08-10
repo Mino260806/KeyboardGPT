@@ -15,6 +15,7 @@ import tn.amin.keyboard_gpt.text.parse.result.AIParseResult;
 import tn.amin.keyboard_gpt.text.parse.result.CommandParseResult;
 import tn.amin.keyboard_gpt.text.parse.result.FormatParseResult;
 import tn.amin.keyboard_gpt.text.parse.result.ParseResult;
+import tn.amin.keyboard_gpt.text.parse.result.SettingsParseResult;
 import tn.amin.keyboard_gpt.text.transform.format.TextUnicodeConverter;
 import tn.amin.keyboard_gpt.ui.IMSController;
 import tn.amin.keyboard_gpt.ui.UiInteractor;
@@ -83,6 +84,8 @@ public class KeyboardGPTBrain implements InputEventListener, GenerativeAIListene
                     UiInteractor.getInstance().showWebSearchDialog("Web Search", url);
                 }
             }
+        } else if (parseResult instanceof SettingsParseResult) {
+            UiInteractor.getInstance().showSettingsDialog();
         }
     }
 

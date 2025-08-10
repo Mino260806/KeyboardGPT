@@ -1,16 +1,19 @@
 package tn.amin.keyboard_gpt.external;
 
 public enum DialogType {
-    ChoseModel(true),
-    ConfigureModel(true),
-    WebSearch(false),
-    EditCommandsList(false),
-    EditCommand(false),
+    ChoseModel("Choose Model", true),
+    ConfigureModel("Configure Model", false),
+    WebSearch("Web Search", false),
+    EditCommandsList("Commands List", true),
+    EditCommand("Edit Command", false),
+    Settings("Settings", false),
     ;
 
-    final boolean isModelConfig;
+    public final String title;
+    public final boolean inSettings;
 
-    DialogType (boolean isModelConfig) {
-        this.isModelConfig = isModelConfig;
+    DialogType(String title, boolean inSettings) {
+        this.title = title;
+        this.inSettings = inSettings;
     }
 }

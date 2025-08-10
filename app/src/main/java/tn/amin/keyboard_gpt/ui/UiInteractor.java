@@ -184,6 +184,27 @@ public class UiInteractor {
         return true;
     }
 
+    public boolean showSettingsDialog() {
+        if (isDialogOnCooldown()) {
+            return false;
+        }
+
+        String rawCommands = SPManager.getInstance().getGenerativeAICommandsRaw();
+
+        Intent intent = new Intent("tn.amin.keyboard_gpt.OVERLAY");
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra(EXTRA_DIALOG_TYPE, DialogType.Settings.name());
+        intent.putExtra(EXTRA_COMMAND_LIST, rawCommands);
+        intent.putExtra(EXTRA_CONFIG_LANGUAGE_MODEL, mConfigInfoProvider.getConfigBundle());
+        intent.putExtra(EXTRA_CONFIG_SELECTED_MODEL,
+                mConfigInfoProvider.getLanguageModel().name());
+
+        MainHook.log("Launching settings");
+        mContext.startActivity(intent);
+
+        return true;
+    }
+
     public void registerConfigChangeListener(ConfigChangeListener listener) {
         mConfigChangeListeners.add(listener);
     }

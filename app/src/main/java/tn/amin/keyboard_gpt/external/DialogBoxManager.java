@@ -38,8 +38,11 @@ public class DialogBoxManager {
                 box = new CommandEditDialogBox(this, mParent, mInputBundle, mConfig);
                 break;
             case WebSearch:
-            default:
                 box = new WebSearchDialogBox(this, mParent, mInputBundle, mConfig);
+                break;
+            case Settings:
+            default:
+                box = new SettingsDialogBox(this, mParent, mInputBundle, mConfig);
                 break;
         }
         return box;

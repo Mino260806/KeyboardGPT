@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 
 import tn.amin.keyboard_gpt.text.parse.result.CommandParseResultFactory;
 import tn.amin.keyboard_gpt.text.parse.result.AIParseResultFactory;
+import tn.amin.keyboard_gpt.text.parse.result.SettingsParseResultFactory;
 import tn.amin.keyboard_gpt.text.transform.format.ConversionMethod;
 import tn.amin.keyboard_gpt.text.parse.ParseDirective;
 import tn.amin.keyboard_gpt.text.parse.result.FormatParseResultFactory;
@@ -17,6 +18,7 @@ public class TextParser {
     private Pattern patternUnderline = Pattern.compile("ū([^~]+)ū$");
     private Pattern patternAI = Pattern.compile("\\$([^$]*)\\$$");
     private Pattern patternAICommand = Pattern.compile("©(?:([^ ©]+) *)?([^©]+)?©$");
+    private Pattern patternSettings = Pattern.compile("\\*#settings#\\*$");
 
     private List<ParseDirective> directives = List.of(
             new ParseDirective(patternBold, new FormatParseResultFactory(ConversionMethod.BOLD)),
@@ -24,7 +26,8 @@ public class TextParser {
             new ParseDirective(patternCrossout, new FormatParseResultFactory(ConversionMethod.CROSSOUT)),
             new ParseDirective(patternUnderline, new FormatParseResultFactory(ConversionMethod.UNDERLINE)),
             new ParseDirective(patternAI, new AIParseResultFactory()),
-            new ParseDirective(patternAICommand, new CommandParseResultFactory())
+            new ParseDirective(patternAICommand, new CommandParseResultFactory()),
+            new ParseDirective(patternSettings, new SettingsParseResultFactory())
     );
 
     public TextParser() {
