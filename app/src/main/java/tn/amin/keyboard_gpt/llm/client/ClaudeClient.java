@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 
 import tn.amin.keyboard_gpt.MainHook;
+import tn.amin.keyboard_gpt.llm.LanguageModel;
 import tn.amin.keyboard_gpt.llm.publisher.ExceptionPublisher;
 import tn.amin.keyboard_gpt.llm.publisher.InputStreamPublisher;
 

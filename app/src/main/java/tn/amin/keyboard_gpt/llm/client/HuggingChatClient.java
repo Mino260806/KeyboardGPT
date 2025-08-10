@@ -11,6 +11,7 @@ import java.net.URL;
 import java.util.UUID;
 
 import de.robv.android.xposed.XposedBridge;
+import tn.amin.keyboard_gpt.llm.LanguageModel;
 import tn.amin.keyboard_gpt.llm.publisher.ExceptionPublisher;
 import tn.amin.keyboard_gpt.llm.publisher.InputStreamPublisher;
 

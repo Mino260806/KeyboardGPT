@@ -1,4 +1,4 @@
-package tn.amin.keyboard_gpt.llm.client;
+package tn.amin.keyboard_gpt.llm;
 
 public enum LanguageModel {
     Gemini("Gemini", "gemini-2.5-flash-lite", "https://generativelanguage.googleapis.com/v1beta/openai"),

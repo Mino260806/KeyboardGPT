@@ -17,7 +17,7 @@ import java.util.ArrayList;
 
 import tn.amin.keyboard_gpt.MainHook;
 import tn.amin.keyboard_gpt.SPManager;
-import tn.amin.keyboard_gpt.llm.client.LanguageModel;
+import tn.amin.keyboard_gpt.llm.LanguageModel;
 import tn.amin.keyboard_gpt.listener.ConfigChangeListener;
 import tn.amin.keyboard_gpt.listener.ConfigInfoProvider;
 import tn.amin.keyboard_gpt.listener.DialogDismissListener;

@@ -26,7 +26,7 @@ import tn.amin.keyboard_gpt.instruction.command.AbstractCommand;
 import tn.amin.keyboard_gpt.instruction.command.Commands;
 import tn.amin.keyboard_gpt.instruction.command.GenerativeAICommand;
 import tn.amin.keyboard_gpt.instruction.command.SimpleGenerativeAICommand;
-import tn.amin.keyboard_gpt.llm.client.LanguageModel;
+import tn.amin.keyboard_gpt.llm.LanguageModel;
 import tn.amin.keyboard_gpt.ui.UiInteractor;
 
 public class DialogActivity extends Activity {

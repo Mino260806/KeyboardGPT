@@ -7,7 +7,7 @@ import java.util.Map;
 import tn.amin.keyboard_gpt.SPManager;
 import tn.amin.keyboard_gpt.ui.UiInteractor;
 import tn.amin.keyboard_gpt.listener.ConfigChangeListener;
-import tn.amin.keyboard_gpt.llm.client.LanguageModel;
+import tn.amin.keyboard_gpt.llm.LanguageModel;
 
 public class CommandManager implements ConfigChangeListener {
     private final static Map<String, AbstractCommand> STATIC_COMMAND_MAP = Map.of(

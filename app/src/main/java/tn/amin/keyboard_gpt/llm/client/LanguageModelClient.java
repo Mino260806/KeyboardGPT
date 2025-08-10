@@ -6,12 +6,9 @@ import org.reactivestreams.Publisher;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.URLConnection;
-import java.nio.charset.StandardCharsets;
 
-import tn.amin.keyboard_gpt.MainHook;
+import tn.amin.keyboard_gpt.llm.LanguageModel;
 import tn.amin.keyboard_gpt.llm.internet.InternetProvider;
 import tn.amin.keyboard_gpt.llm.internet.SimpleInternetProvider;
 import tn.amin.keyboard_gpt.llm.service.InternetRequestListener;
