@@ -37,6 +37,9 @@ public class ChoseModelDialogBox extends DialogBox {
 
                     switchToDialog(DialogType.ConfigureModel);
                 })
+                .setNegativeButton("Back", (dialog, which) -> {
+                    switchToDialog(DialogType.Settings);
+                })
                 .create();
     }
 

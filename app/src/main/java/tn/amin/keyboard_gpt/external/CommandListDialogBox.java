@@ -29,6 +29,9 @@ public class CommandListDialogBox extends DialogBox {
                     getConfig().focusCommandIndex = which - 1;
                     switchToDialog(DialogType.EditCommand);
                 })
+                .setNegativeButton("Back", (dialog, which) -> {
+                    switchToDialog(DialogType.Settings);
+                })
                 .create();
     }
 }
