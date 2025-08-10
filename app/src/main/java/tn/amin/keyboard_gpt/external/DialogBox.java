@@ -1,34 +1,94 @@
 package tn.amin.keyboard_gpt.external;
 
-import android.app.AlertDialog;
+import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
-import androidx.annotation.NonNull;
+import tn.amin.keyboard_gpt.instruction.command.Commands;
+import tn.amin.keyboard_gpt.llm.LanguageModel;
+import tn.amin.keyboard_gpt.ui.UiInteractor;
 
 public abstract class DialogBox {
-    private final Context mContext;
-    private final AlertDialog mAlertDialog;
-    private final Bundle mConfig;
+    private final Activity mParent;
+    private final Dialog mDialog;
+    private final Bundle mInputBundle;
+    private final ConfigContainer mConfigContainer;
+    private final DialogBoxManager mManager;
 
-    public DialogBox(@NonNull Context context, Bundle config) {
-        mContext = context;
-        mAlertDialog = build();
-        mConfig = config;
+    private boolean canClose = true;
+
+    public DialogBox(DialogBoxManager dialogManager, Activity parent,
+                     Bundle inputBundle, ConfigContainer configContainer) {
+        mManager = dialogManager;
+        mParent = parent;
+        mInputBundle = inputBundle;
+        mConfigContainer = configContainer;
+        mDialog = build();
+        mDialog.setOnDismissListener(d -> {
+            if (canClose) {
+                returnToKeyboard();
+            } else {
+                canClose = true;
+            }
+        });
     }
     
-    protected abstract AlertDialog build();
+    protected abstract Dialog build();
 
-    public AlertDialog getDialog() {
-        return mAlertDialog;
+    public Dialog getDialog() {
+        return mDialog;
     }
 
-    public Bundle getConfig() {
-        return mConfig;
+    public ConfigContainer getConfig() {
+        return mConfigContainer;
     }
 
-    public void switchToDialog(DialogBox second) {
-        second.getDialog().show();
+    public Bundle getInput() {
+        return mInputBundle;
+    }
+
+    public Context getContext() {
+        return mParent;
+    }
+
+    public Activity getParent() {
+        return mParent;
+    }
+
+    public void switchToDialog(DialogType type) {
+        silentDismiss();
+        mManager.showDialog(type);
+    }
+
+    protected void returnToKeyboard() {
+        Intent broadcastIntent = new Intent(UiInteractor.ACTION_DIALOG_RESULT);
+        getConfig().fillIntent(broadcastIntent);
+        getContext().sendBroadcast(broadcastIntent);
+        getParent().finish();
+    }
+
+    protected void silentDismiss() {
+        canClose = false;
         getDialog().dismiss();
     }
+
+    protected void safeguardCommands() {
+        if (getConfig().commands == null) {
+            getConfig().commands = Commands.decodeCommands(
+                    getInput().getString(UiInteractor.EXTRA_COMMAND_LIST));
+        }
+    }
+
+    protected void safeguardModelData() {
+        if (getConfig().selectedModel == null)
+            getConfig().selectedModel =
+                    LanguageModel.valueOf(getInput().getString(UiInteractor.EXTRA_CONFIG_SELECTED_MODEL));
+        if (getConfig().languageModelsConfig == null)
+            getConfig().languageModelsConfig =
+                    getInput().getBundle(UiInteractor.EXTRA_CONFIG_LANGUAGE_MODEL);
+    }
+
 }
