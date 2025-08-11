@@ -11,8 +11,8 @@ android {
         applicationId "tn.amin.keyboard_gpt"
         minSdk 24
         targetSdkVersion 36
-        versionCode 13
-        versionName "1.1.2-dev"
+        versionCode 14
+        versionName "2.0-dev"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
