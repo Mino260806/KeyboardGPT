@@ -1,8 +1,10 @@
 package tn.amin.keyboard_gpt.hook;
 
+import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import de.robv.android.xposed.XC_MethodHook;
@@ -16,6 +18,16 @@ public class HookManager {
         Method method = XposedHelpers.findMethodBestMatch(clazz, methodName, paramTypes);
         if (!unhookMap.containsKey(method)) {
             unhookMap.put(method, XposedBridge.hookMethod(method, callback));
+        }
+    }
+
+    public void hookAll(Class<?> clazz, String methodName, XC_MethodHook callback) {
+        for (Method method : clazz.getDeclaredMethods()) {
+            if (method.getName().equals(methodName)) {
+                if (!unhookMap.containsKey(method)) {
+                    unhookMap.put(method, XposedBridge.hookMethod(method, callback));
+                }
+            }
         }
     }
 

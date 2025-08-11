@@ -133,33 +133,18 @@ public class MainHook implements IXposedHookLoadPackage {
     }
 
     private void hookInputConnection() {
-        hookManager.hook(inputConnectionClass, "commitText",
-                new Class<?>[]{ CharSequence.class, int.class }, MethodHook.before(param -> {
-                    if (IMSController.getInstance().isInputLocked()) {
-                        param.setResult(false);
-                    }
-                }));
-
-        hookManager.hook(inputConnectionClass, "setComposingText",
-                new Class<?>[]{ CharSequence.class, int.class }, MethodHook.before(param -> {
-                    if (IMSController.getInstance().isInputLocked()) {
-                        param.setResult(false);
-                    }
-                }));
-
-        hookManager.hook(inputConnectionClass, "finishComposingText",
-                new Class<?>[]{ }, MethodHook.before(param -> {
-                    if (IMSController.getInstance().isInputLocked()) {
-                        param.setResult(false);
-                    }
-                }));
-
-        hookManager.hook(inputConnectionClass, "deleteSurroundingText",
-                new Class<?>[]{ int.class, int.class }, MethodHook.before(param -> {
-                    if (IMSController.getInstance().isInputLocked()) {
-                        param.setResult(false);
-                    }
-                }));
+        XC_MethodHook conditionalGate = MethodHook.before(param -> {
+            if (IMSController.getInstance().isInputLocked()) {
+                param.setResult(false);
+            }
+        });
+        hookManager.hookAll(inputConnectionClass, "commitText", conditionalGate);
+        hookManager.hookAll(inputConnectionClass, "commitCorrection", conditionalGate);
+        hookManager.hookAll(inputConnectionClass, "commitCompletion", conditionalGate);
+        hookManager.hookAll(inputConnectionClass, "setComposingText", conditionalGate);
+        hookManager.hookAll(inputConnectionClass, "replaceText", conditionalGate);
+        hookManager.hookAll(inputConnectionClass, "finishComposingText", conditionalGate);
+        hookManager.hookAll(inputConnectionClass, "deleteSurroundingText", conditionalGate);
     }
 
     public static Context getApplicationContext() {
