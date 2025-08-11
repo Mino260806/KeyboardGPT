@@ -279,4 +279,8 @@ public class UiInteractor {
     public IMSController getIMSController() {
         return mIMSController;
     }
+
+    public InputMethodService getIMS() {
+        return mInputMethodService;
+    }
 }

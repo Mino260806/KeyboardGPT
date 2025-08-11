@@ -26,8 +26,6 @@ public class MainHook implements IXposedHookLoadPackage {
 
     private HookManager hookManager;
 
-    private String editTextClassLiteral = EditText.class.getName();
-
     private Class<?> inputConnectionClass = null;
 
     private Class<?> inputMethodServiceClass = null;
@@ -66,7 +64,6 @@ public class MainHook implements IXposedHookLoadPackage {
                 MainHook.log("InputMethodService onCreate");
                 InputMethodService ims = (InputMethodService) param.thisObject;
 
-                ensureInitialized(ims.getApplicationContext());
                 UiInteractor.getInstance().onInputMethodCreate(ims);
 
                 inputMethodServiceClass = ims.getClass();
@@ -106,6 +103,10 @@ public class MainHook implements IXposedHookLoadPackage {
         hookManager.hook(inputMethodServiceClass, "onUpdateSelection",
                 new Class<?>[]{ int.class, int.class, int.class, int.class, int.class, int.class },
                 MethodHook.after(param -> {
+                    String packageName = UiInteractor.getInstance().getIMS().getCurrentInputEditorInfo().packageName;
+                    if (BuildConfig.APPLICATION_ID.equals(packageName)) {
+                        return;
+                    }
                     IMSController.getInstance().onUpdateSelection(
                             (int) param.args[0],
                             (int) param.args[1],
