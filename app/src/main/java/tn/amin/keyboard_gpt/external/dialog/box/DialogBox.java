@@ -11,6 +11,7 @@ import tn.amin.keyboard_gpt.external.dialog.DialogBoxManager;
 import tn.amin.keyboard_gpt.external.dialog.DialogType;
 import tn.amin.keyboard_gpt.instruction.command.Commands;
 import tn.amin.keyboard_gpt.llm.LanguageModel;
+import tn.amin.keyboard_gpt.text.parse.ParsePattern;
 import tn.amin.keyboard_gpt.ui.UiInteractor;
 
 public abstract class DialogBox {
@@ -81,6 +82,13 @@ public abstract class DialogBox {
         if (getConfig().commands == null) {
             getConfig().commands = Commands.decodeCommands(
                     getInput().getString(UiInteractor.EXTRA_COMMAND_LIST));
+        }
+    }
+
+    protected void safeguardPatterns() {
+        if (getConfig().patterns == null) {
+            getConfig().patterns = ParsePattern.decode(
+                    getInput().getString(UiInteractor.EXTRA_PATTERN_LIST));
         }
     }
 

@@ -142,7 +142,11 @@ public class SPManager implements ConfigInfoProvider {
     }
 
     public List<ParsePattern> getParsePatterns() {
-        return ParsePattern.decode(sp.getString(PREF_PARSE_PATTERNS, null));
+        return ParsePattern.decode(getParsePatternsRaw());
+    }
+
+    public String getParsePatternsRaw() {
+        return sp.getString(PREF_PARSE_PATTERNS, null);
     }
 
     private void updateGenerativeAICommands() {

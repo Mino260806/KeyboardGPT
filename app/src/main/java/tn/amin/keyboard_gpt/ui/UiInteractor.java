@@ -45,6 +45,8 @@ public class UiInteractor {
 
     public static final String EXTRA_COMMAND_INDEX = "tn.amin.keyboard_gpt.command.INDEX";
 
+    public static final String EXTRA_PATTERN_LIST = "tn.amin.keyboard_gpt.pattern.LIST";
+
     private Context mContext = null;
     private ConfigInfoProvider mConfigInfoProvider = null;
     private final ArrayList<ConfigChangeListener> mConfigChangeListeners = new ArrayList<>();
@@ -190,11 +192,13 @@ public class UiInteractor {
         }
 
         String rawCommands = SPManager.getInstance().getGenerativeAICommandsRaw();
+        String rawPatterns = SPManager.getInstance().getParsePatternsRaw();
 
         Intent intent = new Intent("tn.amin.keyboard_gpt.OVERLAY");
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra(EXTRA_DIALOG_TYPE, DialogType.Settings.name());
         intent.putExtra(EXTRA_COMMAND_LIST, rawCommands);
+        intent.putExtra(EXTRA_PATTERN_LIST, rawPatterns);
         intent.putExtra(EXTRA_CONFIG_LANGUAGE_MODEL, mConfigInfoProvider.getConfigBundle());
         intent.putExtra(EXTRA_CONFIG_SELECTED_MODEL,
                 mConfigInfoProvider.getLanguageModel().name());

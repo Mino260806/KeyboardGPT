@@ -6,8 +6,8 @@ public enum DialogType {
     WebSearch("Web Search", false),
     EditCommandsList("Commands List", true),
     EditCommand("Edit Command", false),
-    Settings("Settings", false),
-    ;
+    EditPatternList("Patterns List", true),
+    Settings("Settings", false);
 
     public final String title;
     public final boolean inSettings;
