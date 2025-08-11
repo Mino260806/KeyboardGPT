@@ -15,6 +15,7 @@ import tn.amin.keyboard_gpt.instruction.command.GenerativeAICommand;
 import tn.amin.keyboard_gpt.llm.LanguageModel;
 import tn.amin.keyboard_gpt.listener.ConfigInfoProvider;
 import tn.amin.keyboard_gpt.llm.LanguageModelField;
+import tn.amin.keyboard_gpt.text.parse.ParsePattern;
 import tn.amin.keyboard_gpt.ui.UiInteractor;
 
 public class SPManager implements ConfigInfoProvider {
@@ -22,17 +23,10 @@ public class SPManager implements ConfigInfoProvider {
 
     protected static final String PREF_MODULE_VERSION = "module_version";
 
-    protected static final String PREF_LANGUAGE_MODEL_COMPAT = "language_model";
-
     protected static final String PREF_LANGUAGE_MODEL = "language_model_v2";
 
-    protected static final String PREF_API_KEY = "%s.api_key";
-
-    protected static final String PREF_SUB_MODEL = "%s.sub_model";
-
-    protected static final String PREF_BASE_URL = "%s.base_url";
-
     protected static final String PREF_GEN_AI_COMMANDS = "gen_ai_commands";
+    protected static final String PREF_PARSE_PATTERNS = "parse_patterns";
 
     protected final SharedPreferences sp;
 
@@ -143,19 +137,17 @@ public class SPManager implements ConfigInfoProvider {
         return generativeAICommands;
     }
 
+    public void setParsePatterns(List<ParsePattern> parsePatterns) {
+        sp.edit().putString(PREF_PARSE_PATTERNS, ParsePattern.encode(parsePatterns)).apply();
+    }
+
+    public List<ParsePattern> getParsePatterns() {
+        return ParsePattern.decode(sp.getString(PREF_PARSE_PATTERNS, null));
+    }
+
     private void updateGenerativeAICommands() {
         generativeAICommands = Collections.unmodifiableList(
                 Commands.decodeCommands(sp.getString(PREF_GEN_AI_COMMANDS, "[]")));
-    }
-
-    public Map<LanguageModel, String> getApiKeyMap() {
-        return Arrays.stream(LanguageModel.values())
-                .collect(Collectors.toMap(model -> model, model -> {
-                    String apiKey = getApiKey(model);
-                    if (apiKey == null)
-                        apiKey = "";
-                    return apiKey;
-                }));
     }
 
     @Override

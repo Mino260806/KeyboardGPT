@@ -35,8 +35,8 @@ public class KeyboardGPTBrain implements InputEventListener, GenerativeAIListene
 
         mAIController = new GenerativeAIController();
         mAIController.addListener(this);
-        mTextParser = new TextParser();
         mCommandManager = new CommandManager();
+        mTextParser = new TextParser(SPManager.getInstance().getParsePatterns());
     }
 
     @Override

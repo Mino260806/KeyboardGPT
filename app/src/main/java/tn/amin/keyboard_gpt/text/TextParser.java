@@ -1,10 +1,13 @@
 package tn.amin.keyboard_gpt.text;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import tn.amin.keyboard_gpt.text.parse.ParsePattern;
 import tn.amin.keyboard_gpt.text.parse.result.CommandParseResultFactory;
 import tn.amin.keyboard_gpt.text.parse.result.AIParseResultFactory;
+import tn.amin.keyboard_gpt.text.parse.result.ParseResultFactory;
 import tn.amin.keyboard_gpt.text.parse.result.SettingsParseResultFactory;
 import tn.amin.keyboard_gpt.text.transform.format.ConversionMethod;
 import tn.amin.keyboard_gpt.text.parse.ParseDirective;
@@ -12,25 +15,13 @@ import tn.amin.keyboard_gpt.text.parse.result.FormatParseResultFactory;
 import tn.amin.keyboard_gpt.text.parse.result.ParseResult;
 
 public class TextParser {
-    private Pattern patternBold = Pattern.compile("¿([^¿]+)¿$");
-    private Pattern patternItalic = Pattern.compile("¡([^¡]+)¡$");
-    private Pattern patternCrossout = Pattern.compile("~([^~]+)~$");
-    private Pattern patternUnderline = Pattern.compile("ū([^~]+)ū$");
-    private Pattern patternAI = Pattern.compile("\\$([^$]*)\\$$");
-    private Pattern patternAICommand = Pattern.compile("©(?:([^ ©]+) *)?([^©]+)?©$");
-    private Pattern patternSettings = Pattern.compile("\\*#settings#\\*$");
+    private final List<ParseDirective> directives = new ArrayList<>();
 
-    private List<ParseDirective> directives = List.of(
-            new ParseDirective(patternBold, new FormatParseResultFactory(ConversionMethod.BOLD)),
-            new ParseDirective(patternItalic, new FormatParseResultFactory(ConversionMethod.ITALIC)),
-            new ParseDirective(patternCrossout, new FormatParseResultFactory(ConversionMethod.CROSSOUT)),
-            new ParseDirective(patternUnderline, new FormatParseResultFactory(ConversionMethod.UNDERLINE)),
-            new ParseDirective(patternAI, new AIParseResultFactory()),
-            new ParseDirective(patternAICommand, new CommandParseResultFactory()),
-            new ParseDirective(patternSettings, new SettingsParseResultFactory())
-    );
-
-    public TextParser() {
+    public TextParser(List<ParsePattern> parsePatterns) {
+        for (ParsePattern parsePattern: parsePatterns) {
+            directives.add(new ParseDirective(parsePattern.getPattern(),
+                    ParseResultFactory.of(parsePattern.getType())));
+        }
     }
 
     public ParseResult parse(String text, int cursor) {
