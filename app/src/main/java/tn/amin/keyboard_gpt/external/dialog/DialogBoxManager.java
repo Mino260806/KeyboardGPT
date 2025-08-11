@@ -1,7 +1,16 @@
-package tn.amin.keyboard_gpt.external;
+package tn.amin.keyboard_gpt.external.dialog;
 
 import android.app.Activity;
 import android.os.Bundle;
+
+import tn.amin.keyboard_gpt.external.ConfigContainer;
+import tn.amin.keyboard_gpt.external.dialog.box.ChoseModelDialogBox;
+import tn.amin.keyboard_gpt.external.dialog.box.CommandEditDialogBox;
+import tn.amin.keyboard_gpt.external.dialog.box.CommandListDialogBox;
+import tn.amin.keyboard_gpt.external.dialog.box.ConfigureModelDialogBox;
+import tn.amin.keyboard_gpt.external.dialog.box.DialogBox;
+import tn.amin.keyboard_gpt.external.dialog.box.SettingsDialogBox;
+import tn.amin.keyboard_gpt.external.dialog.box.WebSearchDialogBox;
 
 public class DialogBoxManager {
     private final Activity mParent;

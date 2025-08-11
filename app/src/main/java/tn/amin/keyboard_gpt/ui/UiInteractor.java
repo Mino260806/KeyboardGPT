@@ -21,7 +21,7 @@ import tn.amin.keyboard_gpt.llm.LanguageModel;
 import tn.amin.keyboard_gpt.listener.ConfigChangeListener;
 import tn.amin.keyboard_gpt.listener.ConfigInfoProvider;
 import tn.amin.keyboard_gpt.listener.DialogDismissListener;
-import tn.amin.keyboard_gpt.external.DialogType;
+import tn.amin.keyboard_gpt.external.dialog.DialogType;
 import tn.amin.keyboard_gpt.llm.LanguageModelField;
 
 public class UiInteractor {

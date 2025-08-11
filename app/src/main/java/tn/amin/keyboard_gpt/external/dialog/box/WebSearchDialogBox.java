@@ -1,4 +1,4 @@
-package tn.amin.keyboard_gpt.external;
+package tn.amin.keyboard_gpt.external.dialog.box;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -12,6 +12,8 @@ import android.view.Window;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import tn.amin.keyboard_gpt.external.ConfigContainer;
+import tn.amin.keyboard_gpt.external.dialog.DialogBoxManager;
 import tn.amin.keyboard_gpt.ui.UiInteractor;
 
 public class WebSearchDialogBox extends DialogBox {

@@ -1,4 +1,4 @@
-package tn.amin.keyboard_gpt.external;
+package tn.amin.keyboard_gpt.external.dialog;
 
 public enum DialogType {
     ChoseModel("Choose Model", true),

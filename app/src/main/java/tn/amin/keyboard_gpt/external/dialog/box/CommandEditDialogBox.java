@@ -1,4 +1,4 @@
-package tn.amin.keyboard_gpt.external;
+package tn.amin.keyboard_gpt.external.dialog.box;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -9,6 +9,9 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import tn.amin.keyboard_gpt.R;
+import tn.amin.keyboard_gpt.external.ConfigContainer;
+import tn.amin.keyboard_gpt.external.dialog.DialogBoxManager;
+import tn.amin.keyboard_gpt.external.dialog.DialogType;
 import tn.amin.keyboard_gpt.instruction.command.GenerativeAICommand;
 import tn.amin.keyboard_gpt.instruction.command.SimpleGenerativeAICommand;
 

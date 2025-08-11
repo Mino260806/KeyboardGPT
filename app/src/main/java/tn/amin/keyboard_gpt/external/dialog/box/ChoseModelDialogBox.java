@@ -1,21 +1,16 @@
-package tn.amin.keyboard_gpt.external;
+package tn.amin.keyboard_gpt.external.dialog.box;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import java.util.Arrays;
 
-import tn.amin.keyboard_gpt.R;
+import tn.amin.keyboard_gpt.external.ConfigContainer;
+import tn.amin.keyboard_gpt.external.dialog.DialogBoxManager;
+import tn.amin.keyboard_gpt.external.dialog.DialogType;
 import tn.amin.keyboard_gpt.llm.LanguageModel;
-import tn.amin.keyboard_gpt.llm.LanguageModelField;
 
 public class ChoseModelDialogBox extends DialogBox {
     public ChoseModelDialogBox(DialogBoxManager dialogManager, Activity parent,
