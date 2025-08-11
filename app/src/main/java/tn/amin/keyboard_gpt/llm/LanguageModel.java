@@ -9,8 +9,7 @@ public enum LanguageModel {
     ChatGPT("ChatGPT", "gpt-4o-mini", "https://api.openai.com/v1"),
     Groq("Groq", "llama3-8b-8192", "https://api.groq.com/openai/v1"),
     OpenRouter("OpenRouter", "meta-llama/llama-3.3-70b-instruct:free", "https://openrouter.ai/api/v1"),
-    Claude("Claude", "claude-3-5-sonnet-20240620", "https://api.anthropic.com"),
-//    HuggingChat("Hugging Chat"),
+    Claude("Claude", "claude-3-5-sonnet-20240620", "https://api.anthropic.com/v1"),
     ;
 
     public final String label;

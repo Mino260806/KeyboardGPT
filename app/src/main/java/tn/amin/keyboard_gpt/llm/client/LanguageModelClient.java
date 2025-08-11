@@ -62,16 +62,13 @@ public abstract class LanguageModelClient {
         switch (model) {
             case Gemini:
                 return new GeminiClient();
-            case ChatGPT:
-                return new ChatGPTClient();
-//            case HuggingChat:
-//                return new HuggingChatClient();
             case Groq:
                 return new GroqClient();
             case OpenRouter:
                 return new OpenRouterClient();
             case Claude:
                 return new ClaudeClient();
+            case ChatGPT:
             default:
                 return new ChatGPTClient();
         }
