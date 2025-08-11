@@ -26,8 +26,8 @@ public class KeyboardGPTBrain implements InputEventListener, GenerativeAIListene
 
     private final GenerativeAIController mAIController;
     private final CommandManager mCommandManager;
-//    private final InstructionTreater mInstructionTreater;
     private final TextParser mTextParser;
+    private final SPUpdater mSPUpdater;
 
     public KeyboardGPTBrain(Context context) {
         IMSController.getInstance().addListener(this);
@@ -36,7 +36,8 @@ public class KeyboardGPTBrain implements InputEventListener, GenerativeAIListene
         mAIController = new GenerativeAIController();
         mAIController.addListener(this);
         mCommandManager = new CommandManager();
-        mTextParser = new TextParser(SPManager.getInstance().getParsePatterns());
+        mTextParser = new TextParser();
+        mSPUpdater = new SPUpdater();
     }
 
     @Override
@@ -156,7 +157,7 @@ public class KeyboardGPTBrain implements InputEventListener, GenerativeAIListene
     }
 
     @Override
-    public void onDismiss(boolean isPrompt, boolean isCommand) {
+    public void onDismiss(boolean isPrompt, boolean isCommand, boolean isPattern) {
         if (isPrompt) {
             MainHook.log("Selected " + mAIController.getLanguageModel());
             UiInteractor.getInstance().post(() -> {
@@ -166,6 +167,10 @@ public class KeyboardGPTBrain implements InputEventListener, GenerativeAIListene
         } else if (isCommand) {
             UiInteractor.getInstance().post(() -> {
                 UiInteractor.getInstance().toastShort("New Commands Saved");
+            });
+        } else if (isPattern) {
+            UiInteractor.getInstance().post(() -> {
+                UiInteractor.getInstance().toastShort("New Pattern Saved");
             });
         }
     }

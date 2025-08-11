@@ -30,7 +30,7 @@ public class PatternListDialogBox extends DialogBox {
                 .setTitle("Select Pattern")
                 .setItems(names, (dialog, which) -> {
                     getConfig().focusPatternIndex = which;
-                    switchToDialog(DialogType.EditCommand);
+                    switchToDialog(DialogType.EditPattern);
                 })
                 .setNegativeButton("Back", (dialog, which) -> {
                     switchToDialog(DialogType.Settings);

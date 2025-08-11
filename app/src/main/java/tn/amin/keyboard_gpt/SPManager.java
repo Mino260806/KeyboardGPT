@@ -138,7 +138,11 @@ public class SPManager implements ConfigInfoProvider {
     }
 
     public void setParsePatterns(List<ParsePattern> parsePatterns) {
-        sp.edit().putString(PREF_PARSE_PATTERNS, ParsePattern.encode(parsePatterns)).apply();
+        setParsePatternsRaw(ParsePattern.encode(parsePatterns));
+    }
+
+    public void setParsePatternsRaw(String patternsRaw) {
+        sp.edit().putString(PREF_PARSE_PATTERNS, patternsRaw).apply();
     }
 
     public List<ParsePattern> getParsePatterns() {

@@ -94,6 +94,7 @@ public class UiInteractor {
                 MainHook.log("Got result");
                 boolean isPrompt = false;
                 boolean isCommand = false;
+                boolean isPattern = false;
                 if (!mConfigChangeListeners.isEmpty() && intent.getExtras() != null) {
                     for (String key: intent.getExtras().keySet()) {
                         switch (key) {
@@ -124,12 +125,19 @@ public class UiInteractor {
                                 mConfigChangeListeners.forEach((l) -> l.onCommandsChange(commandsRaw));
                                 isCommand = true;
                                 break;
+                            case EXTRA_PATTERN_LIST:
+                                String patternsRaw = intent.getStringExtra(EXTRA_PATTERN_LIST);
+                                mConfigChangeListeners.forEach((l) -> l.onPatternsChange(patternsRaw));
+                                isPattern = true;
+                                break;
                         }
                     }
                 }
                 final boolean finalIsPrompt = isPrompt;
                 final boolean finalIsCommand = isCommand;
-                mOnDismissListeners.forEach((l) -> l.onDismiss(finalIsPrompt, finalIsCommand));
+                final boolean finalIsPattern = isPattern;
+                mOnDismissListeners.forEach((l) ->
+                        l.onDismiss(finalIsPrompt, finalIsCommand, finalIsPattern));
             }
         }
     };

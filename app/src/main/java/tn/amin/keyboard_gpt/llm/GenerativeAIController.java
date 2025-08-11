@@ -77,8 +77,6 @@ public class GenerativeAIController implements ConfigChangeListener {
 
     @Override
     public void onLanguageModelChange(LanguageModel model) {
-        mSPManager.setLanguageModel(model);
-
         if (mModelClient == null || mModelClient.getLanguageModel() != model) {
             setModel(model);
         }
@@ -86,7 +84,6 @@ public class GenerativeAIController implements ConfigChangeListener {
 
     @Override
     public void onLanguageModelFieldChange(LanguageModel model, LanguageModelField field, String value) {
-        mSPManager.setLanguageModelField(model, field, value);
         if (mModelClient != null && mModelClient.getLanguageModel() == model) {
             mModelClient.setField(field, value);
         }
@@ -94,7 +91,11 @@ public class GenerativeAIController implements ConfigChangeListener {
 
     @Override
     public void onCommandsChange(String commandsRaw) {
-        mSPManager.setGenerativeAICommandsRaw(commandsRaw);
+    }
+
+    @Override
+    public void onPatternsChange(String patternsRaw) {
+
     }
 
     public void addListener(GenerativeAIListener listener) {

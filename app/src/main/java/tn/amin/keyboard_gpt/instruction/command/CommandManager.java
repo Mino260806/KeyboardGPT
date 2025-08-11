@@ -50,4 +50,9 @@ public class CommandManager implements ConfigChangeListener {
     public void onCommandsChange(String commandsRaw) {
         updateCommandMap();
     }
+
+    @Override
+    public void onPatternsChange(String patternsRaw) {
+
+    }
 }

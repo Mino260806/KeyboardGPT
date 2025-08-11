@@ -31,5 +31,7 @@ public class ConfigContainer {
             intent.putExtra(UiInteractor.EXTRA_CONFIG_LANGUAGE_MODEL, languageModelsConfig);
         if (commands != null)
             intent.putExtra(UiInteractor.EXTRA_COMMAND_LIST, Commands.encodeCommands(commands));
+        if (patterns != null)
+            intent.putExtra(UiInteractor.EXTRA_PATTERN_LIST, ParsePattern.encode(patterns));
     }
 }

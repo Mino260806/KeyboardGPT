@@ -9,6 +9,7 @@ import tn.amin.keyboard_gpt.external.dialog.box.CommandEditDialogBox;
 import tn.amin.keyboard_gpt.external.dialog.box.CommandListDialogBox;
 import tn.amin.keyboard_gpt.external.dialog.box.ConfigureModelDialogBox;
 import tn.amin.keyboard_gpt.external.dialog.box.DialogBox;
+import tn.amin.keyboard_gpt.external.dialog.box.PatternEditDialogBox;
 import tn.amin.keyboard_gpt.external.dialog.box.PatternListDialogBox;
 import tn.amin.keyboard_gpt.external.dialog.box.SettingsDialogBox;
 import tn.amin.keyboard_gpt.external.dialog.box.WebSearchDialogBox;
@@ -50,9 +51,9 @@ public class DialogBoxManager {
             case EditPatternList:
                 box = new PatternListDialogBox(this, mParent, mInputBundle, mConfig);
                 break;
-//            case EditPattern:
-//                box = new CommandEditDialogBox(this, mParent, mInputBundle, mConfig);
-//                break;
+            case EditPattern:
+                box = new PatternEditDialogBox(this, mParent, mInputBundle, mConfig);
+                break;
             case WebSearch:
                 box = new WebSearchDialogBox(this, mParent, mInputBundle, mConfig);
                 break;

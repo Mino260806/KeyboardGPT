@@ -7,6 +7,7 @@ public enum DialogType {
     EditCommandsList("Commands List", true),
     EditCommand("Edit Command", false),
     EditPatternList("Patterns List", true),
+    EditPattern("Edit Pattern", false),
     Settings("Settings", false);
 
     public final String title;

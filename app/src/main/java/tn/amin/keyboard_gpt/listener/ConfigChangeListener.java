@@ -9,4 +9,6 @@ public interface ConfigChangeListener {
     void onLanguageModelFieldChange(LanguageModel model, LanguageModelField field, String value);
 
     void onCommandsChange(String commandsRaw);
+
+    void onPatternsChange(String patternsRaw);
 }
