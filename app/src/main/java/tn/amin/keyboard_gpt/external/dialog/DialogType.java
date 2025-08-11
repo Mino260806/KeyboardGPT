@@ -8,7 +8,9 @@ public enum DialogType {
     EditCommand("Edit Command", false),
     EditPatternList("Patterns List", true),
     EditPattern("Edit Pattern", false),
-    Settings("Settings", false);
+    Settings("Settings", false),
+    OtherSettings("Other Settings", true),
+    ;
 
     public final String title;
     public final boolean inSettings;

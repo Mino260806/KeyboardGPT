@@ -8,4 +8,6 @@ public interface ConfigInfoProvider {
     LanguageModel getLanguageModel();
 
     Bundle getConfigBundle();
+
+    Bundle getOtherSettings();
 }

@@ -1,5 +1,7 @@
 package tn.amin.keyboard_gpt.text;
 
+import android.os.Bundle;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -68,5 +70,10 @@ public class TextParser implements ConfigChangeListener {
     @Override
     public void onPatternsChange(String patternsRaw) {
         updatePatterns(ParsePattern.decode(patternsRaw));
+    }
+
+    @Override
+    public void onOtherSettingsChange(Bundle otherSettings) {
+
     }
 }

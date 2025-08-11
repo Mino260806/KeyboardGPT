@@ -47,6 +47,8 @@ public class UiInteractor {
 
     public static final String EXTRA_PATTERN_LIST = "tn.amin.keyboard_gpt.pattern.LIST";
 
+    public static final String EXTRA_OTHER_SETTINGS = "tn.amin.keyboard_gpt.other_settings";
+
     private Context mContext = null;
     private ConfigInfoProvider mConfigInfoProvider = null;
     private final ArrayList<ConfigChangeListener> mConfigChangeListeners = new ArrayList<>();
@@ -130,6 +132,11 @@ public class UiInteractor {
                                 mConfigChangeListeners.forEach((l) -> l.onPatternsChange(patternsRaw));
                                 isPattern = true;
                                 break;
+                            case EXTRA_OTHER_SETTINGS:
+                                MainHook.log("Got other result");
+                                Bundle otherSettings = intent.getBundleExtra(EXTRA_OTHER_SETTINGS);
+                                mConfigChangeListeners.forEach((l) -> l.onOtherSettingsChange(otherSettings));
+                                break;
                         }
                     }
                 }
@@ -210,6 +217,8 @@ public class UiInteractor {
         intent.putExtra(EXTRA_CONFIG_LANGUAGE_MODEL, mConfigInfoProvider.getConfigBundle());
         intent.putExtra(EXTRA_CONFIG_SELECTED_MODEL,
                 mConfigInfoProvider.getLanguageModel().name());
+        intent.putExtra(EXTRA_OTHER_SETTINGS,
+                mConfigInfoProvider.getOtherSettings());
 
         MainHook.log("Launching settings");
         mContext.startActivity(intent);

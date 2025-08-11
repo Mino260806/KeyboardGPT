@@ -15,6 +15,7 @@ import tn.amin.keyboard_gpt.instruction.command.GenerativeAICommand;
 import tn.amin.keyboard_gpt.llm.LanguageModel;
 import tn.amin.keyboard_gpt.listener.ConfigInfoProvider;
 import tn.amin.keyboard_gpt.llm.LanguageModelField;
+import tn.amin.keyboard_gpt.settings.OtherSettingsType;
 import tn.amin.keyboard_gpt.text.parse.ParsePattern;
 import tn.amin.keyboard_gpt.ui.UiInteractor;
 
@@ -27,6 +28,8 @@ public class SPManager implements ConfigInfoProvider {
 
     protected static final String PREF_GEN_AI_COMMANDS = "gen_ai_commands";
     protected static final String PREF_PARSE_PATTERNS = "parse_patterns";
+
+    protected static final String PREF_OTHER_SETTING = "other_setting.%s";
 
     protected final SharedPreferences sp;
 
@@ -43,6 +46,10 @@ public class SPManager implements ConfigInfoProvider {
             throw new RuntimeException("Missing call to SPManager.init(Context)");
         }
         return instance;
+    }
+
+    public static boolean isReady() {
+        return instance != null;
     }
 
     private SPManager(Context context) {
@@ -171,5 +178,43 @@ public class SPManager implements ConfigInfoProvider {
             bundle.putBundle(model.name(), configBundle);
         }
         return bundle;
+    }
+
+    @Override
+    public Bundle getOtherSettings() {
+        Bundle otherSettings = new Bundle();
+        for (OtherSettingsType type: OtherSettingsType.values()) {
+            switch (type.nature) {
+                case Boolean:
+                    otherSettings.putBoolean(type.name(), (Boolean) getOtherSetting(type));
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unknown type nature " + type.nature);
+            }
+        }
+        return otherSettings;
+    }
+
+    public void setOtherSetting(OtherSettingsType type, Object value) {
+        switch (type.nature) {
+            case Boolean:
+                sp.edit().putBoolean(String.format(PREF_OTHER_SETTING, type.name()), (Boolean) value).apply();
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown type nature " + type.nature);
+        }
+    }
+
+    public Object getOtherSetting(OtherSettingsType type) {
+        switch (type.nature) {
+            case Boolean:
+                return sp.getBoolean(String.format(PREF_OTHER_SETTING, type.name()), (Boolean) type.defaultValue);
+            default:
+                throw new IllegalArgumentException("Unknown type nature " + type.nature);
+        }
+    }
+
+    public Boolean getEnableLogs() {
+        return (Boolean) getOtherSetting(OtherSettingsType.EnableLogs);
     }
 }

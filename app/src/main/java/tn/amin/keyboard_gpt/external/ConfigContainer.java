@@ -24,6 +24,8 @@ public class ConfigContainer {
 
     public int focusPatternIndex = -1;
 
+    public Bundle otherExtras = new Bundle();
+
     public void fillIntent(Intent intent) {
         if (selectedModel != null)
             intent.putExtra(UiInteractor.EXTRA_CONFIG_SELECTED_MODEL, selectedModel.name());
@@ -33,5 +35,8 @@ public class ConfigContainer {
             intent.putExtra(UiInteractor.EXTRA_COMMAND_LIST, Commands.encodeCommands(commands));
         if (patterns != null)
             intent.putExtra(UiInteractor.EXTRA_PATTERN_LIST, ParsePattern.encode(patterns));
+        if (!otherExtras.isEmpty()) {
+            intent.putExtra(UiInteractor.EXTRA_OTHER_SETTINGS, otherExtras);
+        }
     }
 }

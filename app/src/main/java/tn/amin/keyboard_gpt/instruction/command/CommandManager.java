@@ -1,5 +1,7 @@
 package tn.amin.keyboard_gpt.instruction.command;
 
+import android.os.Bundle;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +55,11 @@ public class CommandManager implements ConfigChangeListener {
 
     @Override
     public void onPatternsChange(String patternsRaw) {
+
+    }
+
+    @Override
+    public void onOtherSettingsChange(Bundle otherSettings) {
 
     }
 }

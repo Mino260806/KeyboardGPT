@@ -1,11 +1,13 @@
 package tn.amin.keyboard_gpt.external.dialog.box;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import tn.amin.keyboard_gpt.MainHook;
 import tn.amin.keyboard_gpt.external.ConfigContainer;
 import tn.amin.keyboard_gpt.external.dialog.DialogBoxManager;
 import tn.amin.keyboard_gpt.external.dialog.DialogType;

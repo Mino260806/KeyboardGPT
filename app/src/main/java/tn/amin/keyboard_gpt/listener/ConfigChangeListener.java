@@ -1,5 +1,7 @@
 package tn.amin.keyboard_gpt.listener;
 
+import android.os.Bundle;
+
 import tn.amin.keyboard_gpt.llm.LanguageModel;
 import tn.amin.keyboard_gpt.llm.LanguageModelField;
 
@@ -11,4 +13,6 @@ public interface ConfigChangeListener {
     void onCommandsChange(String commandsRaw);
 
     void onPatternsChange(String patternsRaw);
+
+    void onOtherSettingsChange(Bundle otherSettings);
 }

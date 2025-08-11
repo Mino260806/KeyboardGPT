@@ -2,6 +2,7 @@ package tn.amin.keyboard_gpt.llm;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.os.Bundle;
 
 import androidx.core.content.ContextCompat;
 
@@ -95,6 +96,11 @@ public class GenerativeAIController implements ConfigChangeListener {
 
     @Override
     public void onPatternsChange(String patternsRaw) {
+
+    }
+
+    @Override
+    public void onOtherSettingsChange(Bundle otherSettings) {
 
     }
 

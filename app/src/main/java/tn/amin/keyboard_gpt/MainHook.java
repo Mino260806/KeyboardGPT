@@ -166,11 +166,13 @@ public class MainHook implements IXposedHookLoadPackage {
     }
 
     public static void logST() {
-        XposedBridge.log(Log.getStackTraceString(new Throwable()));
+        log(Log.getStackTraceString(new Throwable()));
     }
 
     public static void log(String message) {
-        XposedBridge.log("(KeyboardGPT) " + message);
+        if (!SPManager.isReady() || SPManager.getInstance().getEnableLogs()) {
+            XposedBridge.log("(KeyboardGPT) " + message);
+        }
     }
 
     public static void log(Throwable t) {
