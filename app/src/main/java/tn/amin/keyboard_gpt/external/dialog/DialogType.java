@@ -1,7 +1,7 @@
 package tn.amin.keyboard_gpt.external.dialog;
 
 public enum DialogType {
-    ChoseModel("Choose Model", true),
+    ChoseModel("Choose & Configure Model", true),
     ConfigureModel("Configure Model", false),
     WebSearch("Web Search", false),
     EditCommandsList("Commands List", true),
