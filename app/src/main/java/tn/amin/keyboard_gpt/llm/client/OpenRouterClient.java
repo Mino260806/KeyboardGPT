@@ -1,5 +1,7 @@
 package tn.amin.keyboard_gpt.llm.client;
 
+import tn.amin.keyboard_gpt.llm.LanguageModel;
+
 public class OpenRouterClient extends ChatGPTClient {
     @Override
     public LanguageModel getLanguageModel() {

@@ -15,6 +15,7 @@ import tn.amin.keyboard_gpt.text.parse.result.AIParseResult;
 import tn.amin.keyboard_gpt.text.parse.result.CommandParseResult;
 import tn.amin.keyboard_gpt.text.parse.result.FormatParseResult;
 import tn.amin.keyboard_gpt.text.parse.result.ParseResult;
+import tn.amin.keyboard_gpt.text.parse.result.SettingsParseResult;
 import tn.amin.keyboard_gpt.text.transform.format.TextUnicodeConverter;
 import tn.amin.keyboard_gpt.ui.IMSController;
 import tn.amin.keyboard_gpt.ui.UiInteractor;
@@ -25,8 +26,8 @@ public class KeyboardGPTBrain implements InputEventListener, GenerativeAIListene
 
     private final GenerativeAIController mAIController;
     private final CommandManager mCommandManager;
-//    private final InstructionTreater mInstructionTreater;
     private final TextParser mTextParser;
+    private final SPUpdater mSPUpdater;
 
     public KeyboardGPTBrain(Context context) {
         IMSController.getInstance().addListener(this);
@@ -34,8 +35,9 @@ public class KeyboardGPTBrain implements InputEventListener, GenerativeAIListene
 
         mAIController = new GenerativeAIController();
         mAIController.addListener(this);
-        mTextParser = new TextParser();
         mCommandManager = new CommandManager();
+        mTextParser = new TextParser();
+        mSPUpdater = new SPUpdater();
     }
 
     @Override
@@ -83,6 +85,8 @@ public class KeyboardGPTBrain implements InputEventListener, GenerativeAIListene
                     UiInteractor.getInstance().showWebSearchDialog("Web Search", url);
                 }
             }
+        } else if (parseResult instanceof SettingsParseResult) {
+            UiInteractor.getInstance().showSettingsDialog();
         }
     }
 
@@ -153,7 +157,7 @@ public class KeyboardGPTBrain implements InputEventListener, GenerativeAIListene
     }
 
     @Override
-    public void onDismiss(boolean isPrompt, boolean isCommand) {
+    public void onDismiss(boolean isPrompt, boolean isCommand, boolean isPattern) {
         if (isPrompt) {
             MainHook.log("Selected " + mAIController.getLanguageModel());
             UiInteractor.getInstance().post(() -> {
@@ -163,6 +167,10 @@ public class KeyboardGPTBrain implements InputEventListener, GenerativeAIListene
         } else if (isCommand) {
             UiInteractor.getInstance().post(() -> {
                 UiInteractor.getInstance().toastShort("New Commands Saved");
+            });
+        } else if (isPattern) {
+            UiInteractor.getInstance().post(() -> {
+                UiInteractor.getInstance().toastShort("New Pattern Saved");
             });
         }
     }

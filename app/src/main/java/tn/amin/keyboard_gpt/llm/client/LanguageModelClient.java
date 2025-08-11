@@ -6,22 +6,19 @@ import org.reactivestreams.Publisher;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.URLConnection;
-import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 import tn.amin.keyboard_gpt.MainHook;
+import tn.amin.keyboard_gpt.llm.LanguageModel;
+import tn.amin.keyboard_gpt.llm.LanguageModelField;
 import tn.amin.keyboard_gpt.llm.internet.InternetProvider;
 import tn.amin.keyboard_gpt.llm.internet.SimpleInternetProvider;
 import tn.amin.keyboard_gpt.llm.service.InternetRequestListener;
 
 public abstract class LanguageModelClient {
-    private String mApiKey = null;
-
-    private String mSubModel = null;
-
-    private String mBaseUrl = null;
+    private Map<LanguageModelField, String> mFields = new HashMap<>();
 
     private InternetProvider mInternetProvider = new SimpleInternetProvider();
 
@@ -29,44 +26,49 @@ public abstract class LanguageModelClient {
 
     abstract public LanguageModel getLanguageModel();
 
-    public void setApiKey(String apiKey) {
-        mApiKey = apiKey;
+    public void setField(LanguageModelField field, String value) {
+        mFields.put(field, value);
     }
 
-    public void setSubModel(String subModel) {
-        mSubModel = subModel;
+    public String getField(LanguageModelField field) {
+        return mFields.getOrDefault(field, getLanguageModel().getDefault(field));
     }
 
-    public void setBaseUrl(String baseUrl) {
-        mBaseUrl = baseUrl;
+    public double getDoubleField(LanguageModelField field) {
+        try {
+            String doubleStr = mFields.getOrDefault(field, getLanguageModel().getDefault(field));
+            if (doubleStr != null) {
+                return Double.parseDouble(doubleStr);
+            }
+        } catch (NumberFormatException | NullPointerException e) {
+            MainHook.log(e);
+        }
+        return Double.parseDouble(getLanguageModel().getDefault(field));
     }
 
     public String getSubModel() {
-        return mSubModel != null ? mSubModel : getLanguageModel().defaultSubModel;
+        return getField(LanguageModelField.SubModel);
     }
 
     public String getApiKey() {
-        return mApiKey;
+        return getField(LanguageModelField.ApiKey);
     }
 
     public String getBaseUrl() {
-        return mBaseUrl != null ? mBaseUrl : getLanguageModel().defaultBaseUrl;
+        return getField(LanguageModelField.BaseUrl);
     }
 
     public static LanguageModelClient forModel(LanguageModel model) {
         switch (model) {
             case Gemini:
                 return new GeminiClient();
-            case ChatGPT:
-                return new ChatGPTClient();
-//            case HuggingChat:
-//                return new HuggingChatClient();
             case Groq:
                 return new GroqClient();
             case OpenRouter:
                 return new OpenRouterClient();
             case Claude:
                 return new ClaudeClient();
+            case ChatGPT:
             default:
                 return new ChatGPTClient();
         }

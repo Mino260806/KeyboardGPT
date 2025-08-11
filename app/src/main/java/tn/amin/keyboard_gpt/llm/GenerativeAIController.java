@@ -2,6 +2,7 @@ package tn.amin.keyboard_gpt.llm;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.os.Bundle;
 
 import androidx.core.content.ContextCompat;
 
@@ -15,7 +16,6 @@ import java.util.List;
 import tn.amin.keyboard_gpt.MainHook;
 import tn.amin.keyboard_gpt.SPManager;
 import tn.amin.keyboard_gpt.listener.GenerativeAIListener;
-import tn.amin.keyboard_gpt.llm.client.LanguageModel;
 import tn.amin.keyboard_gpt.llm.client.LanguageModelClient;
 import tn.amin.keyboard_gpt.listener.ConfigChangeListener;
 import tn.amin.keyboard_gpt.llm.internet.InternetProvider;
@@ -70,48 +70,38 @@ public class GenerativeAIController implements ConfigChangeListener {
     private void setModel(LanguageModel model) {
         MainHook.log("setModel " + model.label);
         mModelClient = LanguageModelClient.forModel(model);
-        mModelClient.setApiKey(mSPManager.getApiKey(model));
-        mModelClient.setSubModel(mSPManager.getSubModel(model));
-        mModelClient.setBaseUrl(mSPManager.getBaseUrl(model));
+        for (LanguageModelField field: LanguageModelField.values()) {
+            mModelClient.setField(field, mSPManager.getLanguageModelField(model, field));
+        }
         mModelClient.setInternetProvider(mInternetProvider);
     }
 
     @Override
     public void onLanguageModelChange(LanguageModel model) {
-        mSPManager.setLanguageModel(model);
-
         if (mModelClient == null || mModelClient.getLanguageModel() != model) {
             setModel(model);
         }
     }
 
     @Override
-    public void onApiKeyChange(LanguageModel languageModel, String apiKey) {
-        mSPManager.setApiKey(languageModel, apiKey);
-        if (mModelClient != null && mModelClient.getLanguageModel() == languageModel) {
-            mModelClient.setApiKey(apiKey);
-        }
-    }
-
-    @Override
-    public void onSubModelChange(LanguageModel languageModel, String subModel) {
-        mSPManager.setSubModel(languageModel, subModel);
-        if (mModelClient != null && mModelClient.getLanguageModel() == languageModel) {
-            mModelClient.setSubModel(subModel);
-        }
-    }
-
-    @Override
-    public void onBaseUrlChange(LanguageModel languageModel, String baseUrl) {
-        mSPManager.setBaseUrl(languageModel, baseUrl);
-        if (mModelClient != null && mModelClient.getLanguageModel() == languageModel) {
-            mModelClient.setBaseUrl(baseUrl);
+    public void onLanguageModelFieldChange(LanguageModel model, LanguageModelField field, String value) {
+        if (mModelClient != null && mModelClient.getLanguageModel() == model) {
+            mModelClient.setField(field, value);
         }
     }
 
     @Override
     public void onCommandsChange(String commandsRaw) {
-        mSPManager.setGenerativeAICommandsRaw(commandsRaw);
+    }
+
+    @Override
+    public void onPatternsChange(String patternsRaw) {
+
+    }
+
+    @Override
+    public void onOtherSettingsChange(Bundle otherSettings) {
+
     }
 
     public void addListener(GenerativeAIListener listener) {

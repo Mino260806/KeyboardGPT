@@ -17,11 +17,12 @@ import java.util.ArrayList;
 
 import tn.amin.keyboard_gpt.MainHook;
 import tn.amin.keyboard_gpt.SPManager;
-import tn.amin.keyboard_gpt.llm.client.LanguageModel;
+import tn.amin.keyboard_gpt.llm.LanguageModel;
 import tn.amin.keyboard_gpt.listener.ConfigChangeListener;
 import tn.amin.keyboard_gpt.listener.ConfigInfoProvider;
 import tn.amin.keyboard_gpt.listener.DialogDismissListener;
-import tn.amin.keyboard_gpt.external.DialogType;
+import tn.amin.keyboard_gpt.external.dialog.DialogType;
+import tn.amin.keyboard_gpt.llm.LanguageModelField;
 
 public class UiInteractor {
     public static final String ACTION_DIALOG_RESULT = "tn.amin.keyboard_gpt.DIALOG_RESULT";
@@ -32,11 +33,7 @@ public class UiInteractor {
 
     public static final String EXTRA_CONFIG_LANGUAGE_MODEL = "tn.amin.keyboard_gpt.config.model";
 
-    public static final String EXTRA_CONFIG_LANGUAGE_MODEL_BASE_URL = "tn.amin.keyboard_gpt.config.model.BASE_URL";
-
-    public static final String EXTRA_CONFIG_LANGUAGE_MODEL_API_KEY = "tn.amin.keyboard_gpt.config.model.API_KEY";
-
-    public static final String EXTRA_CONFIG_LANGUAGE_MODEL_SUB_MODEL = "tn.amin.keyboard_gpt.config.model.SUB_MODEL";
+    public static final String EXTRA_CONFIG_LANGUAGE_MODEL_FIELD = "tn.amin.keyboard_gpt.config.model.%s";
 
 
     public static final String EXTRA_WEBVIEW_TITLE = "tn.amin.keyboard_gpt.webview.TITLE";
@@ -47,6 +44,10 @@ public class UiInteractor {
     public static final String EXTRA_COMMAND_LIST = "tn.amin.keyboard_gpt.command.LIST";
 
     public static final String EXTRA_COMMAND_INDEX = "tn.amin.keyboard_gpt.command.INDEX";
+
+    public static final String EXTRA_PATTERN_LIST = "tn.amin.keyboard_gpt.pattern.LIST";
+
+    public static final String EXTRA_OTHER_SETTINGS = "tn.amin.keyboard_gpt.other_settings";
 
     private Context mContext = null;
     private ConfigInfoProvider mConfigInfoProvider = null;
@@ -95,6 +96,7 @@ public class UiInteractor {
                 MainHook.log("Got result");
                 boolean isPrompt = false;
                 boolean isCommand = false;
+                boolean isPattern = false;
                 if (!mConfigChangeListeners.isEmpty() && intent.getExtras() != null) {
                     for (String key: intent.getExtras().keySet()) {
                         switch (key) {
@@ -110,13 +112,13 @@ public class UiInteractor {
                                     LanguageModel configuredlanguageModel = LanguageModel.valueOf(modelName);
                                     Bundle languageModelBundle = bundle.getBundle(modelName);
 
-                                    String apiKey = languageModelBundle.getString(EXTRA_CONFIG_LANGUAGE_MODEL_API_KEY);
-                                    String subModel = languageModelBundle.getString(EXTRA_CONFIG_LANGUAGE_MODEL_SUB_MODEL);
-                                    String baseUrl = languageModelBundle.getString(EXTRA_CONFIG_LANGUAGE_MODEL_BASE_URL);
-
-                                    mConfigChangeListeners.forEach((l) -> l.onApiKeyChange(configuredlanguageModel, apiKey));
-                                    mConfigChangeListeners.forEach((l) -> l.onSubModelChange(configuredlanguageModel, subModel));
-                                    mConfigChangeListeners.forEach((l) -> l.onBaseUrlChange(configuredlanguageModel, baseUrl));
+                                    for (LanguageModelField field: LanguageModelField.values()) {
+                                        if (languageModelBundle.containsKey(field.name)) {
+                                            String fieldValue = languageModelBundle.getString(field.name);
+                                            mConfigChangeListeners.forEach(l ->
+                                                    l.onLanguageModelFieldChange(configuredlanguageModel, field, fieldValue));
+                                        }
+                                    }
                                 }
                                 isPrompt = true;
                                 break;
@@ -125,12 +127,24 @@ public class UiInteractor {
                                 mConfigChangeListeners.forEach((l) -> l.onCommandsChange(commandsRaw));
                                 isCommand = true;
                                 break;
+                            case EXTRA_PATTERN_LIST:
+                                String patternsRaw = intent.getStringExtra(EXTRA_PATTERN_LIST);
+                                mConfigChangeListeners.forEach((l) -> l.onPatternsChange(patternsRaw));
+                                isPattern = true;
+                                break;
+                            case EXTRA_OTHER_SETTINGS:
+                                MainHook.log("Got other result");
+                                Bundle otherSettings = intent.getBundleExtra(EXTRA_OTHER_SETTINGS);
+                                mConfigChangeListeners.forEach((l) -> l.onOtherSettingsChange(otherSettings));
+                                break;
                         }
                     }
                 }
                 final boolean finalIsPrompt = isPrompt;
                 final boolean finalIsCommand = isCommand;
-                mOnDismissListeners.forEach((l) -> l.onDismiss(finalIsPrompt, finalIsCommand));
+                final boolean finalIsPattern = isPattern;
+                mOnDismissListeners.forEach((l) ->
+                        l.onDismiss(finalIsPrompt, finalIsCommand, finalIsPattern));
             }
         }
     };
@@ -182,6 +196,31 @@ public class UiInteractor {
         intent.putExtra(EXTRA_COMMAND_LIST, rawCommands);
 
         MainHook.log("Launching commands edit");
+        mContext.startActivity(intent);
+
+        return true;
+    }
+
+    public boolean showSettingsDialog() {
+        if (isDialogOnCooldown()) {
+            return false;
+        }
+
+        String rawCommands = SPManager.getInstance().getGenerativeAICommandsRaw();
+        String rawPatterns = SPManager.getInstance().getParsePatternsRaw();
+
+        Intent intent = new Intent("tn.amin.keyboard_gpt.OVERLAY");
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra(EXTRA_DIALOG_TYPE, DialogType.Settings.name());
+        intent.putExtra(EXTRA_COMMAND_LIST, rawCommands);
+        intent.putExtra(EXTRA_PATTERN_LIST, rawPatterns);
+        intent.putExtra(EXTRA_CONFIG_LANGUAGE_MODEL, mConfigInfoProvider.getConfigBundle());
+        intent.putExtra(EXTRA_CONFIG_SELECTED_MODEL,
+                mConfigInfoProvider.getLanguageModel().name());
+        intent.putExtra(EXTRA_OTHER_SETTINGS,
+                mConfigInfoProvider.getOtherSettings());
+
+        MainHook.log("Launching settings");
         mContext.startActivity(intent);
 
         return true;

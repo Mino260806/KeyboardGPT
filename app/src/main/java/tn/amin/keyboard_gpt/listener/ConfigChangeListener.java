@@ -1,15 +1,18 @@
 package tn.amin.keyboard_gpt.listener;
 
-import tn.amin.keyboard_gpt.llm.client.LanguageModel;
+import android.os.Bundle;
+
+import tn.amin.keyboard_gpt.llm.LanguageModel;
+import tn.amin.keyboard_gpt.llm.LanguageModelField;
 
 public interface ConfigChangeListener {
     void onLanguageModelChange(LanguageModel model);
 
-    void onApiKeyChange(LanguageModel languageModel, String apiKey);
-
-    void onSubModelChange(LanguageModel languageModel, String subModel);
-
-    void onBaseUrlChange(LanguageModel languageModel, String baseUrl);
+    void onLanguageModelFieldChange(LanguageModel model, LanguageModelField field, String value);
 
     void onCommandsChange(String commandsRaw);
+
+    void onPatternsChange(String patternsRaw);
+
+    void onOtherSettingsChange(Bundle otherSettings);
 }

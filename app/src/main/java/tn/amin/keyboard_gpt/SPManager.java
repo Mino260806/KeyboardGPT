@@ -12,24 +12,24 @@ import java.util.stream.Collectors;
 
 import tn.amin.keyboard_gpt.instruction.command.Commands;
 import tn.amin.keyboard_gpt.instruction.command.GenerativeAICommand;
-import tn.amin.keyboard_gpt.llm.client.LanguageModel;
+import tn.amin.keyboard_gpt.llm.LanguageModel;
 import tn.amin.keyboard_gpt.listener.ConfigInfoProvider;
+import tn.amin.keyboard_gpt.llm.LanguageModelField;
+import tn.amin.keyboard_gpt.settings.OtherSettingsType;
+import tn.amin.keyboard_gpt.text.parse.ParsePattern;
 import tn.amin.keyboard_gpt.ui.UiInteractor;
 
 public class SPManager implements ConfigInfoProvider {
     protected static final String PREF_NAME = "keyboard_gpt";
 
-    protected static final String PREF_LANGUAGE_MODEL_COMPAT = "language_model";
+    protected static final String PREF_MODULE_VERSION = "module_version";
 
     protected static final String PREF_LANGUAGE_MODEL = "language_model_v2";
 
-    protected static final String PREF_API_KEY = "%s.api_key";
-
-    protected static final String PREF_SUB_MODEL = "%s.sub_model";
-
-    protected static final String PREF_BASE_URL = "%s.base_url";
-
     protected static final String PREF_GEN_AI_COMMANDS = "gen_ai_commands";
+    protected static final String PREF_PARSE_PATTERNS = "parse_patterns";
+
+    protected static final String PREF_OTHER_SETTING = "other_setting.%s";
 
     protected final SharedPreferences sp;
 
@@ -48,9 +48,32 @@ public class SPManager implements ConfigInfoProvider {
         return instance;
     }
 
+    public static boolean isReady() {
+        return instance != null;
+    }
+
     private SPManager(Context context) {
         sp = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        updateVersion();
         updateGenerativeAICommands();
+    }
+
+    private void updateVersion() {
+        SharedPreferences.Editor editor = sp.edit();
+        int version = getVersion();
+        if (version == -1) {
+            MainHook.log("Clearing SP because no version found");
+            editor.clear();
+        }
+
+        if (version != BuildConfig.VERSION_CODE) {
+            editor.putInt(PREF_MODULE_VERSION, BuildConfig.VERSION_CODE);
+        }
+        editor.apply();
+    }
+
+    public int getVersion() {
+        return sp.getInt(PREF_MODULE_VERSION, -1);
     }
 
     public boolean hasLanguageModel() {
@@ -70,34 +93,38 @@ public class SPManager implements ConfigInfoProvider {
         sp.edit().putString(PREF_LANGUAGE_MODEL, model.name()).apply();
     }
 
+    public void setLanguageModelField(LanguageModel model, LanguageModelField field, String value) {
+        String entryName = String.format("%s." + field, model.name());
+        sp.edit().putString(entryName, value).apply();
+    }
+
+    public String getLanguageModelField(LanguageModel model, LanguageModelField field) {
+        String entryName = String.format("%s." + field, model.name());
+        return sp.getString(entryName, model.getDefault(field));
+    }
+
     public void setApiKey(LanguageModel model, String apiKey) {
-        String key = String.format(PREF_API_KEY, model.name());
-        sp.edit().putString(key, apiKey).apply();
+        setLanguageModelField(model, LanguageModelField.ApiKey, apiKey);
     }
 
     public String getApiKey(LanguageModel model) {
-        String key = String.format(PREF_API_KEY, model.name());
-        return sp.getString(key, null);
+        return getLanguageModelField(model, LanguageModelField.ApiKey);
     }
 
     public void setSubModel(LanguageModel model, String subModel) {
-        String key = String.format(PREF_SUB_MODEL, model.name());
-        sp.edit().putString(key, subModel).apply();
+        setLanguageModelField(model, LanguageModelField.SubModel, subModel);
     }
 
     public String getSubModel(LanguageModel model) {
-        String key = String.format(PREF_SUB_MODEL, model.name());
-        return sp.getString(key, null);
+        return getLanguageModelField(model, LanguageModelField.SubModel);
     }
 
     public void setBaseUrl(LanguageModel model, String baseUrl) {
-        String key = String.format(PREF_BASE_URL, model.name());
-        sp.edit().putString(key, baseUrl).apply();
+        setLanguageModelField(model, LanguageModelField.BaseUrl, baseUrl);
     }
 
     public String getBaseUrl(LanguageModel model) {
-        String key = String.format(PREF_BASE_URL, model.name());
-        return sp.getString(key, null);
+        return getLanguageModelField(model, LanguageModelField.BaseUrl);
     }
 
     public void setGenerativeAICommandsRaw(String commands) {
@@ -117,19 +144,25 @@ public class SPManager implements ConfigInfoProvider {
         return generativeAICommands;
     }
 
+    public void setParsePatterns(List<ParsePattern> parsePatterns) {
+        setParsePatternsRaw(ParsePattern.encode(parsePatterns));
+    }
+
+    public void setParsePatternsRaw(String patternsRaw) {
+        sp.edit().putString(PREF_PARSE_PATTERNS, patternsRaw).apply();
+    }
+
+    public List<ParsePattern> getParsePatterns() {
+        return ParsePattern.decode(getParsePatternsRaw());
+    }
+
+    public String getParsePatternsRaw() {
+        return sp.getString(PREF_PARSE_PATTERNS, null);
+    }
+
     private void updateGenerativeAICommands() {
         generativeAICommands = Collections.unmodifiableList(
                 Commands.decodeCommands(sp.getString(PREF_GEN_AI_COMMANDS, "[]")));
-    }
-
-    public Map<LanguageModel, String> getApiKeyMap() {
-        return Arrays.stream(LanguageModel.values())
-                .collect(Collectors.toMap(model -> model, model -> {
-                    String apiKey = getApiKey(model);
-                    if (apiKey == null)
-                        apiKey = "";
-                    return apiKey;
-                }));
     }
 
     @Override
@@ -138,12 +171,50 @@ public class SPManager implements ConfigInfoProvider {
         for (LanguageModel model: LanguageModel.values()) {
             Bundle configBundle = new Bundle();
 
-            configBundle.putString(UiInteractor.EXTRA_CONFIG_LANGUAGE_MODEL_API_KEY, getApiKey(model));
-            configBundle.putString(UiInteractor.EXTRA_CONFIG_LANGUAGE_MODEL_SUB_MODEL, getSubModel(model));
-            configBundle.putString(UiInteractor.EXTRA_CONFIG_LANGUAGE_MODEL_BASE_URL, getBaseUrl(model));
+            for (LanguageModelField field: LanguageModelField.values()) {
+                configBundle.putString(field.name, getLanguageModelField(model, field));
+            }
 
             bundle.putBundle(model.name(), configBundle);
         }
         return bundle;
+    }
+
+    @Override
+    public Bundle getOtherSettings() {
+        Bundle otherSettings = new Bundle();
+        for (OtherSettingsType type: OtherSettingsType.values()) {
+            switch (type.nature) {
+                case Boolean:
+                    otherSettings.putBoolean(type.name(), (Boolean) getOtherSetting(type));
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unknown type nature " + type.nature);
+            }
+        }
+        return otherSettings;
+    }
+
+    public void setOtherSetting(OtherSettingsType type, Object value) {
+        switch (type.nature) {
+            case Boolean:
+                sp.edit().putBoolean(String.format(PREF_OTHER_SETTING, type.name()), (Boolean) value).apply();
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown type nature " + type.nature);
+        }
+    }
+
+    public Object getOtherSetting(OtherSettingsType type) {
+        switch (type.nature) {
+            case Boolean:
+                return sp.getBoolean(String.format(PREF_OTHER_SETTING, type.name()), (Boolean) type.defaultValue);
+            default:
+                throw new IllegalArgumentException("Unknown type nature " + type.nature);
+        }
+    }
+
+    public Boolean getEnableLogs() {
+        return (Boolean) getOtherSetting(OtherSettingsType.EnableLogs);
     }
 }

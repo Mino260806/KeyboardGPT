@@ -1,13 +1,16 @@
 package tn.amin.keyboard_gpt.instruction.command;
 
+import android.os.Bundle;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import tn.amin.keyboard_gpt.SPManager;
+import tn.amin.keyboard_gpt.llm.LanguageModelField;
 import tn.amin.keyboard_gpt.ui.UiInteractor;
 import tn.amin.keyboard_gpt.listener.ConfigChangeListener;
-import tn.amin.keyboard_gpt.llm.client.LanguageModel;
+import tn.amin.keyboard_gpt.llm.LanguageModel;
 
 public class CommandManager implements ConfigChangeListener {
     private final static Map<String, AbstractCommand> STATIC_COMMAND_MAP = Map.of(
@@ -41,22 +44,22 @@ public class CommandManager implements ConfigChangeListener {
     }
 
     @Override
-    public void onApiKeyChange(LanguageModel languageModel, String apiKey) {
-
-    }
-
-    @Override
-    public void onSubModelChange(LanguageModel languageModel, String subModel) {
-
-    }
-
-    @Override
-    public void onBaseUrlChange(LanguageModel languageModel, String baseUrl) {
+    public void onLanguageModelFieldChange(LanguageModel model, LanguageModelField field, String value) {
 
     }
 
     @Override
     public void onCommandsChange(String commandsRaw) {
         updateCommandMap();
+    }
+
+    @Override
+    public void onPatternsChange(String patternsRaw) {
+
+    }
+
+    @Override
+    public void onOtherSettingsChange(Bundle otherSettings) {
+
     }
 }
