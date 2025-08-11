@@ -11,6 +11,7 @@ import java.net.URL;
 import java.util.stream.Collectors;
 
 import tn.amin.keyboard_gpt.llm.LanguageModel;
+import tn.amin.keyboard_gpt.llm.LanguageModelField;
 import tn.amin.keyboard_gpt.llm.publisher.ExceptionPublisher;
 import tn.amin.keyboard_gpt.llm.publisher.InternetRequestPublisher;
 
@@ -48,6 +49,7 @@ public class GroqClient extends ChatGPTClient {
             rootJson.put("model", getSubModel());
             rootJson.put("messages", messagesJson);
             rootJson.put("stream", true);
+            rootJson.put("temperature", getDoubleField(LanguageModelField.Temperature));
 
             InternetRequestPublisher publisher = new InternetRequestPublisher(
                     (s, reader) -> {

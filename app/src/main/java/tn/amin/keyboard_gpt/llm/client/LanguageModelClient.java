@@ -10,6 +10,7 @@ import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.Map;
 
+import tn.amin.keyboard_gpt.MainHook;
 import tn.amin.keyboard_gpt.llm.LanguageModel;
 import tn.amin.keyboard_gpt.llm.LanguageModelField;
 import tn.amin.keyboard_gpt.llm.internet.InternetProvider;
@@ -31,6 +32,18 @@ public abstract class LanguageModelClient {
 
     public String getField(LanguageModelField field) {
         return mFields.getOrDefault(field, getLanguageModel().getDefault(field));
+    }
+
+    public double getDoubleField(LanguageModelField field) {
+        try {
+            String doubleStr = mFields.getOrDefault(field, getLanguageModel().getDefault(field));
+            if (doubleStr != null) {
+                return Double.parseDouble(doubleStr);
+            }
+        } catch (NumberFormatException | NullPointerException e) {
+            MainHook.log(e);
+        }
+        return Double.parseDouble(getLanguageModel().getDefault(field));
     }
 
     public String getSubModel() {

@@ -11,6 +11,7 @@ import java.net.URL;
 import java.util.stream.Collectors;
 
 import tn.amin.keyboard_gpt.llm.LanguageModel;
+import tn.amin.keyboard_gpt.llm.LanguageModelField;
 import tn.amin.keyboard_gpt.llm.publisher.ExceptionPublisher;
 import tn.amin.keyboard_gpt.llm.publisher.InternetRequestPublisher;
 
@@ -44,6 +45,7 @@ public class ChatGPTClient extends LanguageModelClient {
             rootJson.put("model", getSubModel());
             rootJson.put("messages", messagesJson);
             rootJson.put("stream", false);
+            rootJson.put("temperature", getDoubleField(LanguageModelField.Temperature));
 
             InternetRequestPublisher publisher = new InternetRequestPublisher(
                     (s, reader) -> {

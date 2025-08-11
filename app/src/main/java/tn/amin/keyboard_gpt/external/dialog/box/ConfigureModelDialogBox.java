@@ -6,7 +6,9 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -35,11 +37,22 @@ public class ConfigureModelDialogBox extends DialogBox {
         LinearLayout layout = (LinearLayout)
                 getParent().getLayoutInflater().inflate(R.layout.dialog_configue_model, null);
 
+        LinearLayout advancedLayout = new LinearLayout(getContext());
+        advancedLayout.setOrientation(LinearLayout.VERTICAL);
+
+        LinearLayout advancedExpand = (LinearLayout)
+                getParent().getLayoutInflater().inflate(R.layout.dialog_configure_model_advanced, null);
+
         Bundle tempModelConfig = new Bundle();
         for (LanguageModelField field: LanguageModelField.values()) {
             RelativeLayout fieldLayout = (RelativeLayout)
                     getParent().getLayoutInflater().inflate(R.layout.dialog_configure_model_field, layout, false);
-            layout.addView(fieldLayout);
+            if (!field.advanced) {
+                layout.addView(fieldLayout);
+            } else {
+                advancedLayout.addView(fieldLayout);
+            }
+
             TextView fieldTitle = fieldLayout.findViewById(R.id.field_tile);
             EditText fieldEdit = fieldLayout.findViewById(R.id.field_edit);
 
@@ -63,6 +76,26 @@ public class ConfigureModelDialogBox extends DialogBox {
                 }
             });
         }
+
+        layout.addView(advancedExpand);
+        layout.addView(advancedLayout);
+
+        advancedLayout.setVisibility(View.GONE);
+        ImageView advancedArrow = advancedExpand.findViewById(R.id.icon_advanced);
+        advancedExpand.setOnClickListener(new View.OnClickListener() {
+            private boolean expanded = false;
+            @Override
+            public void onClick(View v) {
+                expanded = !expanded;
+                if (expanded) {
+                    advancedArrow.animate().rotation(90);
+                    advancedLayout.setVisibility(View.VISIBLE);
+                } else {
+                    advancedArrow.animate().rotation(0);
+                    advancedLayout.setVisibility(View.GONE);
+                }
+            }
+        });
 
         return new AlertDialog.Builder(getContext())
                 .setTitle(getConfig().selectedModel.label + " configuration")
