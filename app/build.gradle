@@ -53,6 +53,16 @@ android {
     }
 }
 
+android.applicationVariants.all { variant ->
+    variant.outputs.all { output ->
+        def appName = "KeyboardGPT"
+        def buildType = variant.buildType.name
+        def versionName = variant.versionName
+        def versionCode = variant.versionCode
+        outputFileName = "${appName}-${buildType}-v${versionName}.apk"
+    }
+}
+
 dependencies {
 
     implementation 'androidx.core:core-ktx:1.12.0'
