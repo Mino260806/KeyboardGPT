@@ -22,7 +22,9 @@ public enum LanguageModel {
         defaults = ImmutableMap.of(
                 LanguageModelField.SubModel, defaultSubModel,
                 LanguageModelField.BaseUrl, defaultBaseUrl,
-                LanguageModelField.Temperature, "1.0"
+                LanguageModelField.MaxTokens, "4096",
+                LanguageModelField.Temperature, "1.0",
+                LanguageModelField.TopP, "1.0"
         );
     }
 

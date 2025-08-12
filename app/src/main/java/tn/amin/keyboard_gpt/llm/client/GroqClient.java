@@ -49,7 +49,9 @@ public class GroqClient extends ChatGPTClient {
             rootJson.put("model", getSubModel());
             rootJson.put("messages", messagesJson);
             rootJson.put("stream", true);
+            rootJson.put("max_completion_tokens", getIntField(LanguageModelField.MaxTokens));
             rootJson.put("temperature", getDoubleField(LanguageModelField.Temperature));
+            rootJson.put("top_p", getDoubleField(LanguageModelField.TopP));
 
             InternetRequestPublisher publisher = new InternetRequestPublisher(
                     (s, reader) -> {

@@ -45,7 +45,9 @@ public class ChatGPTClient extends LanguageModelClient {
             rootJson.put("model", getSubModel());
             rootJson.put("messages", messagesJson);
             rootJson.put("stream", false);
+            rootJson.put("max_completion_tokens", getIntField(LanguageModelField.MaxTokens));
             rootJson.put("temperature", getDoubleField(LanguageModelField.Temperature));
+            rootJson.put("top_p", getDoubleField(LanguageModelField.TopP));
 
             InternetRequestPublisher publisher = new InternetRequestPublisher(
                     (s, reader) -> {

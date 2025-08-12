@@ -46,6 +46,18 @@ public abstract class LanguageModelClient {
         return Double.parseDouble(getLanguageModel().getDefault(field));
     }
 
+    public int getIntField(LanguageModelField field) {
+        try {
+            String intStr = mFields.getOrDefault(field, getLanguageModel().getDefault(field));
+            if (intStr != null) {
+                return Integer.parseInt(intStr);
+            }
+        } catch (NumberFormatException | NullPointerException e) {
+            MainHook.log(e);
+        }
+        return Integer.parseInt(getLanguageModel().getDefault(field));
+    }
+
     public String getSubModel() {
         return getField(LanguageModelField.SubModel);
     }
