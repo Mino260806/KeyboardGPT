@@ -164,8 +164,12 @@ public class UiInteractor {
             return false;
         }
 
+        Intent intent = getOverlayIntent(DialogType.WebSearch, false);
+        intent.putExtra(EXTRA_WEBVIEW_TITLE, title);
+        intent.putExtra(EXTRA_WEBVIEW_URL, url);
+
         MainHook.log("Launching web search");
-        mContext.startActivity(getOverlayIntent(DialogType.WebSearch, false));
+        mContext.startActivity(intent);
 
         return true;
     }
