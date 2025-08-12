@@ -81,7 +81,7 @@ public class KeyboardGPTBrain implements InputEventListener, GenerativeAIListene
                     GenerativeAICommand genAICommand = (GenerativeAICommand) command;
                     generateResponse(commandParseResult.prompt, genAICommand.getTweakMessage());
                 } else if (command instanceof WebSearchCommand){
-                    String url = "https://www.google.com/search?q=" + commandParseResult.prompt;
+                    String url = "https://duckduckgo.com/?q=" + commandParseResult.prompt;
                     UiInteractor.getInstance().showWebSearchDialog("Web Search", url);
                 }
             }
