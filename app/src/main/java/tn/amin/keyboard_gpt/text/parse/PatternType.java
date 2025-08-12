@@ -3,11 +3,11 @@ package tn.amin.keyboard_gpt.text.parse;
 public enum PatternType {
     Settings("Settings", 0, "\\*#settings#\\*$", false),
     CommandAI("Default AI command", 1, "\\$([^$]*)\\$$", true),
-    CommandCustom("Custom command", 2, "©(?:([^ ©]+) *)?([^©]+)?©$", true),
-    FormatBold("Bold", 1, "¿([^¿]+)¿$", true),
-    FormatItalic("Italic", 1, "¡([^¡]+)¡$", true),
+    CommandCustom("Custom command", 2, "%(?:([^ %]+) *)?([^%]+)?%$", true),
+    FormatItalic("Italic", 1, "\\|([^|]+)\\|$", true),
+    FormatBold("Bold", 1, "@([^@]+)@$", true),
     FormatCrossout("Crossout", 1, "~([^~]+)~$", true),
-    FormatUnderline("Underline", 1, "ū([^~]+)ū$", true),
+    FormatUnderline("Underline", 1, "_([^_]+)_$", true),
     ;
 
     public final String title;

@@ -22,14 +22,13 @@ public class CommandManager implements ConfigChangeListener {
     public CommandManager() {
         UiInteractor.getInstance().registerConfigChangeListener(this);
 
-        updateCommandMap();
+        List<GenerativeAICommand> aiCommands = SPManager.getInstance().getGenerativeAICommands();
+        updateCommandMap(aiCommands);
     }
 
-    private void updateCommandMap() {
-        List<GenerativeAICommand> generativeAICommands = SPManager.getInstance().getGenerativeAICommands();
-
+    private void updateCommandMap(List<GenerativeAICommand> aiCommands) {
         commandMap = new HashMap<>(STATIC_COMMAND_MAP);
-        for (GenerativeAICommand command: generativeAICommands) {
+        for (GenerativeAICommand command: aiCommands) {
             commandMap.put(command.getCommandPrefix(), command);
         }
     }
@@ -50,7 +49,7 @@ public class CommandManager implements ConfigChangeListener {
 
     @Override
     public void onCommandsChange(String commandsRaw) {
-        updateCommandMap();
+        updateCommandMap(Commands.decodeCommands(commandsRaw));
     }
 
     @Override

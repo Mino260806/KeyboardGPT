@@ -55,6 +55,7 @@ public class ConfigureModelDialogBox extends DialogBox {
 
             TextView fieldTitle = fieldLayout.findViewById(R.id.field_tile);
             EditText fieldEdit = fieldLayout.findViewById(R.id.field_edit);
+            fieldEdit.setInputType(field.inputType);
 
             fieldTitle.setText(field.title);
             String fieldValue = modelConfig.getString(field.name);

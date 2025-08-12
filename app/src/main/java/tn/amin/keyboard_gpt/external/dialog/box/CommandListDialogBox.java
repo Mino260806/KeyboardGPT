@@ -22,18 +22,21 @@ public class CommandListDialogBox extends DialogBox {
     protected Dialog build() {
         safeguardCommands();
 
-        CharSequence[] names = Stream.concat(Stream.of("New Command"),
-                        getConfig().commands.stream().map(AbstractCommand::getCommandPrefix))
+        CharSequence[] names = getConfig().commands.stream().map(AbstractCommand::getCommandPrefix)
                 .toArray(CharSequence[]::new);
 
         return new AlertDialog.Builder(getContext())
                 .setTitle("Select Command")
                 .setItems(names, (dialog, which) -> {
-                    getConfig().focusCommandIndex = which - 1;
+                    getConfig().focusCommandIndex = which;
                     switchToDialog(DialogType.EditCommand);
                 })
                 .setNegativeButton("Back", (dialog, which) -> {
                     switchToDialog(DialogType.Settings);
+                })
+                .setPositiveButton("New", (dialog, which) -> {
+                    getConfig().focusCommandIndex = -1;
+                    switchToDialog(DialogType.EditCommand);
                 })
                 .create();
     }
