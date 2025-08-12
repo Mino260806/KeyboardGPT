@@ -40,7 +40,7 @@ public class PatternEditDialogBox extends DialogBox {
         regexEditText.setText(pattern.getPattern().pattern());
 
         if (!pattern.getType().editable) {
-            regexEditText.setInputType(InputType.TYPE_NULL);
+            regexEditText.setEnabled(false);
         }
 
         regexButton.setOnClickListener(v -> {
