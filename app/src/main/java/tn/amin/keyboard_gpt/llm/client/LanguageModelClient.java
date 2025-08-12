@@ -86,7 +86,7 @@ public abstract class LanguageModelClient {
     }
 
     protected static String getDefaultSystemMessage() {
-        return "You are a helpful assitant.";
+        return "You are a helpful assistant integrated inside a keyboard.";
     }
 
     public void setInternetProvider(InternetProvider internetProvider) {
