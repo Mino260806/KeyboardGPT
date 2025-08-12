@@ -154,15 +154,8 @@ public class UiInteractor {
             return false;
         }
 
-        Intent intent = new Intent("tn.amin.keyboard_gpt.OVERLAY");
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtra(EXTRA_DIALOG_TYPE, DialogType.ChoseModel.name());
-        intent.putExtra(EXTRA_CONFIG_LANGUAGE_MODEL, mConfigInfoProvider.getConfigBundle());
-        intent.putExtra(EXTRA_CONFIG_SELECTED_MODEL,
-                mConfigInfoProvider.getLanguageModel().name());
-
         MainHook.log("Launching configure dialog");
-        mContext.startActivity(intent);
+        mContext.startActivity(getOverlayIntent(DialogType.ChoseModel));
         return true;
     }
 
@@ -171,14 +164,8 @@ public class UiInteractor {
             return false;
         }
 
-        Intent intent = new Intent("tn.amin.keyboard_gpt.OVERLAY");
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtra(EXTRA_DIALOG_TYPE, DialogType.WebSearch.name());
-        intent.putExtra(EXTRA_WEBVIEW_TITLE, title);
-        intent.putExtra(EXTRA_WEBVIEW_URL, url);
-
         MainHook.log("Launching web search");
-        mContext.startActivity(intent);
+        mContext.startActivity(getOverlayIntent(DialogType.WebSearch, false));
 
         return true;
     }
@@ -188,15 +175,8 @@ public class UiInteractor {
             return false;
         }
 
-        String rawCommands = SPManager.getInstance().getGenerativeAICommandsRaw();
-
-        Intent intent = new Intent("tn.amin.keyboard_gpt.OVERLAY");
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtra(EXTRA_DIALOG_TYPE, DialogType.EditCommandsList.name());
-        intent.putExtra(EXTRA_COMMAND_LIST, rawCommands);
-
         MainHook.log("Launching commands edit");
-        mContext.startActivity(intent);
+        mContext.startActivity(getOverlayIntent(DialogType.EditCommandsList));
 
         return true;
     }
@@ -206,24 +186,34 @@ public class UiInteractor {
             return false;
         }
 
-        String rawCommands = SPManager.getInstance().getGenerativeAICommandsRaw();
-        String rawPatterns = SPManager.getInstance().getParsePatternsRaw();
-
-        Intent intent = new Intent("tn.amin.keyboard_gpt.OVERLAY");
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtra(EXTRA_DIALOG_TYPE, DialogType.Settings.name());
-        intent.putExtra(EXTRA_COMMAND_LIST, rawCommands);
-        intent.putExtra(EXTRA_PATTERN_LIST, rawPatterns);
-        intent.putExtra(EXTRA_CONFIG_LANGUAGE_MODEL, mConfigInfoProvider.getConfigBundle());
-        intent.putExtra(EXTRA_CONFIG_SELECTED_MODEL,
-                mConfigInfoProvider.getLanguageModel().name());
-        intent.putExtra(EXTRA_OTHER_SETTINGS,
-                mConfigInfoProvider.getOtherSettings());
-
         MainHook.log("Launching settings");
-        mContext.startActivity(intent);
+        mContext.startActivity(getOverlayIntent(DialogType.Settings));
 
         return true;
+    }
+
+    private Intent getOverlayIntent(DialogType dialogType) {
+        return getOverlayIntent(dialogType, true);
+    }
+
+    private Intent getOverlayIntent(DialogType dialogType, boolean includeSp) {
+        Intent intent = new Intent("tn.amin.keyboard_gpt.OVERLAY");
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra(EXTRA_DIALOG_TYPE, dialogType.name());
+        if (includeSp) {
+            String rawCommands = SPManager.getInstance().getGenerativeAICommandsRaw();
+            String rawPatterns = SPManager.getInstance().getParsePatternsRaw();
+
+            intent.putExtra(EXTRA_COMMAND_LIST, rawCommands);
+            intent.putExtra(EXTRA_PATTERN_LIST, rawPatterns);
+            intent.putExtra(EXTRA_CONFIG_LANGUAGE_MODEL, mConfigInfoProvider.getConfigBundle());
+            intent.putExtra(EXTRA_CONFIG_SELECTED_MODEL,
+                    mConfigInfoProvider.getLanguageModel().name());
+            intent.putExtra(EXTRA_OTHER_SETTINGS,
+                    mConfigInfoProvider.getOtherSettings());
+        }
+
+        return intent;
     }
 
     public void registerConfigChangeListener(ConfigChangeListener listener) {
