@@ -3,29 +3,30 @@
 *Last updated on 12/08/2025*
 
 An **LSPosed Module** that lets you integrate Generative AI like ChatGPT in your favorite keyboard.
-[x] Tested up to Android 15, may work in later versions.
-[x] Works with Rooted and Unrooted devices.
-[x] Works in all apps.
-[x] Works with all keyboards.
+
+- [x] Tested up to Android 15, may work in later versions.
+- [x] Works with Rooted and Unrooted devices.
+- [x] Works in all apps.
+- [x] Works with all keyboards.
 
 <details>  
   <summary>Demo Video : Normal Prompt</summary>  
 
-<video src="demo/demo_normal_prompt.webm" /> 
+<video src="demo/demo_normal_prompt.mp4" /> 
 
 </details>  
 
 <details>  
   <summary>Demo Video : Custom Prompts</summary>  
 
-<video src="demo/demo_normal_prompt.webm" /> 
+<video src="demo/demo_normal_prompt.mp4" /> 
 
 </details>  
 
 <details>  
   <summary>Demo Video : Text Formatting</summary>  
 
-<video src="demo/demo_normal_prompt.webm" /> 
+<video src="demo/demo_normal_prompt.mp4" /> 
 
 </details>  
 
@@ -33,14 +34,14 @@ An **LSPosed Module** that lets you integrate Generative AI like ChatGPT in your
 <details>  
   <summary>Demo Video : Custom Patterns</summary>  
 
-<video src="demo/demo_custom_patterns.webm" /> 
+<video src="demo/demo_custom_patterns.mp4" /> 
 
 </details>  
 
 <details>  
   <summary>Demo Video : Web Search</summary>  
 
-<video src="demo/demo_web_search.webm" /> 
+<video src="demo/demo_web_search.mp4" /> 
 </details>  
 
 <p align="center">  
@@ -57,7 +58,7 @@ To this date, all tested keyboards are fully compatible with KeyboardGPT
 - [Futo Keyboard](https://play.google.com/store/apps/details?id=org.futo.inputmethod.latin.playstore)
 
 PS: If a keyboard is not in this list, it means that it has not been tested yet.
-However, even if your keyboard is not there, there is a very high chance that it's also supported by KeyboardGPT, as I haven't found an unsupported keyboard to this date.
+However, even if your keyboard is not there, there is a very high chance that it's also supported by KeyboardGPT, as I haven't found an unsupported keyboard among those I have tested.
 
 ## Features
 
@@ -83,7 +84,7 @@ However, even if your keyboard is not there, there is a very high chance that it
 
 </details>
 
-Note: With *No Root* method, you cannot patch a system app (Mostly Gboard or Samsung Keyboard).
+Note: With *No Root* method, you cannot patch a system app (Mostly Gboard or Samsung Keyboard, depending on your system).
 
 ## Usage Guide
 
