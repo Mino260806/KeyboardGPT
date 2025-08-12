@@ -41,7 +41,17 @@ public class GeminiClient extends LanguageModelClient {
                     new JSONArray().put(new JSONObject().put("text", prompt)))));
             JSONObject generationConfigJson = new JSONObject()
                     .put("temperature", getDoubleField(LanguageModelField.Temperature));
+            JSONArray safetySettings = new JSONArray()
+                    .put(new JSONObject().put("category", "HARM_CATEGORY_SEXUALLY_EXPLICIT")
+                            .put("threshold", "BLOCK_NONE"))
+                    .put(new JSONObject().put("category", "HARM_CATEGORY_HATE_SPEECH")
+                            .put("threshold", "BLOCK_NONE"))
+                    .put(new JSONObject().put("category", "HARM_CATEGORY_HARASSMENT")
+                            .put("threshold", "BLOCK_NONE"))
+                    .put(new JSONObject().put("category", "HARM_CATEGORY_DANGEROUS_CONTENT")
+                            .put("threshold", "BLOCK_NONE"));
             JSONObject rootJson = new JSONObject();
+            rootJson.put("safetySettings", safetySettings);
             rootJson.put("contents", contentsJson);
             rootJson.put("generationConfig", generationConfigJson);
 
