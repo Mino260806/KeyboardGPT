@@ -12,21 +12,32 @@ An **LSPosed Module** that lets you integrate Generative AI like ChatGPT in your
 <details>  
   <summary>Demo Video : Normal Prompt</summary>  
 
-<video src="demo/demo_normal_prompt.mp4" /> 
+
+
+https://github.com/user-attachments/assets/bc054498-7aa6-4834-bf54-41d5e2b785b6
+
+
 
 </details>  
 
 <details>  
   <summary>Demo Video : Custom Prompts</summary>  
 
-<video src="demo/demo_normal_prompt.mp4" /> 
+
+
+https://github.com/user-attachments/assets/ae3a4aff-3744-4b16-a3eb-18da2b5c1f3c
+
+
 
 </details>  
 
 <details>  
   <summary>Demo Video : Text Formatting</summary>  
 
-<video src="demo/demo_normal_prompt.mp4" /> 
+
+https://github.com/user-attachments/assets/27043163-9920-48e3-bb02-0f68803d0be7
+
+
 
 </details>  
 
@@ -34,14 +45,20 @@ An **LSPosed Module** that lets you integrate Generative AI like ChatGPT in your
 <details>  
   <summary>Demo Video : Custom Patterns</summary>  
 
-<video src="demo/demo_custom_patterns.mp4" /> 
+
+https://github.com/user-attachments/assets/80e9abab-7a4b-404e-9777-2d22436ce5e2
+
+
 
 </details>  
 
 <details>  
   <summary>Demo Video : Web Search</summary>  
 
-<video src="demo/demo_web_search.mp4" /> 
+
+https://github.com/user-attachments/assets/4cbf9088-0fb2-45d1-9a89-c0c72c1aff6e
+
+
 </details>  
 
 <p align="center">  
@@ -80,7 +97,10 @@ However, even if your keyboard is not there, there is a very high chance that it
 <details>  
   <summary>Video : Using LSPatch (No Root)</summary>  
 
-<video src="demo/guide_lspatch.webm" /> 
+
+https://github.com/user-attachments/assets/ebacb5e4-08fb-45ff-8dcd-4d9b8f9232a0
+
+
 
 </details>
 
