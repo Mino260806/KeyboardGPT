@@ -45,25 +45,30 @@ public class PatternEditDialogBox extends DialogBox {
         }
 
         regexButton.setOnClickListener(v -> {
-            String symbol = regexEditText.getText().toString();
+            String symbol = regexEditText.getText().toString().trim();
             if (symbol.length() != 1) {
                 Toast.makeText(getContext(), "Symbol length must be 1", Toast.LENGTH_LONG).show();
                 return;
             }
 
-            if (List.of("^", "]", "[", "-", " ", "\n", "\t").contains(symbol)) {
+            if (List.of("]", "[", "-", " ", "\n", "\t").contains(symbol)) {
                 Toast.makeText(getContext(), "Forbidden symbol", Toast.LENGTH_LONG).show();
                 return;
             }
 
+            String litteralSymbol = symbol;
+            if (List.of("\\", "^").contains(symbol)) {
+                litteralSymbol = "\\" + symbol;
+            }
+
             String regex;
             if (pattern.getType().groupCount == 1) {
-                String regexBlueprint = "%s([^%s]+)%s$";
-                regex = String.format(regexBlueprint, Pattern.quote(symbol), symbol, Pattern.quote(symbol));
+                String regexBlueprint = "%s([^%s]*)%s$";
+                regex = String.format(regexBlueprint, Pattern.quote(symbol), litteralSymbol, Pattern.quote(symbol));
             } else if (pattern.getType().groupCount == 2) {
                 String regexBlueprint = "%s(?:([^ %s]+) *)?([^%s]+)?%s$";
                 regex = String.format(regexBlueprint, Pattern.quote(symbol),
-                        symbol, symbol, Pattern.quote(symbol));
+                        litteralSymbol, litteralSymbol, Pattern.quote(symbol));
             } else {
                 Toast.makeText(getContext(), "Automatic regex not supported by this pattern", Toast.LENGTH_LONG).show();
                 return;
