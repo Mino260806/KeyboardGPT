@@ -22,6 +22,7 @@ import tn.amin.keyboard_gpt.llm.internet.InternetProvider;
 import tn.amin.keyboard_gpt.llm.internet.SimpleInternetProvider;
 import tn.amin.keyboard_gpt.llm.publisher.SimpleStringPublisher;
 import tn.amin.keyboard_gpt.llm.service.ExternalInternetProvider;
+import tn.amin.keyboard_gpt.settings.OtherSettingsType;
 import tn.amin.keyboard_gpt.ui.UiInteractor;
 
 public class GenerativeAIController implements ConfigChangeListener {
@@ -32,29 +33,42 @@ public class GenerativeAIController implements ConfigChangeListener {
     private ExternalInternetProvider mExternalClient = null;
 
     private List<GenerativeAIListener> mListeners = new ArrayList<>();
-    private InternetProvider mInternetProvider = null;
+    private InternetProvider mInternetProvider = new SimpleInternetProvider();
 
     public GenerativeAIController() {
         mSPManager = SPManager.getInstance();
         mInteractor = UiInteractor.getInstance();
 
         mInteractor.registerConfigChangeListener(this);
-
-        if (ContextCompat.checkSelfPermission(MainHook.getApplicationContext(),
-                Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
-            MainHook.log("Missing INTERNET permission, using ExternalInternetProvider");
-            mExternalClient = new ExternalInternetProvider(MainHook.getApplicationContext());
-            mExternalClient.connect();
-            mInternetProvider = mExternalClient;
-        } else {
-            MainHook.log("Found INTERNET permission, using SimpleInternetProvider");
-            mInternetProvider = new SimpleInternetProvider();
-        }
-
         if (mSPManager.hasLanguageModel()) {
             setModel(mSPManager.getLanguageModel());
         } else {
             mModelClient = LanguageModelClient.forModel(LanguageModel.Gemini);
+        }
+
+        updateInternetProvider();
+    }
+
+    private void updateInternetProvider() {
+        updateInternetProvider(null);
+    }
+
+    private void updateInternetProvider(Boolean enableExternalInternet) {
+        if (enableExternalInternet == null) {
+            enableExternalInternet = mSPManager.getEnableExternalInternet();
+        }
+
+        if (enableExternalInternet) {
+            MainHook.log("Using ExternalInternetProvider");
+            mExternalClient = new ExternalInternetProvider(MainHook.getApplicationContext());
+            mExternalClient.connect();
+            mInternetProvider = mExternalClient;
+        } else {
+            MainHook.log("Using SimpleInternetProvider");
+            mInternetProvider = new SimpleInternetProvider();
+        }
+
+        if (mModelClient != null) {
             mModelClient.setInternetProvider(mInternetProvider);
         }
     }
@@ -101,7 +115,11 @@ public class GenerativeAIController implements ConfigChangeListener {
 
     @Override
     public void onOtherSettingsChange(Bundle otherSettings) {
-
+        String enableInternetKey = OtherSettingsType.EnableExternalInternet.name();
+        if (otherSettings.containsKey(enableInternetKey)) {
+            boolean enableExternalInternet = otherSettings.getBoolean(enableInternetKey);
+            updateInternetProvider(enableExternalInternet);
+        }
     }
 
     public void addListener(GenerativeAIListener listener) {

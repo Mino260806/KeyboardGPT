@@ -217,4 +217,8 @@ public class SPManager implements ConfigInfoProvider {
     public Boolean getEnableLogs() {
         return (Boolean) getOtherSetting(OtherSettingsType.EnableLogs);
     }
+
+    public Boolean getEnableExternalInternet() {
+        return (Boolean) getOtherSetting(OtherSettingsType.EnableExternalInternet);
+    }
 }
