@@ -80,6 +80,8 @@ public abstract class LanguageModelClient {
                 return new OpenRouterClient();
             case Claude:
                 return new ClaudeClient();
+            case Mistral:
+                return new MistralClient();
             case ChatGPT:
             default:
                 return new ChatGPTClient();
