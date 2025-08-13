@@ -56,17 +56,15 @@ public class MistralClient extends LanguageModelClient {
                         if (responseJson.has("choices")) {
                             JSONArray choices = responseJson.getJSONArray("choices");
                             for (int i = 0; i < choices.length(); i++) {
-                                JSONObject choice = choices.getJSONObject(i);
+                                JSONObject choice = choices.getJSONObject(i).getJSONObject("message");
                                 if (choice.has("role") && "assistant".equals(choice.getString("role"))) {
                                     s.onNext(choice
-                                            .getJSONObject("message")
                                             .getString("content"));
                                     return;
                                 }
                             }
                             if (choices.length() > 0) {
                                 s.onNext(choices.getJSONObject(0)
-                                        .getJSONObject("message")
                                         .getString("content"));
                             }
                             else {
