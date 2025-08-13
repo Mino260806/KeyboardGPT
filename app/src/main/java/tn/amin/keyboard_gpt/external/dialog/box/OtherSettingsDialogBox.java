@@ -8,12 +8,14 @@ import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.CheckedTextView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import java.util.Arrays;
 
+import tn.amin.keyboard_gpt.R;
 import tn.amin.keyboard_gpt.external.ConfigContainer;
 import tn.amin.keyboard_gpt.external.dialog.DialogBoxManager;
 import tn.amin.keyboard_gpt.external.dialog.DialogType;
@@ -96,13 +98,16 @@ public class OtherSettingsDialogBox extends DialogBox {
             switch (type.nature) {
                 case Boolean:
                     view = getParent().getLayoutInflater().inflate(
-                            android.R.layout.simple_list_item_multiple_choice, parent, false);
-                    CheckedTextView item = (CheckedTextView) view;
-                    item.setText(type.title);
-                    item.setChecked(getBoolean(type));
-                    item.setOnClickListener(v -> {
-                        item.setChecked(!item.isChecked());
-                        getConfig().otherExtras.putBoolean(type.name(), item.isChecked());
+                            R.layout.listview_item_checkbox, parent, false);
+                    TextView titleView = view.findViewById(R.id.text_title);
+                    TextView descView = view.findViewById(R.id.text_desc);
+                    CheckBox checkBox = view.findViewById(R.id.checkbox);
+                    titleView.setText(type.title);
+                    descView.setText(type.description);
+                    checkBox.setChecked(getBoolean(type));
+                    view.setOnClickListener(v -> {
+                        checkBox.setChecked(!checkBox.isChecked());
+                        getConfig().otherExtras.putBoolean(type.name(), checkBox.isChecked());
                     });
                     break;
 
