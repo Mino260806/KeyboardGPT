@@ -65,6 +65,7 @@ public class ChatGPTClient extends LanguageModelClient {
                             }
                             if (choices.length() > 0) {
                                 s.onNext(choices.getJSONObject(0)
+                                        .getJSONObject("message")
                                         .getString("content"));
                             }
                             else {
