@@ -1,10 +1,10 @@
 
 # Keyboard GPT
-*Last updated on 12/08/2025*
+*Last updated on 14/08/2025*
 
 An **LSPosed Module** that lets you integrate Generative AI like ChatGPT in your favorite keyboard.
 
-- [x] Tested up to Android 15, may work in later versions.
+- [x] Tested up to Android 16, may work in later versions.
 - [x] Works with Rooted and Unrooted devices.
 - [x] Works in all apps.
 - [x] Works with all keyboards.
