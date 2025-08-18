@@ -1,12 +1,13 @@
 package tn.amin.keyboard_gpt;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.app.Instrumentation;
 import android.content.Context;
 import android.inputmethodservice.InputMethodService;
+import android.os.Build;
 import android.util.Log;
 import android.view.inputmethod.EditorInfo;
-import android.widget.EditText;
 
 
 import de.robv.android.xposed.IXposedHookLoadPackage;
@@ -130,21 +131,46 @@ public class MainHook implements IXposedHookLoadPackage {
 
                 hookInputConnection();
         }));
+        MainHook.log("Done hooking InputMethodService : " + inputMethodServiceClass.getName());
     }
 
+    @SuppressLint("ObsoleteSdkInt")
     private void hookInputConnection() {
         XC_MethodHook conditionalGate = MethodHook.before(param -> {
             if (IMSController.getInstance().isInputLocked()) {
                 param.setResult(false);
             }
         });
-        hookManager.hookAll(inputConnectionClass, "commitText", conditionalGate);
-        hookManager.hookAll(inputConnectionClass, "commitCorrection", conditionalGate);
-        hookManager.hookAll(inputConnectionClass, "commitCompletion", conditionalGate);
-        hookManager.hookAll(inputConnectionClass, "setComposingText", conditionalGate);
-        hookManager.hookAll(inputConnectionClass, "replaceText", conditionalGate);
-        hookManager.hookAll(inputConnectionClass, "finishComposingText", conditionalGate);
-        hookManager.hookAll(inputConnectionClass, "deleteSurroundingText", conditionalGate);
+
+        hookManager.hook(inputConnectionClass, "commitText",
+                new Class<?>[] { CharSequence.class, int.class }, conditionalGate);
+        hookManager.hook(inputConnectionClass, "commitCorrection",
+                new Class<?>[] { android.view.inputmethod.CorrectionInfo.class }, conditionalGate);
+        hookManager.hook(inputConnectionClass, "commitCompletion",
+                new Class<?>[] { android.view.inputmethod.CompletionInfo.class }, conditionalGate);
+        hookManager.hook(inputConnectionClass, "setComposingText",
+                new Class<?>[] { CharSequence.class, int.class }, conditionalGate);
+        hookManager.hook(inputConnectionClass, "finishComposingText",
+                new Class<?>[] {}, conditionalGate);
+        hookManager.hook(inputConnectionClass, "deleteSurroundingText",
+                new Class<?>[] { int.class, int.class }, conditionalGate);
+
+        if (Build.VERSION.SDK_INT >= 24) {
+            hookManager.hook(inputConnectionClass, "deleteSurroundingTextInCodePoints",
+                    new Class<?>[] { int.class, int.class }, conditionalGate);
+        }
+        if (Build.VERSION.SDK_INT >= 33) {
+            hookManager.hook(inputConnectionClass, "commitText",
+                    new Class<?>[] { CharSequence.class, int.class,
+                            android.view.inputmethod.TextAttribute.class }, conditionalGate);
+        }
+        if (Build.VERSION.SDK_INT >= 34) {
+            hookManager.hook(inputConnectionClass, "replaceText",
+                    new Class<?>[] { int.class, int.class, CharSequence.class, int.class,
+                            android.view.inputmethod.TextAttribute.class }, conditionalGate);
+        }
+
+        MainHook.log("Done hooking InputConnection : " + inputConnectionClass.getName());
     }
 
     public static Context getApplicationContext() {
