@@ -49,7 +49,7 @@ public class HookManager {
     private Method findMethod(Class<?> clazz, String methodName, Class<?>[] paramTypes) {
         try {
             return XposedHelpers.findMethodBestMatch(clazz, methodName, paramTypes);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             MainHook.log("XposedHelpers API could not find " + clazz.getName() + "."  + methodName
                     + " because of (" +
                     e.getClass().getName() + " : " + e.getMessage() +
